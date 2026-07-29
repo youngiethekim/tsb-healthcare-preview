@@ -300,3 +300,33 @@ function tsbSubmitLead(form, extra) {
     io.observe(qeng);
   } else { run(); }
 })();
+
+/* ---- scale slider (organizational structures) ---- */
+(function () {
+  "use strict";
+  var LV = [
+    { gov: "One clinic or lab", leaves: ["Front desk"], name: "Single site", badge: "1 location", desc: "Start at a single clinic or lab with everything the front desk and patients need." },
+    { gov: "Clinic network", leaves: ["Clinic", "Lab", "Imaging", "Pharmacy"], name: "Multi-site network", badge: "A few sites", desc: "Run several locations from one platform, each with local control and a shared view." },
+    { gov: "Hospital & outpatient", leaves: ["Outpatient", "Lab", "Imaging", "Specialty clinics", "Pre-op"], name: "Hospital / health system", badge: "Dozens of sites", desc: "Coordinate every outpatient service across a hospital or multi-site health system." },
+    { gov: "Regional health authority", leaves: ["Hospital A", "Hospital B", "Labs", "Imaging", "Public health"], name: "Health authority", badge: "Region-wide", desc: "One platform across every facility in a regional health authority, with local control per site." },
+    { gov: "Province or state", leaves: ["Authority 1", "Authority 2", "Authority 3", "+ many more"], name: "Provincial / state-wide", badge: "Millions of patients", desc: "Scale across multiple authorities and regions — province- or state-wide — with central oversight and local control." },
+  ];
+  document.querySelectorAll("[data-scale]").forEach(function (card) {
+    var range = card.querySelector("[data-sv-range]"),
+      gov = card.querySelector("[data-sv-gov]"), leaves = card.querySelector("[data-sv-leaves]"),
+      name = card.querySelector("[data-sv-name]"), badge = card.querySelector("[data-sv-badge]"), desc = card.querySelector("[data-sv-desc]"),
+      ticks = card.querySelectorAll("[data-sv-ticks] span");
+    if (!range) return;
+    function render(i) {
+      var d = LV[i];
+      gov.textContent = d.gov;
+      leaves.innerHTML = d.leaves.map(function (l) { return '<div class="sv-leaf">' + l + "</div>"; }).join("");
+      name.textContent = d.name; badge.textContent = d.badge; desc.textContent = d.desc;
+      range.style.setProperty("--fill", (i / 4 * 100) + "%");
+      ticks.forEach(function (t, k) { t.classList.toggle("on", k === i); });
+    }
+    range.addEventListener("input", function () { render(+range.value); });
+    ticks.forEach(function (t) { t.addEventListener("click", function () { range.value = t.dataset.lv; render(+t.dataset.lv); }); });
+    render(+range.value);
+  });
+})();
