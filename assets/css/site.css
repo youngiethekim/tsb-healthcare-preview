@@ -651,3 +651,17 @@ footer.site { background: var(--navy); color: #cfe0e8; padding: 60px 0 34px; }
 .cert-note .tlink{font-size:13px;white-space:nowrap}
 @media(max-width:860px){.cert-badges{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:460px){.cert-badges{grid-template-columns:1fr}}
+
+/* ---- secondary case-study cards ---- */
+.csgrid{margin-top:44px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.cscard{
+  display:flex;flex-direction:column;gap:10px;padding:26px 24px;
+  background:#fff;border:1px solid var(--line);border-radius:16px;
+  text-decoration:none;color:var(--ink);transition:transform .2s var(--ease),box-shadow .2s var(--ease),border-color .2s var(--ease);
+}
+.cscard:hover{transform:translateY(-3px);box-shadow:0 14px 34px rgba(10,39,64,.09);border-color:var(--teal-soft)}
+.cs-tag{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--teal)}
+.cs-h{font-weight:750;font-size:17px;line-height:1.3;letter-spacing:-.01em}
+.cscard p{color:var(--muted);font-size:14px;line-height:1.55;margin:0}
+.cs-more{margin-top:auto;font-size:13px;font-weight:650;color:var(--muted)}
+@media(max-width:860px){.csgrid{grid-template-columns:1fr}}
