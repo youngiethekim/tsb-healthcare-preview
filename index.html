@@ -34,16 +34,17 @@
   </div></header>
 <main>
 <section class="hero tall">
+    <canvas class="hero-fx" aria-hidden="true"></canvas>
     <div class="wrap hero-grid">
       <div><span class="pill"><span class="d"></span> Diagnostics scheduling &amp; patient flow</span>
         <h1>The Digital Front Door for <span class="ac">Modern Healthcare</span></h1>
         <p class="lede"><b>LabOnlineBooking&trade;</b> by TSB HealthCare is British Columbia's leading platform for diagnostics scheduling, patient flow and operational intelligence.</p>
-        <div class="hero-cta"><a class="btn btn-primary" href="/tsb-healthcare-preview/#demo">Request a Demo <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a><a class="btn btn-light" href="#"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Watch Video</a></div>
+        <div class="hero-cta"><a class="btn btn-primary" href="/tsb-healthcare-preview/#demo">Request a Demo <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a><button class="btn btn-light" type="button" data-vopen><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Watch Video</button></div>
         <div class="hero-note"><div class="avs"><span style="background-image:url(/tsb-healthcare-preview/assets/img/clinical.jpg)"></span><span style="background-image:url(/tsb-healthcare-preview/assets/img/kiosk.jpg)"></span><span style="background-image:url(/tsb-healthcare-preview/assets/img/staff.jpg)"></span><span style="background-image:url(/tsb-healthcare-preview/assets/img/display.jpg)"></span></div><p>Trusted by care teams across <b>68+ sites</b> &middot; <b>739K+ patients</b> served</p></div>
       </div>
       <div class="reveal"><div class="phone-wrap"><div class="phone">
     <div class="badge b-top"><div class="bi"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></div><div><div class="bt">Checked in</div><div class="bv">0 min wait</div></div></div>
-    <div class="badge b-bot"><div class="bi"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div><div><div class="bt">Now serving</div><div class="bv">A-107</div></div></div>
+    <div class="badge b-bot"><div class="bi"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div><div><div class="bt">Now serving</div><div class="bv js-serve">A-107</div></div></div>
     <div class="screen">
       <div class="sh"><span class="logo-dot"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="3"/><circle cx="18" cy="5" r="3"/><path d="M6 16V9a4 4 0 0 1 4-4h4"/><path d="M18 8v7a4 4 0 0 1-4 4h-4"/></svg></span><b>TSB HealthCare</b></div>
       <h4>Book Your Lab Appointment</h4>
@@ -62,7 +63,7 @@
   </div></div></div>
     </div>
   </section>
-<div class="wrap"><div class="stats-card reveal"><div class="stat"><div class="v">3.3M+</div><div class="l">Appointments Booked</div></div><div class="stat"><div class="v">739K+</div><div class="l">Patients Served</div></div><div class="stat"><div class="v">68+</div><div class="l">Active Lab Sites</div></div><div class="stat"><div class="v">6+</div><div class="l">Years in Production</div></div><div class="stat"><div class="v">99.9%</div><div class="l">Platform Uptime</div></div></div></div>
+<div class="wrap"><div class="stats-card reveal"><div class="stat"><div class="v" data-count="3.3M+">3.3M+</div><div class="l">Appointments Booked</div></div><div class="stat"><div class="v" data-count="739K+">739K+</div><div class="l">Patients Served</div></div><div class="stat"><div class="v" data-count="68+">68+</div><div class="l">Active Lab Sites</div></div><div class="stat"><div class="v" data-count="6+">6+</div><div class="l">Years in Production</div></div><div class="stat"><div class="v" data-count="99.9%">99.9%</div><div class="l">Platform Uptime</div></div></div></div>
 <section class="section" id="solutions"><div class="wrap sol-grid">
       <div class="reveal"><span class="eyebrow">The platform</span>
         <h2>Powerful Solutions.<br>Measurable Impact.</h2>
@@ -71,6 +72,21 @@
       </div>
       <div class="cards reveal" style="--cols:2"><div class="scard"><div class="ci"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg></div><h3>Online Booking</h3><p>24/7 self-service scheduling for labs, imaging and clinics.</p></div><div class="scard"><div class="ci"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg></div><h3>Smart Patient Flow</h3><p>Real-time queues, arrival tracking and seamless coordination.</p></div><div class="scard"><div class="ci"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6"/><rect x="12" y="8" width="3" height="10"/><rect x="17" y="5" width="3" height="13"/></svg></div><h3>Operational Intelligence</h3><p>Advanced analytics to drive performance and capacity.</p></div><div class="scard"><div class="ci"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg></div><h3>Seamless Integration</h3><p>Connects with LIS, EMR and existing health systems.</p></div></div>
     </div></section>
+<section class="section"><div class="wrap">
+    <div class="shead center reveal"><span class="eyebrow">How it works</span><h2>One connected patient journey, end to end</h2><p class="lede">Every touchpoint is tracked and linked — so patients always know what's next, and you always know where the day stands.</p></div>
+    <div class="flowchart reveal">
+      <svg class="flow-line" viewBox="0 0 1000 4" preserveAspectRatio="none" aria-hidden="true"><line class="flow-base" x1="30" y1="2" x2="970" y2="2"/><line class="flow-pulse" x1="30" y1="2" x2="970" y2="2"/></svg>
+      <div class="flow-steps" style="--n:7"><div class="fstep"><div class="fn"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg></div><div class="ft"><span class="sn">01</span><h4>Book</h4><p>Online, phone or AI assistant</p></div></div><div class="fstep"><div class="fn"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div><div class="ft"><span class="sn">02</span><h4>Remind</h4><p>Automated confirmations</p></div></div><div class="fstep"><div class="fn"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M10 6h4M12 17v.01"/></svg></div><div class="ft"><span class="sn">03</span><h4>Check in</h4><p>Self-service kiosk on arrival</p></div></div><div class="fstep"><div class="fn"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h10M4 18h7"/><circle cx="18" cy="16" r="3"/></svg></div><div class="ft"><span class="sn">04</span><h4>Queue</h4><p>Walk-in &amp; booked, one queue</p></div></div><div class="fstep"><div class="fn"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg></div><div class="ft"><span class="sn">05</span><h4>Now serving</h4><p>Called by SMS &amp; display</p></div></div><div class="fstep"><div class="fn"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div><div class="ft"><span class="sn">06</span><h4>Seen</h4><p>Right room, right time</p></div></div><div class="fstep"><div class="fn"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6"/><rect x="12" y="8" width="3" height="10"/><rect x="17" y="5" width="3" height="13"/></svg></div><div class="ft"><span class="sn">07</span><h4>Analyze</h4><p>Every step improves tomorrow</p></div></div></div>
+    </div>
+  </div></section>
+<section class="section video-sec"><div class="wrap">
+    <div class="shead center reveal"><span class="eyebrow">See it in action</span><h2>Watch how patients flow through</h2><p class="lede">A quick look at booking, self check-in, smart queues and live analytics — the whole journey on one platform.</p></div>
+    <div class="vwrap reveal" data-vopen role="button" tabindex="0" aria-label="Play the TSB HealthCare overview video">
+      <img src="/tsb-healthcare-preview/assets/img/kiosk.jpg" alt="TSB HealthCare overview video">
+      <span class="play-btn"><svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
+      <span class="vlabel">Watch the overview</span>
+    </div>
+  </div></section>
 <section class="section"><div class="wrap">
     <div class="shead center reveal"><span class="eyebrow">Every point of care</span><h2>Built for the way healthcare works</h2><p class="lede">From diagnostics to outpatient and public health, TSB helps care teams deliver a warmer, faster experience — every day.</p></div>
     <div class="care-grid" style="margin-top:44px">
@@ -81,7 +97,7 @@
   </div></section>
 <section class="section band"><div class="wrap">
     <div class="shead center reveal"><span class="eyebrow">Proven results across BC</span><h2>Real impact, measured every day</h2></div>
-    <div class="band-stats reveal"><div class="bstat"><div class="v">186K<em>+</em></div><div class="l">Staff Hours Saved</div></div><div class="bstat"><div class="v">112K<em>+</em></div><div class="l">Appointments Recovered (Fewer No-Shows)</div></div><div class="bstat"><div class="v">70<em>%</em></div><div class="l">Reduction in Check-In Time</div></div><div class="bstat"><div class="v">95<em>%+</em></div><div class="l">Data Accuracy Achieved</div></div></div>
+    <div class="band-stats reveal"><div class="bstat"><div class="v" data-count="186K+">186K<em>+</em></div><div class="l">Staff Hours Saved</div></div><div class="bstat"><div class="v" data-count="112K+">112K<em>+</em></div><div class="l">Appointments Recovered (Fewer No-Shows)</div></div><div class="bstat"><div class="v" data-count="70%">70<em>%</em></div><div class="l">Reduction in Check-In Time</div></div><div class="bstat"><div class="v" data-count="95%+">95<em>%+</em></div><div class="l">Data Accuracy Achieved</div></div></div>
   </div></section>
 <section class="section"><div class="wrap scale-grid">
   <div class="reveal">
@@ -118,6 +134,7 @@
     </div>
   </div></section>
 </main>
+<div class="vlight" aria-hidden="true"><div class="vbox"><button class="vclose" aria-label="Close video">Close &#10005;</button><video controls playsinline preload="none" poster="/tsb-healthcare-preview/assets/video/video-poster.jpg"><source src="/tsb-healthcare-preview/assets/video/tsb-overview.mp4" type="video/mp4"></video></div></div>
 <footer class="site"><div class="wrap">
     <div class="foot">
       <div class="brand"><img src="/tsb-healthcare-preview/assets/img/tsb-logo.svg" alt="TSB HealthCare"><p>The digital front door for modern healthcare — diagnostics scheduling, patient flow, and operational intelligence.</p></div>

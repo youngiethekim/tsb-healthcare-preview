@@ -322,3 +322,66 @@ footer.site { background: var(--navy); color: #cfe0e8; padding: 60px 0 34px; }
 .sol-grid h2 { font-size: clamp(28px, 4vw, 42px); font-weight: 820; letter-spacing: -0.03em; margin-top: 14px; }
 .sol-grid .lede { color: var(--ink-soft); font-size: 17px; margin-top: 16px; max-width: 42ch; }
 .sol-grid .more { margin-top: 22px; }
+
+/* ============ video + interactivity ============ */
+/* hero ambient canvas */
+.hero-fx { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.hero .wrap { position: relative; z-index: 2; }
+.hero-grid { z-index: 2; }
+
+/* video section */
+.video-sec .vwrap { position: relative; border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--shadow); border: 1px solid var(--line); cursor: pointer; max-width: 940px; margin-inline: auto; }
+.video-sec .vwrap img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block; transition: transform .6s var(--ease); }
+.video-sec .vwrap:hover img { transform: scale(1.03); }
+.video-sec .vwrap::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(10,40,64,0.5), rgba(10,40,64,0.08)); }
+.play-btn { position: absolute; inset: 0; margin: auto; width: 86px; height: 86px; border-radius: 50%; background: rgba(255,255,255,0.94); color: var(--teal); display: grid; place-items: center; z-index: 2; box-shadow: var(--shadow); transition: transform .3s var(--ease); }
+.vwrap:hover .play-btn { transform: scale(1.08); }
+.play-btn::before { content: ""; position: absolute; inset: -14px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.5); animation: ripple2 2.6s var(--ease) infinite; }
+@keyframes ripple2 { 0% { transform: scale(.85); opacity: .8; } 100% { transform: scale(1.28); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .play-btn::before { animation: none; } }
+.vlabel { position: absolute; left: 24px; bottom: 20px; z-index: 2; color: #fff; font-weight: 700; font-size: 16px; text-shadow: 0 2px 8px rgba(0,0,0,.4); }
+
+/* lightbox */
+.vlight { position: fixed; inset: 0; z-index: 200; background: rgba(6,24,40,0.86); backdrop-filter: blur(6px); display: none; place-items: center; padding: 24px; }
+.vlight.open { display: grid; animation: vfade .25s ease; }
+@keyframes vfade { from { opacity: 0; } to { opacity: 1; } }
+.vlight .vbox { position: relative; width: min(980px, 100%); aspect-ratio: 16 / 9; background: #000; border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); }
+.vlight video { width: 100%; height: 100%; display: block; }
+.vlight .vclose { position: absolute; top: -44px; right: 0; background: none; border: none; color: #fff; cursor: pointer; font-size: 15px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; }
+.vlight .vclose:hover { color: var(--cyan-bright); }
+
+/* count-up uses tabular figures to avoid width jitter */
+.stat .v, .bstat .v { font-variant-numeric: tabular-nums; }
+
+/* ============ flow diagrams ============ */
+.flowchart { position: relative; margin-top: 48px; }
+.flow-line { position: absolute; top: 34px; left: 0; width: 100%; height: 4px; overflow: visible; z-index: 0; }
+@media (max-width: 820px) { .flow-line { display: none; } }
+.flow-base { stroke: var(--line-2); stroke-width: 3; }
+.flow-pulse { stroke: var(--cyan-bright); stroke-width: 4; stroke-linecap: round; stroke-dasharray: 26 340; animation: dashmove 3.2s linear infinite; }
+@keyframes dashmove { from { stroke-dashoffset: 366; } to { stroke-dashoffset: 0; } }
+@media (prefers-reduced-motion: reduce) { .flow-pulse { animation: none; opacity: .35; } }
+.flow-steps { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(var(--n, 7), 1fr); gap: 8px; }
+@media (max-width: 820px) { .flow-steps { grid-template-columns: repeat(2, 1fr); gap: 26px; } }
+@media (max-width: 480px) { .flow-steps { grid-template-columns: 1fr; } }
+.fstep { text-align: center; }
+.fstep .fn { width: 68px; height: 68px; border-radius: 50%; background: #fff; border: 1px solid var(--line); box-shadow: var(--shadow-card); display: grid; place-items: center; color: var(--teal); margin: 0 auto 14px; transition: transform .3s var(--ease); }
+.fstep:hover .fn { transform: translateY(-3px) scale(1.05); }
+.fstep .sn { font-size: 11px; color: var(--cyan); font-weight: 700; letter-spacing: .08em; }
+.fstep h4 { font-size: 15px; font-weight: 750; margin: 3px 0 5px; }
+.fstep p { font-size: 12.5px; color: var(--muted); line-height: 1.45; }
+@media (max-width: 820px) { .fstep { text-align: left; display: grid; grid-template-columns: 56px 1fr; gap: 14px; align-items: center; } .fstep .fn { width: 52px; height: 52px; margin: 0; } .fstep .ft { grid-column: 2; } }
+
+/* queue merge diagram */
+.qflow { max-width: 780px; margin: 44px auto 0; }
+.qflow svg { width: 100%; height: auto; display: block; }
+.q-node { fill: var(--card); stroke: var(--line-2); stroke-width: 1.5; }
+.q-engine { fill: var(--teal); }
+.q-title { fill: var(--ink); font-family: var(--f); font-weight: 750; font-size: 15px; }
+.q-title.w { fill: #fff; }
+.q-code { fill: var(--muted); font-family: var(--f); font-weight: 600; font-size: 12px; }
+.q-code.w { fill: #bfe6ef; }
+.q-path { stroke: var(--line-2); stroke-width: 2.5; fill: none; }
+.q-pulse { stroke: var(--cyan); stroke-width: 3.5; fill: none; stroke-linecap: round; stroke-dasharray: 12 150; animation: dashmove2 2.4s linear infinite; }
+@keyframes dashmove2 { from { stroke-dashoffset: 162; } to { stroke-dashoffset: 0; } }
+@media (prefers-reduced-motion: reduce) { .q-pulse { animation: none; opacity: .4; } }
