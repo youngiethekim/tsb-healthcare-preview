@@ -1,3 +1,27 @@
+/* =====================================================================
+   LEAD CAPTURE — paste your two values here to go live:
+   1) TSB_WEB3FORMS_KEY: free key from https://web3forms.com (tie it to
+      info@tsbhealthcare.com) — form submissions then email straight to you.
+   2) TSB_CALENDLY_URL: your Calendly link (e.g.
+      https://calendly.com/tsbhealthcare/demo) — lets visitors self-book a
+      time instantly after they request a demo.
+   Until these are set, forms still validate and show a success message.
+   ===================================================================== */
+var TSB_WEB3FORMS_KEY = "";
+var TSB_CALENDLY_URL = "";
+function tsbSubmitLead(form, extra) {
+  return new Promise(function (resolve) {
+    if (!TSB_WEB3FORMS_KEY) { resolve(); return; }
+    var data = new FormData(form);
+    Object.keys(extra || {}).forEach(function (k) { data.append(k, extra[k]); });
+    data.append("access_key", TSB_WEB3FORMS_KEY);
+    data.append("subject", (extra && extra._subject) || "New lead — TSB HealthCare website");
+    data.append("from_name", "TSB HealthCare website");
+    fetch("https://api.web3forms.com/submit", { method: "POST", body: data, headers: { Accept: "application/json" } })
+      .then(function () { resolve(); }, function () { resolve(); });
+  });
+}
+
 (function () {
   "use strict";
   document.documentElement.className += " js";
@@ -155,7 +179,6 @@
   "use strict";
   var roi = document.getElementById("roi");
   if (!roi) return;
-  var FORM_ENDPOINT = ""; // paste a Formspree/Web3Forms endpoint here to email leads to info@tsbhealthcare.com
   var DAYS = 260, TARGET_NS = 0.02, WAIT_CUT = 0.40, STAFF_MIN = 2.2, STAFF_COST = 42;
   var keys = ["sites", "perday", "noshow", "wait", "rev"];
   var inp = {};
@@ -185,12 +208,7 @@
       e.preventDefault();
       if (!form.checkValidity()) { form.reportValidity(); return; }
       var done = function () { form.style.display = "none"; roi.querySelector(".rform-ok").classList.add("show"); };
-      if (FORM_ENDPOINT) {
-        var data = new FormData(form);
-        data.append("results", roi.dataset.summary || "");
-        data.append("_subject", "New ROI calculator lead — TSB HealthCare");
-        fetch(FORM_ENDPOINT, { method: "POST", body: data, headers: { Accept: "application/json" } }).then(done).catch(done);
-      } else { done(); }
+      tsbSubmitLead(form, { results: roi.dataset.summary || "", _subject: "New ROI calculator lead — TSB HealthCare" }).then(done);
     });
   }
 })();
@@ -198,9 +216,6 @@
 /* ---- sticky CTA bar + book-a-demo qualifying form ---- */
 (function () {
   "use strict";
-  var CALENDLY_URL = "";   // paste your Calendly link to let visitors self-book instantly after submitting
-  var FORM_ENDPOINT = "";  // paste a Formspree/Web3Forms endpoint to email demo requests to info@tsbhealthcare.com
-
   /* sticky bar */
   var bar = document.querySelector(".sticky-cta");
   if (bar) {
@@ -241,17 +256,13 @@
     var done = function () {
       bform.style.display = "none";
       var ok = document.querySelector(".bok"); ok.classList.add("show");
-      if (CALENDLY_URL) {
+      if (TSB_CALENDLY_URL) {
         var d = document.getElementById("calendly-embed");
-        d.innerHTML = '<div class="calendly-inline-widget" data-url="' + CALENDLY_URL + '" style="min-width:320px;height:640px"></div>';
+        d.innerHTML = '<div class="calendly-inline-widget" data-url="' + TSB_CALENDLY_URL + '" style="min-width:320px;height:640px"></div>';
         var sc = document.createElement("script"); sc.src = "https://assets.calendly.com/assets/external/widget.js"; sc.async = true; d.appendChild(sc);
       }
     };
-    if (FORM_ENDPOINT) {
-      var data = new FormData(bform);
-      groups.forEach(function (g) { data.append(g, sel[g] || ""); });
-      data.append("_subject", "New demo request — TSB HealthCare");
-      fetch(FORM_ENDPOINT, { method: "POST", body: data, headers: { Accept: "application/json" } }).then(done).catch(done);
-    } else { done(); }
+    var extra = {}; groups.forEach(function (g) { extra[g] = sel[g] || ""; }); extra._subject = "New demo request — TSB HealthCare";
+    tsbSubmitLead(bform, extra).then(done);
   });
 })();
