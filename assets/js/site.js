@@ -11,6 +11,12 @@
     window.addEventListener("scroll", onScroll, { passive: true });
     var toggle = nav.querySelector(".nav-toggle");
     if (toggle) toggle.addEventListener("click", function () { nav.classList.toggle("open"); });
+    var mega = nav.querySelector(".mega-toggle");
+    if (mega) {
+      var item = mega.closest(".nav-item");
+      mega.addEventListener("click", function (e) { e.stopPropagation(); var o = item.classList.toggle("open"); mega.setAttribute("aria-expanded", o); });
+      document.addEventListener("click", function (e) { if (!item.contains(e.target)) item.classList.remove("open"); });
+    }
     nav.querySelectorAll(".nav-links a").forEach(function (a) {
       a.addEventListener("click", function () { nav.classList.remove("open"); });
     });
