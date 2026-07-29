@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Patient Flow ROI Calculator | TSB HealthCare</title>
+<meta name="description" content="Estimate the appointments, staff hours and annual value your health system could recover with TSB patient flow. An interactive ROI calculator for operations and patient-access leaders.">
+<link rel="canonical" href="https://www.tsbhealthcare.com/roi-calculator/">
+<meta name="robots" content="noindex,nofollow">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="TSB HealthCare">
+<meta property="og:title" content="Patient Flow ROI Calculator | TSB HealthCare">
+<meta property="og:description" content="Estimate the appointments, staff hours and annual value your health system could recover with TSB patient flow. An interactive ROI calculator for operations and patient-access leaders.">
+<meta property="og:url" content="https://www.tsbhealthcare.com/roi-calculator/">
+<meta property="og:image" content="https://www.tsbhealthcare.com/assets/img/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/tsb-healthcare-preview/assets/img/favicon.svg">
+<link rel="preload" href="/tsb-healthcare-preview/assets/fonts/hanken.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/tsb-healthcare-preview/assets/css/site.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.tsbhealthcare.com/"},{"@type":"ListItem","position":2,"name":"ROI Calculator","item":"https://www.tsbhealthcare.com/roi-calculator/"}]},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How is this ROI estimated?","acceptedAnswer":{"@type":"Answer","text":"The calculator applies TSB's measured results across 68+ live sites to the numbers you enter — reducing no-shows toward ~2%, cutting average wait time by about 40%, and recovering front-desk staff time through self check-in. It multiplies recovered appointments by your revenue per visit and staff hours saved by a loaded hourly cost."}},{"@type":"Question","name":"Are these numbers a guarantee?","acceptedAnswer":{"@type":"Answer","text":"No — it's a directional estimate to help you size the opportunity. Real results depend on your services, patient mix and current processes. Request the full report and we'll build a tailored, per-site projection with you."}},{"@type":"Question","name":"What counts as a 'recovered appointment'?","acceptedAnswer":{"@type":"Answer","text":"An appointment that would otherwise have been lost to a no-show or an unfilled cancellation, but is kept or refilled thanks to reminders, easy rescheduling and automatic cancellation fill — turning wasted capacity back into seen patients."}},{"@type":"Question","name":"Can I get an estimate for my exact sites?","acceptedAnswer":{"@type":"Answer","text":"Yes. Enter your details and request the full breakdown — we'll email an itemized, per-site ROI report and a benchmark for a setting like yours, and a specialist can walk your team through it."}}]}]}</script>
+</head>
+<body>
+<header class="nav"><div class="wrap nav-in">
+    <a class="brand" href="/tsb-healthcare-preview/" aria-label="TSB HealthCare home"><img src="/tsb-healthcare-preview/assets/img/tsb-logo.svg" alt="TSB HealthCare" width="150" height="26"></a>
+    <button class="nav-toggle" aria-label="Menu"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="/tsb-healthcare-preview/self-check-in-kiosks/">Self Check-In</a>
+      <a href="/tsb-healthcare-preview/patient-queue-management/">Queue</a>
+      <a href="/tsb-healthcare-preview/patient-flow-analytics/">Analytics</a>
+      <a href="/tsb-healthcare-preview/roi-calculator/">ROI Calculator</a>
+      <a href="/tsb-healthcare-preview/pricing/">Pricing</a>
+    </nav>
+    <div class="nav-right"><a class="btn btn-primary" href="/tsb-healthcare-preview/#demo">Request a Demo</a></div>
+  </div></header>
+<main>
+<section class="hero">
+    <canvas class="hero-fx" aria-hidden="true"></canvas>
+    <div class="wrap hero-grid solo">
+      <div><div class="crumbs"><a href="/tsb-healthcare-preview/">Home</a><span>/</span>ROI Calculator</div><span class="pill"><span class="d"></span> Free tool &middot; for operations leaders</span>
+        <h1>See the capacity you could <span class="ac">recover</span></h1>
+        <p class="lede">Enter a few numbers about your operation and get an instant estimate of the appointments, staff hours and annual value TSB could help you recover — based on results measured across 68+ sites.</p>
+        <div class="hero-cta"><a class="btn btn-primary" href="/tsb-healthcare-preview/#demo">Book a demo <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+        <div class="hero-note"><div class="avs"><span style="background-image:url(/tsb-healthcare-preview/assets/img/clinical.jpg)"></span><span style="background-image:url(/tsb-healthcare-preview/assets/img/kiosk.jpg)"></span><span style="background-image:url(/tsb-healthcare-preview/assets/img/staff.jpg)"></span><span style="background-image:url(/tsb-healthcare-preview/assets/img/display.jpg)"></span></div><p>Trusted by care teams across <b>68+ sites</b> &middot; <b>739K+ patients</b> served</p></div>
+      </div>
+      
+    </div>
+  </section>
+<section class="section" id="roi"><div class="wrap">
+    <div class="roi">
+      <div class="roi-inputs reveal">
+        <h3>Your operation</h3><div class="sub">Drag to match your setting &mdash; results update live.</div>
+        <div class="rfield"><div class="rtop"><label for="in-sites">Number of sites / locations</label><span class="rout" id="out-sites">8</span></div><input type="range" id="in-sites" min="1" max="60" step="1" value="8"></div>
+        <div class="rfield"><div class="rtop"><label for="in-perday">Avg patients per site, per day</label><span class="rout" id="out-perday">180</span></div><input type="range" id="in-perday" min="20" max="600" step="10" value="180"></div>
+        <div class="rfield"><div class="rtop"><label for="in-noshow">Current no-show rate</label><span class="rout" id="out-noshow">12%</span></div><input type="range" id="in-noshow" min="2" max="30" step="1" value="12"></div>
+        <div class="rfield"><div class="rtop"><label for="in-wait">Average patient wait (min)</label><span class="rout" id="out-wait">22 min</span></div><input type="range" id="in-wait" min="5" max="60" step="1" value="22"></div>
+        <div class="rfield"><div class="rtop"><label for="in-rev">Avg revenue per visit</label><span class="rout" id="out-rev">$75</span></div><input type="range" id="in-rev" min="20" max="400" step="5" value="75"></div>
+      </div>
+      <div class="roi-results reveal">
+        <div class="rhead">Your estimated annual recovery with TSB</div>
+        <div class="rgrid">
+          <div class="rcell"><div class="rv" id="r-appts">&mdash;</div><div class="rl">Appointments recovered / year</div></div>
+          <div class="rcell"><div class="rv" id="r-hours">&mdash;</div><div class="rl">Staff hours saved / year</div></div>
+          <div class="rcell"><div class="rv" id="r-wait">&mdash;</div><div class="rl">New average wait</div></div>
+        </div>
+        <div class="rvalue"><span class="rl">Estimated annual value</span><span class="rbig" id="r-value">&mdash;</span></div>
+        <p class="rnote">Directional estimate based on TSB's measured results across 68+ sites (&asymp;40% shorter waits, no-shows reduced toward 2%, front-desk time saved via self check-in). Your real numbers come from a tailored assessment.</p>
+      </div>
+    </div>
+    <div class="roi-capture reveal">
+      <div><h3>Get your full breakdown</h3><p>We'll email an itemized, per-site ROI report and a benchmark for a setting like yours &mdash; ready to share with your team.</p></div>
+      <div>
+        <form id="roi-form" novalidate>
+          <input class="full" type="text" name="name" placeholder="Full name" required>
+          <input type="email" name="email" placeholder="Work email" required>
+          <input type="text" name="organization" placeholder="Organization" required>
+          <select name="role" required><option value="" disabled selected>Your role</option><option>Operations / Patient Access</option><option>Lab / Imaging manager</option><option>Clinical / Nursing lead</option><option>IT / Informatics</option><option>Executive / Finance</option><option>Other</option></select>
+          <button class="btn btn-primary full" type="submit">Email me the report <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+          <div class="note">No obligation. Your details are never sold or shared.</div>
+        </form>
+        <div class="rform-ok"><div class="ok"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div><h4>On its way</h4><p>Thanks &mdash; we'll email your personalized ROI breakdown shortly, and a specialist can walk you through it.</p></div>
+      </div>
+    </div>
+  </div></section>
+<section class="section band"><div class="wrap">
+    <div class="shead center reveal"><span class="eyebrow">Proven results across BC</span><h2>Real impact, measured every day</h2></div>
+    <div class="band-stats reveal"><div class="bstat"><div class="v" data-count="186K+">186K<em>+</em></div><div class="l">Staff Hours Saved</div></div><div class="bstat"><div class="v" data-count="112K+">112K<em>+</em></div><div class="l">Appointments Recovered (Fewer No-Shows)</div></div><div class="bstat"><div class="v" data-count="70%">70<em>%</em></div><div class="l">Reduction in Check-In Time</div></div><div class="bstat"><div class="v" data-count="95%+">95<em>%+</em></div><div class="l">Data Accuracy Achieved</div></div></div>
+  </div></section>
+<section class="section" id="faq"><div class="wrap">
+    <div class="shead center reveal"><span class="eyebrow">Questions, answered</span><h2>Frequently asked questions</h2></div>
+    <div class="faq-list"><details class="faq"><summary>How is this ROI estimated?<span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary><div class="fa">It applies TSB's measured results across 68+ live sites to your inputs — reducing no-shows toward ~2%, cutting average wait time ~40%, and recovering front-desk time via self check-in — then multiplies recovered appointments by your revenue per visit and staff hours by a loaded hourly cost.</div></details><details class="faq"><summary>Are these numbers a guarantee?<span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary><div class="fa">No — it's a directional estimate to size the opportunity. Request the full report and we'll build a tailored, per-site projection with you.</div></details><details class="faq"><summary>What counts as a 'recovered appointment'?<span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary><div class="fa">An appointment otherwise lost to a no-show or unfilled cancellation that is kept or refilled through reminders, easy rescheduling and automatic cancellation fill.</div></details><details class="faq"><summary>Can I get an estimate for my exact sites?<span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary><div class="fa">Yes. Request the full breakdown and we'll email an itemized, per-site ROI report and benchmark, and a specialist can walk your team through it.</div></details></div>
+  </div></section>
+<section class="section-sm"><div class="wrap">
+    <div class="shead reveal"><span class="eyebrow">Explore the platform</span><h2 style="font-size:clamp(24px,3vw,32px)">Keep exploring</h2></div>
+    <div class="related"><a class="rcard reveal" href="/tsb-healthcare-preview/patient-flow-analytics/"><span><b>Flow analytics</b><span>Recover lost capacity</span></span><span class="arw"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a><a class="rcard reveal" href="/tsb-healthcare-preview/self-check-in-kiosks/"><span><b>Self check-in kiosks</b><span>Clear the front desk</span></span><span class="arw"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a><a class="rcard reveal" href="/tsb-healthcare-preview/solutions/hospitals/"><span><b>For hospitals</b><span>Multi-site flow</span></span><span class="arw"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a></div>
+  </div></section>
+<section class="section cta-band" id="demo"><div class="wrap"><div class="cta-card reveal">
+    <h2>Ready to see it on your numbers?</h2><p>Book a 30-minute walkthrough and we'll turn this estimate into a tailored, per-site projection for your health system.</p>
+    <div class="btns"><a class="btn btn-primary" href="mailto:info@tsbhealthcare.com?subject=TSB%20HealthCare%20demo">Request a Demo <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a><a class="btn btn-light" href="/tsb-healthcare-preview/">Explore the platform</a></div>
+  </div></div></section>
+<section class="trusted"><div class="wrap">
+    <div class="t">Trusted by Leading Health Organizations</div>
+    <div class="logo-row">
+      <img src="/tsb-healthcare-preview/assets/img/partner-2.png" alt="Vancouver Coastal Health" loading="lazy">
+      <img src="/tsb-healthcare-preview/assets/img/partner-3.png" alt="Fraser Health" loading="lazy">
+      <img src="/tsb-healthcare-preview/assets/img/partner-4.png" alt="Interior Health" loading="lazy">
+      <img src="/tsb-healthcare-preview/assets/img/partner-1.png" alt="Provincial Health Services Authority" loading="lazy">
+      <img src="/tsb-healthcare-preview/assets/img/partner-5.png" alt="Providence Health Care" loading="lazy">
+      <span class="more">and more&hellip;</span>
+    </div>
+  </div></section>
+</main>
+<div class="vlight" aria-hidden="true"><div class="vbox"><button class="vclose" aria-label="Close video">Close &#10005;</button><video controls playsinline preload="none" poster="/tsb-healthcare-preview/assets/video/video-poster.jpg"><source src="/tsb-healthcare-preview/assets/video/tsb-overview.mp4" type="video/mp4"></video></div></div>
+<footer class="site"><div class="wrap">
+    <div class="foot">
+      <div class="brand"><img src="/tsb-healthcare-preview/assets/img/tsb-logo.svg" alt="TSB HealthCare"><p>The digital front door for modern healthcare — diagnostics scheduling, patient flow, and operational intelligence.</p></div>
+      <div><h5>Platform</h5>
+        <a href="/tsb-healthcare-preview/self-check-in-kiosks/">Self check-in kiosks</a>
+        <a href="/tsb-healthcare-preview/online-appointment-booking/">Online booking</a>
+        <a href="/tsb-healthcare-preview/patient-queue-management/">Queue management</a>
+        <a href="/tsb-healthcare-preview/patient-flow-analytics/">Flow analytics</a>
+        <a href="/tsb-healthcare-preview/ai-scheduling-assistant/">AI assistant</a></div>
+      <div><h5>Solutions</h5>
+        <a href="/tsb-healthcare-preview/solutions/hospitals/">Hospitals &amp; systems</a>
+        <a href="/tsb-healthcare-preview/solutions/diagnostic-labs/">Diagnostic labs</a>
+        <a href="/tsb-healthcare-preview/solutions/medical-imaging/">Medical imaging</a>
+        <a href="/tsb-healthcare-preview/solutions/immunization-public-health/">Public health</a>
+        <a href="/tsb-healthcare-preview/pricing/">Pricing</a></div>
+      <div><h5>Company</h5>
+        <a href="/tsb-healthcare-preview/roi-calculator/">ROI calculator</a>
+        <a href="/tsb-healthcare-preview/#proof">Proven results</a>
+        <a href="/tsb-healthcare-preview/compare/qless-alternative/">vs. QLess</a>
+        <a href="/tsb-healthcare-preview/compare/qmatic-alternative/">vs. Qmatic</a>
+        <a href="mailto:info@tsbhealthcare.com">info@tsbhealthcare.com</a></div>
+    </div>
+    <div class="foot-bottom"><span>&copy; 2026 TSB HealthCare. All rights reserved.</span><span>Built in BC &middot; Scaling across Canada</span></div>
+  </div></footer>
+<script src="/tsb-healthcare-preview/assets/js/site.js" defer></script>
+</body>
+</html>

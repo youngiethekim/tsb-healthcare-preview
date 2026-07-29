@@ -139,3 +139,48 @@
     draw();
   }
 })();
+
+/* ---- ROI / capacity calculator ---- */
+(function () {
+  "use strict";
+  var roi = document.getElementById("roi");
+  if (!roi) return;
+  var FORM_ENDPOINT = ""; // paste a Formspree/Web3Forms endpoint here to email leads to info@tsbhealthcare.com
+  var DAYS = 260, TARGET_NS = 0.02, WAIT_CUT = 0.40, STAFF_MIN = 2.2, STAFF_COST = 42;
+  var keys = ["sites", "perday", "noshow", "wait", "rev"];
+  var inp = {};
+  keys.forEach(function (k) { inp[k] = roi.querySelector("#in-" + k); });
+  function commas(n) { return Math.round(n).toLocaleString("en-US"); }
+  function kfmt(n) { n = Math.round(n); if (n >= 1e6) return (n / 1e6).toFixed(1).replace(/\.0$/, "") + "M"; if (n >= 1000) return (n / 1000).toFixed(n >= 1e5 ? 0 : 1).replace(/\.0$/, "") + "K"; return String(n); }
+  function money(n) { n = Math.round(n); if (n >= 1e6) return "$" + (n / 1e6).toFixed(2).replace(/\.?0+$/, "") + "M"; return "$" + commas(n); }
+  function set(id, v) { var el = roi.querySelector("#r-" + id); if (el) el.textContent = v; }
+  function out(k, v) { var el = roi.querySelector("#out-" + k); if (el) el.textContent = v; }
+  function update() {
+    var sites = +inp.sites.value, perday = +inp.perday.value, ns = +inp.noshow.value / 100, wait = +inp.wait.value, rev = +inp.rev.value;
+    out("sites", sites); out("perday", commas(perday)); out("noshow", inp.noshow.value + "%"); out("wait", wait + " min"); out("rev", "$" + rev);
+    keys.forEach(function (k) { var el = inp[k]; el.style.setProperty("--fill", ((el.value - el.min) / (el.max - el.min)) * 100 + "%"); });
+    var visits = sites * perday * DAYS;
+    var recovered = Math.max(0, ns - TARGET_NS) * visits;
+    var newWait = Math.round(wait * (1 - WAIT_CUT));
+    var staffHrs = visits * STAFF_MIN / 60;
+    var value = recovered * rev + staffHrs * STAFF_COST;
+    set("appts", kfmt(recovered)); set("hours", kfmt(staffHrs)); set("wait", newWait + " min"); set("value", money(value));
+    roi.dataset.summary = "~" + commas(recovered) + " appts/yr recovered, ~" + commas(staffHrs) + " staff hrs/yr, wait " + wait + "->" + newWait + " min, est. value " + money(value) + " (" + sites + " sites, " + perday + "/day, " + inp.noshow.value + "% no-show)";
+  }
+  keys.forEach(function (k) { inp[k].addEventListener("input", update); });
+  update();
+  var form = roi.querySelector("#roi-form");
+  if (form) {
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      if (!form.checkValidity()) { form.reportValidity(); return; }
+      var done = function () { form.style.display = "none"; roi.querySelector(".rform-ok").classList.add("show"); };
+      if (FORM_ENDPOINT) {
+        var data = new FormData(form);
+        data.append("results", roi.dataset.summary || "");
+        data.append("_subject", "New ROI calculator lead — TSB HealthCare");
+        fetch(FORM_ENDPOINT, { method: "POST", body: data, headers: { Accept: "application/json" } }).then(done).catch(done);
+      } else { done(); }
+    });
+  }
+})();
