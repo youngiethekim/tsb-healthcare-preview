@@ -426,3 +426,38 @@ footer.site { background: var(--navy); color: #cfe0e8; padding: 60px 0 34px; }
 .rform-ok .ok { width: 54px; height: 54px; border-radius: 50%; background: var(--teal-soft); color: var(--teal); display: grid; place-items: center; margin: 0 auto 14px; }
 .rform-ok h4 { font-size: 19px; font-weight: 780; }
 .rform-ok p { color: var(--ink-soft); margin-top: 8px; }
+
+/* ============ sticky CTA bar ============ */
+.sticky-cta { position: fixed; left: 0; right: 0; bottom: 0; z-index: 90; transform: translateY(130%); transition: transform .45s var(--ease); pointer-events: none; }
+.sticky-cta.show { transform: none; pointer-events: auto; }
+.sticky-in { max-width: 1120px; margin: 0 16px 16px; background: var(--navy); color: #fff; border-radius: 14px; box-shadow: var(--shadow); padding: 13px 16px 13px 20px; display: flex; align-items: center; gap: 16px; justify-content: space-between; flex-wrap: wrap; }
+@media (min-width: 1152px) { .sticky-in { margin-inline: auto; } }
+.sticky-in .stext { font-weight: 700; font-size: 15px; }
+.sticky-in .stext span { color: #9dbccb; font-weight: 500; display: block; font-size: 13px; margin-top: 1px; }
+.sticky-in .sbtns { display: flex; gap: 10px; align-items: center; }
+.sticky-in .btn { padding: 10px 16px; }
+.sticky-in .sclose { background: none; border: none; color: #8fb0bf; cursor: pointer; padding: 6px; display: grid; place-items: center; }
+.sticky-in .sclose:hover { color: #fff; }
+@media (max-width: 620px) { .sticky-in .stext span { display: none; } .sticky-in { padding: 10px 10px 10px 16px; gap: 10px; } .sticky-in .btn { padding: 9px 12px; font-size: 13.5px; } }
+
+/* ============ book-a-demo form ============ */
+.bform-wrap { max-width: 720px; margin: 0 auto; background: var(--card); border: 1px solid var(--line); border-radius: var(--r-lg); padding: clamp(24px, 4vw, 40px); box-shadow: var(--shadow-card); }
+.bprog { font-size: 13px; font-weight: 700; color: var(--teal); letter-spacing: .06em; text-transform: uppercase; }
+.bstep .bgroup { margin-top: 22px; }
+.blabel { display: block; font-weight: 700; font-size: 15.5px; margin-bottom: 10px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { font-family: var(--f); font-size: 14px; font-weight: 600; padding: 9px 15px; border-radius: 999px; border: 1.5px solid var(--line-2); background: #fff; color: var(--ink-soft); cursor: pointer; transition: border-color .2s, color .2s, background .2s; }
+.chip:hover { border-color: var(--teal); color: var(--teal); }
+.chip.sel { background: var(--teal); border-color: var(--teal); color: #fff; }
+.bgroup.err .blabel { color: #c85a3c; }
+.bnav { margin-top: 26px; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+.brow2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+@media (max-width: 520px) { .brow2 { grid-template-columns: 1fr; } }
+.bform-wrap input, .bform-wrap textarea { width: 100%; padding: 12px 14px; border: 1px solid var(--line-2); border-radius: 10px; font-family: var(--f); font-size: 15px; background: #fff; color: var(--ink); }
+.bform-wrap input:focus, .bform-wrap textarea:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px var(--teal-soft); }
+.bhint { font-size: 12.5px; color: var(--muted); margin-top: 14px; }
+.bok { display: none; text-align: center; padding: 18px; }
+.bok.show { display: block; }
+.bok .ok { width: 60px; height: 60px; border-radius: 50%; background: var(--teal-soft); color: var(--teal); display: grid; place-items: center; margin: 0 auto 16px; }
+.bok h3 { font-size: 23px; font-weight: 820; }
+.bok p { color: var(--ink-soft); margin-top: 10px; }

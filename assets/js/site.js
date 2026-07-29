@@ -184,3 +184,64 @@
     });
   }
 })();
+
+/* ---- sticky CTA bar + book-a-demo qualifying form ---- */
+(function () {
+  "use strict";
+  var CALENDLY_URL = "";   // paste your Calendly link to let visitors self-book instantly after submitting
+  var FORM_ENDPOINT = "";  // paste a Formspree/Web3Forms endpoint to email demo requests to info@tsbhealthcare.com
+
+  /* sticky bar */
+  var bar = document.querySelector(".sticky-cta");
+  if (bar) {
+    var dismissed = false;
+    var onScroll = function () { if (!dismissed) bar.classList.toggle("show", window.scrollY > window.innerHeight * 0.85); };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    var x = bar.querySelector(".sclose");
+    if (x) x.addEventListener("click", function () { dismissed = true; bar.classList.remove("show"); });
+  }
+
+  /* book-a-demo form */
+  var bform = document.getElementById("book-form");
+  if (!bform) return;
+  var sel = {}, groups = ["setting", "role", "bottleneck"];
+  bform.querySelectorAll(".chip").forEach(function (c) {
+    c.addEventListener("click", function () {
+      var g = c.dataset.group;
+      bform.querySelectorAll('.chip[data-group="' + g + '"]').forEach(function (o) { o.classList.remove("sel"); });
+      c.classList.add("sel"); sel[g] = c.dataset.value;
+      c.closest(".bgroup").classList.remove("err");
+    });
+  });
+  var s1 = bform.querySelector('[data-step="1"]'), s2 = bform.querySelector('[data-step="2"]'), prog = bform.querySelector(".bprog");
+  bform.querySelector("[data-next]").addEventListener("click", function () {
+    var ok = true;
+    groups.forEach(function (g) {
+      if (!sel[g]) { ok = false; bform.querySelector('.chip[data-group="' + g + '"]').closest(".bgroup").classList.add("err"); }
+    });
+    if (!ok) return;
+    s1.hidden = true; s2.hidden = false; prog.textContent = "Step 2 of 2";
+    var f = s2.querySelector("input"); if (f) f.focus();
+  });
+  bform.querySelector("[data-back]").addEventListener("click", function () { s2.hidden = true; s1.hidden = false; prog.textContent = "Step 1 of 2"; });
+  bform.addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (!bform.checkValidity()) { bform.reportValidity(); return; }
+    var done = function () {
+      bform.style.display = "none";
+      var ok = document.querySelector(".bok"); ok.classList.add("show");
+      if (CALENDLY_URL) {
+        var d = document.getElementById("calendly-embed");
+        d.innerHTML = '<div class="calendly-inline-widget" data-url="' + CALENDLY_URL + '" style="min-width:320px;height:640px"></div>';
+        var sc = document.createElement("script"); sc.src = "https://assets.calendly.com/assets/external/widget.js"; sc.async = true; d.appendChild(sc);
+      }
+    };
+    if (FORM_ENDPOINT) {
+      var data = new FormData(bform);
+      groups.forEach(function (g) { data.append(g, sel[g] || ""); });
+      data.append("_subject", "New demo request — TSB HealthCare");
+      fetch(FORM_ENDPOINT, { method: "POST", body: data, headers: { Accept: "application/json" } }).then(done).catch(done);
+    } else { done(); }
+  });
+})();
