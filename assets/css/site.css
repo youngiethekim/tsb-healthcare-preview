@@ -619,3 +619,8 @@ footer.site { background: var(--navy); color: #cfe0e8; padding: 60px 0 34px; }
 .scale-text .st-name { font-size: clamp(20px, 2.6vw, 26px); font-weight: 820; letter-spacing: -.02em; }
 .scale-text .st-badge { display: inline-block; margin-top: 8px; font-size: 12px; font-weight: 700; color: var(--teal); background: var(--teal-soft); padding: 4px 12px; border-radius: 999px; }
 .scale-text .st-desc { color: var(--ink-soft); font-size: 15.5px; margin-top: 12px; max-width: 52ch; margin-inline: auto; }
+
+.scale-stats { display: flex; justify-content: center; gap: 12px; margin-top: 24px; flex-wrap: wrap; }
+.scale-stats .ss { background: var(--paper); border-radius: 12px; padding: 14px 22px; text-align: center; min-width: 120px; }
+.scale-stats .ss .v { font-size: 22px; font-weight: 850; color: var(--teal); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.scale-stats .ss .l { font-size: 11.5px; color: var(--muted); margin-top: 3px; }

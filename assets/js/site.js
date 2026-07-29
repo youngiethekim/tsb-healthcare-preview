@@ -305,16 +305,17 @@ function tsbSubmitLead(form, extra) {
 (function () {
   "use strict";
   var LV = [
-    { gov: "One clinic or lab", leaves: ["Front desk"], name: "Single site", badge: "1 location", desc: "Start at a single clinic or lab with everything the front desk and patients need." },
-    { gov: "Clinic network", leaves: ["Clinic", "Lab", "Imaging", "Pharmacy"], name: "Multi-site network", badge: "A few sites", desc: "Run several locations from one platform, each with local control and a shared view." },
-    { gov: "Hospital & outpatient", leaves: ["Outpatient", "Lab", "Imaging", "Specialty clinics", "Pre-op"], name: "Hospital / health system", badge: "Dozens of sites", desc: "Coordinate every outpatient service across a hospital or multi-site health system." },
-    { gov: "Regional health authority", leaves: ["Hospital A", "Hospital B", "Labs", "Imaging", "Public health"], name: "Health authority", badge: "Region-wide", desc: "One platform across every facility in a regional health authority, with local control per site." },
-    { gov: "Province or state", leaves: ["Authority 1", "Authority 2", "Authority 3", "+ many more"], name: "Provincial / state-wide", badge: "Millions of patients", desc: "Scale across multiple authorities and regions — province- or state-wide — with central oversight and local control." },
+    { gov: "One clinic or lab", leaves: ["Front desk"], name: "Single site", badge: "1 location", desc: "Start at a single clinic or lab with everything the front desk and patients need.", sites: "1", patients: "~10K" },
+    { gov: "Clinic network", leaves: ["Clinic", "Lab", "Imaging", "Pharmacy"], name: "Multi-site network", badge: "A few sites", desc: "Run several locations from one platform, each with local control and a shared view.", sites: "2–10", patients: "~100K" },
+    { gov: "Hospital & outpatient", leaves: ["Outpatient", "Lab", "Imaging", "Specialty clinics", "Pre-op"], name: "Hospital / health system", badge: "Dozens of sites", desc: "Coordinate every outpatient service across a hospital or multi-site health system.", sites: "10–50", patients: "~500K" },
+    { gov: "Regional health authority", leaves: ["Hospital A", "Hospital B", "Labs", "Imaging", "Public health"], name: "Health authority", badge: "Region-wide", desc: "One platform across every facility in a regional health authority, with local control per site.", sites: "50–200", patients: "1M+" },
+    { gov: "Province or state", leaves: ["Authority 1", "Authority 2", "Authority 3", "+ many more"], name: "Provincial / state-wide", badge: "Millions of patients", desc: "Scale across multiple authorities and regions — province- or state-wide — with central oversight and local control.", sites: "500+", patients: "Millions" },
   ];
   document.querySelectorAll("[data-scale]").forEach(function (card) {
     var range = card.querySelector("[data-sv-range]"),
       gov = card.querySelector("[data-sv-gov]"), leaves = card.querySelector("[data-sv-leaves]"),
       name = card.querySelector("[data-sv-name]"), badge = card.querySelector("[data-sv-badge]"), desc = card.querySelector("[data-sv-desc]"),
+      sites = card.querySelector("[data-sv-sites]"), patients = card.querySelector("[data-sv-patients]"),
       ticks = card.querySelectorAll("[data-sv-ticks] span");
     if (!range) return;
     function render(i) {
@@ -322,6 +323,8 @@ function tsbSubmitLead(form, extra) {
       gov.textContent = d.gov;
       leaves.innerHTML = d.leaves.map(function (l) { return '<div class="sv-leaf">' + l + "</div>"; }).join("");
       name.textContent = d.name; badge.textContent = d.badge; desc.textContent = d.desc;
+      if (sites) sites.textContent = d.sites;
+      if (patients) patients.textContent = d.patients;
       range.style.setProperty("--fill", (i / 4 * 100) + "%");
       ticks.forEach(function (t, k) { t.classList.toggle("on", k === i); });
     }
