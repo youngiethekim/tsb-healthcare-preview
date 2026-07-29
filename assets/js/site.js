@@ -266,3 +266,37 @@ function tsbSubmitLead(form, extra) {
     tsbSubmitLead(bform, extra).then(done);
   });
 })();
+
+/* ---- animated slot queue engine ---- */
+(function () {
+  "use strict";
+  var grid = document.querySelector("[data-qeng]");
+  if (!grid) return;
+  var qeng = grid.closest(".qeng");
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var slots = [].slice.call(grid.children);
+  var booked = [0, 1, 3, 5, 6, 8, 11, 12, 14, 17, 19], reserved = [2, 9], fill = [4, 7, 10, 13, 15, 18, 20, 22, 23];
+  var vB = qeng.querySelector('[data-q="booked"]'), vU = qeng.querySelector('[data-q="util"]'), vW = qeng.querySelector('[data-q="wait"]');
+  function base() {
+    slots.forEach(function (s, i) { s.className = "qslot" + (booked.indexOf(i) >= 0 ? " booked" : reserved.indexOf(i) >= 0 ? " reserved" : ""); });
+    vB.textContent = "13"; vU.textContent = "54%"; vW.textContent = "18";
+  }
+  function finalState() { base(); fill.forEach(function (i) { slots[i].classList.add("walkin"); }); vB.textContent = "22"; vU.textContent = "92%"; vW.textContent = "6"; }
+  if (reduce) { finalState(); return; }
+  var timer;
+  function run() {
+    base(); var k = 0;
+    timer = setInterval(function () {
+      if (k >= fill.length) { clearInterval(timer); timer = setTimeout(run, 2600); return; }
+      slots[fill[k]].classList.add("walkin", "pop");
+      vB.textContent = String(14 + k);
+      vU.textContent = Math.round(54 + (92 - 54) * (k + 1) / fill.length) + "%";
+      vW.textContent = String(Math.round(18 - (18 - 6) * (k + 1) / fill.length));
+      k++;
+    }, 380);
+  }
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { run(); io.disconnect(); } }); }, { threshold: 0.3 });
+    io.observe(qeng);
+  } else { run(); }
+})();

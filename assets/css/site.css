@@ -569,3 +569,27 @@ footer.site { background: var(--navy); color: #cfe0e8; padding: 60px 0 34px; }
 .tcard .tav { width: 38px; height: 38px; border-radius: 50%; background: var(--teal-soft); border: 1px dashed var(--line-2); display: grid; place-items: center; color: var(--muted); font-size: 10px; flex: none; }
 .tcard .tby b { font-size: 14px; display: block; color: var(--ink); }
 .tcard .tby span { font-size: 12px; color: var(--muted); }
+
+/* ============ animated slot queue engine ============ */
+.qeng { background: #fff; border: 1px solid var(--line); border-radius: 20px; box-shadow: var(--shadow); padding: 22px; width: 100%; max-width: 480px; margin-inline: auto; color: var(--ink); }
+.qeng-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.qeng-top b { font-size: 15px; font-weight: 800; }
+.qeng-live { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--teal); display: inline-flex; align-items: center; gap: 6px; }
+.qeng-live .d { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); animation: qblink 1.4s ease-in-out infinite; }
+@keyframes qblink { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
+@media (prefers-reduced-motion: reduce) { .qeng-live .d { animation: none; } }
+.qeng-cols { font-size: 10px; color: var(--muted); display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-bottom: 6px; text-align: center; font-weight: 600; }
+.qeng-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+.qslot { aspect-ratio: 1 / 1; border-radius: 7px; background: #eef3f5; transition: background .35s var(--ease); }
+.qslot.booked { background: var(--teal); }
+.qslot.reserved { background: #0f5f74; }
+.qslot.walkin { background: var(--cyan); }
+.qslot.pop { animation: qpop .45s var(--ease); }
+@keyframes qpop { 0% { transform: scale(.3); opacity: .2; } 60% { transform: scale(1.12); } 100% { transform: scale(1); } }
+.qeng-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 16px; text-align: center; }
+.qeng-stats .qs { background: var(--paper); border-radius: 10px; padding: 12px 6px; }
+.qeng-stats .qs .v { font-size: clamp(18px, 2.4vw, 22px); font-weight: 850; color: var(--teal); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.qeng-stats .qs .l { font-size: 10.5px; color: var(--muted); margin-top: 3px; }
+.qeng-legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 14px; font-size: 11px; color: var(--ink-soft); }
+.qeng-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.qeng-legend i { width: 11px; height: 11px; border-radius: 3px; }
