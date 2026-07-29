@@ -534,3 +534,15 @@ footer.site { background: var(--navy); color: #cfe0e8; padding: 60px 0 34px; }
   .nav-item.open .mega { display: grid; }
   .mega-t { padding: 8px 10px 2px; }
 }
+
+/* ============ solutions hub grid ============ */
+.solgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(258px, 1fr)); gap: 14px; margin-top: 40px; }
+.solcard { display: block; background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 24px; transition: border-color .2s, background .2s, transform .3s var(--ease); }
+.solcard:hover { border-color: var(--teal); background: var(--paper); transform: translateY(-3px); }
+.solcard .ci { color: var(--teal); margin-bottom: 12px; }
+.solcard .ci svg { width: 28px; height: 28px; }
+.solcard h3 { font-size: 17.5px; font-weight: 750; }
+.solcard p { color: var(--ink-soft); font-size: 14px; margin-top: 6px; }
+.solcard .go { margin-top: 12px; color: var(--teal); font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; }
+.mega-all { grid-column: 1 / -1; border-top: 1px solid var(--line); margin-top: 4px; padding: 12px 10px 2px; color: var(--teal); font-weight: 700; font-size: 14px; }
+.mega-all:hover { color: var(--teal-deep) !important; background: none !important; }
