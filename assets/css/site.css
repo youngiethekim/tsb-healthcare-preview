@@ -624,3 +624,30 @@ footer.site { background: var(--navy); color: #cfe0e8; padding: 60px 0 34px; }
 .scale-stats .ss { background: var(--paper); border-radius: 12px; padding: 14px 22px; text-align: center; min-width: 120px; }
 .scale-stats .ss .v { font-size: 22px; font-weight: 850; color: var(--teal); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
 .scale-stats .ss .l { font-size: 11.5px; color: var(--muted); margin-top: 3px; }
+
+/* ---- certifications & compliance band ---- */
+.certsec.paper{background:var(--paper)}
+.cert-badges{
+  margin-top:40px;display:grid;grid-template-columns:repeat(4,1fr);
+  gap:1px;background:var(--line);border:1px solid var(--line);border-radius:16px;overflow:hidden;
+}
+.cbadge{
+  position:relative;display:flex;align-items:center;gap:14px;
+  padding:22px 20px;background:#fff;
+}
+.certsec.paper .cbadge{background:var(--paper)}
+.cb-ic{display:inline-flex;color:var(--teal);flex:0 0 auto}
+.cb-ic svg{width:22px;height:22px}
+.cb-h{font-weight:700;font-size:15px;letter-spacing:-.01em;color:var(--ink)}
+.cb-s{font-size:12.5px;color:var(--muted);margin-top:2px}
+.cbadge.is-todo{opacity:.62}
+.cbadge.is-todo .cb-ic{color:var(--muted)}
+.cb-tag{
+  position:absolute;top:12px;right:12px;font-size:10px;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--muted);border:1px dashed var(--line);
+  border-radius:20px;padding:2px 8px;background:#fff;
+}
+.cert-note{text-align:center;color:var(--muted);font-size:13px;margin-top:22px}
+.cert-note .tlink{font-size:13px;white-space:nowrap}
+@media(max-width:860px){.cert-badges{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:460px){.cert-badges{grid-template-columns:1fr}}
