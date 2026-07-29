@@ -461,3 +461,11 @@ footer.site { background: var(--navy); color: #cfe0e8; padding: 60px 0 34px; }
 .bok .ok { width: 60px; height: 60px; border-radius: 50%; background: var(--teal-soft); color: var(--teal); display: grid; place-items: center; margin: 0 auto 16px; }
 .bok h3 { font-size: 23px; font-weight: 820; }
 .bok p { color: var(--ink-soft); margin-top: 10px; }
+
+/* ============ hero background video ============ */
+.hero-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; opacity: 0.55; }
+.hero.has-video::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(90deg, rgba(7,30,50,0.94) 0%, rgba(7,30,50,0.78) 44%, rgba(7,30,50,0.5) 100%),
+              radial-gradient(120% 120% at 82% -10%, rgba(20,86,110,0.45), transparent 60%); }
+.hero.has-video .hero-fx { display: none; }
+@media (max-width: 620px) { .hero.has-video::after { background: linear-gradient(180deg, rgba(7,30,50,0.85), rgba(7,30,50,0.92)); } }

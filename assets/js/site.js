@@ -111,6 +111,10 @@
     });
   }
 
+  /* ---- hero background video: honor reduced-motion (show poster still) ---- */
+  var hv = document.querySelector(".hero-video");
+  if (hv && reduce) { hv.removeAttribute("autoplay"); hv.pause(); }
+
   /* ---- hero ambient particles ---- */
   var fx = document.querySelector(".hero-fx");
   if (fx && !reduce && fx.getContext) {

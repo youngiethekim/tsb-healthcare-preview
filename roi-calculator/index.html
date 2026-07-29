@@ -34,6 +34,7 @@
   </div></header>
 <main>
 <section class="hero">
+    
     <canvas class="hero-fx" aria-hidden="true"></canvas>
     <div class="wrap hero-grid solo">
       <div><div class="crumbs"><a href="/tsb-healthcare-preview/">Home</a><span>/</span>ROI Calculator</div><span class="pill"><span class="d"></span> Free tool &middot; for operations leaders</span>
@@ -69,11 +70,11 @@
     <div class="roi-capture reveal">
       <div><h3>Get your full breakdown</h3><p>We'll email an itemized, per-site ROI report and a benchmark for a setting like yours &mdash; ready to share with your team.</p></div>
       <div>
-        <form id="roi-form" novalidate>
+        <form id="roi-form" class="rform" novalidate>
           <input class="full" type="text" name="name" placeholder="Full name" required>
           <input type="email" name="email" placeholder="Work email" required>
           <input type="text" name="organization" placeholder="Organization" required>
-          <select name="role" required><option value="" disabled selected>Your role</option><option>Operations / Patient Access</option><option>Lab / Imaging manager</option><option>Clinical / Nursing lead</option><option>IT / Informatics</option><option>Executive / Finance</option><option>Other</option></select>
+          <select class="full" name="role" required><option value="" disabled selected>Your role</option><option>Operations / Patient Access</option><option>Lab / Imaging manager</option><option>Clinical / Nursing lead</option><option>IT / Informatics</option><option>Executive / Finance</option><option>Other</option></select>
           <button class="btn btn-primary full" type="submit">Email me the report <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
           <div class="note">No obligation. Your details are never sold or shared.</div>
         </form>
