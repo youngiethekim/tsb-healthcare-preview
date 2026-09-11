@@ -157,6 +157,11 @@ img { display: block; max-width: 100%; }
 /* stats card */
 .stats-card { position: relative; z-index: 10; margin: -70px auto 0; background: var(--card); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow); padding: 32px clamp(20px, 3vw, 40px); display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; }
 .stats-card.four { grid-template-columns: repeat(4, 1fr); }
+.stats-card.six { grid-template-columns: repeat(6, 1fr); }
+@media (max-width: 1100px) { .stats-card.six { grid-template-columns: repeat(3, 1fr); gap: 26px 20px; } .stats-card.six .stat + .stat::before { display: none; } }
+@media (max-width: 560px) { .stats-card.six { grid-template-columns: repeat(2, 1fr); } }
+.stat .v.txt { font-size: clamp(20px, 2.2vw, 26px); }
+.stats-note { text-align: center; color: var(--muted); font-size: 12.5px; margin: 12px 0 0; }
 @media (max-width: 860px) { .stats-card, .stats-card.four { grid-template-columns: repeat(2, 1fr); gap: 26px 20px; } }
 .stat { text-align: center; position: relative; }
 .stat + .stat::before { content: ""; position: absolute; left: -10px; top: 8px; bottom: 8px; width: 1px; background: var(--line); }
