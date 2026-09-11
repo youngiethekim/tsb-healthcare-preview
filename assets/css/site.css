@@ -354,6 +354,7 @@ footer.site { background: var(--navy); color: #cfe0e8; padding: 60px 0 34px; }
 @keyframes vfade { from { opacity: 0; } to { opacity: 1; } }
 .vlight .vbox { position: relative; width: min(980px, 100%); aspect-ratio: 16 / 9; background: #000; border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); }
 .vlight video { width: 100%; height: 100%; display: block; }
+.vlight .vframe { width: 100%; height: 100%; display: block; border: 0; }
 .vlight .vclose { position: absolute; top: -44px; right: 0; background: none; border: none; color: #fff; cursor: pointer; font-size: 15px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; }
 .vlight .vclose:hover { color: var(--cyan-bright); }
 

@@ -99,12 +99,40 @@ function tsbSubmitLead(form, extra) {
     }
   }
 
-  /* ---- video lightbox ---- */
+  /* ---- video lightbox ----
+     Plays the local file by default. If the .vlight carries data-embed, that
+     URL is used instead and is only fetched when the viewer presses play, so
+     the host is never contacted on page load. */
   var light = document.querySelector(".vlight");
   if (light) {
     var vid = light.querySelector("video");
-    var open = function (e) { if (e) e.preventDefault(); light.classList.add("open"); if (vid) { try { vid.currentTime = 0; vid.play(); } catch (x) {} } document.body.style.overflow = "hidden"; };
-    var close = function () { light.classList.remove("open"); if (vid) vid.pause(); document.body.style.overflow = ""; };
+    var embed = light.getAttribute("data-embed") || "";
+    var frame = null;
+    if (embed) {
+      if (vid) { vid.parentNode.removeChild(vid); vid = null; }
+      frame = document.createElement("iframe");
+      frame.className = "vframe";
+      frame.setAttribute("title", light.getAttribute("data-embed-title") || "TSB HealthCare video");
+      frame.setAttribute("allow", "autoplay; fullscreen; picture-in-picture; encrypted-media");
+      frame.setAttribute("allowfullscreen", "");
+      frame.setAttribute("referrerpolicy", "strict-origin-when-cross-origin");
+      light.querySelector(".vbox").appendChild(frame);
+    }
+    var open = function (e) {
+      if (e) e.preventDefault();
+      light.classList.add("open");
+      light.setAttribute("aria-hidden", "false");
+      if (frame) frame.src = embed;
+      else if (vid) { try { vid.currentTime = 0; vid.play(); } catch (x) {} }
+      document.body.style.overflow = "hidden";
+    };
+    var close = function () {
+      light.classList.remove("open");
+      light.setAttribute("aria-hidden", "true");
+      if (frame) frame.removeAttribute("src");
+      else if (vid) vid.pause();
+      document.body.style.overflow = "";
+    };
     document.querySelectorAll("[data-vopen]").forEach(function (b) {
       b.addEventListener("click", open);
       b.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(e); } });
