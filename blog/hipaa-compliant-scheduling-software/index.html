@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HIPAA-Compliant Scheduling Software: What to Look For</title>
+<meta name="description" content="Is scheduling software HIPAA compliant? What HIPAA requires of a scheduling vendor, where systems leak PHI, and the questions to ask before you buy.">
+<link rel="canonical" href="https://www.tsbhealthcare.com/blog/hipaa-compliant-scheduling-software/">
+<meta name="robots" content="noindex,nofollow">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="TSB Healthcare">
+<meta property="og:title" content="HIPAA-Compliant Scheduling Software: What to Look For">
+<meta property="og:description" content="Is scheduling software HIPAA compliant? What HIPAA requires of a scheduling vendor, where systems leak PHI, and the questions to ask before you buy.">
+<meta property="og:url" content="https://www.tsbhealthcare.com/blog/hipaa-compliant-scheduling-software/">
+<meta property="og:image" content="https://www.tsbhealthcare.com/assets/img/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/tsb-healthcare-preview/assets/img/favicon.svg">
+<link rel="preload" href="/tsb-healthcare-preview/assets/fonts/hanken.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/tsb-healthcare-preview/assets/css/site.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BlogPosting","headline":"HIPAA-Compliant Scheduling Software: What to Look For","description":"Is scheduling software HIPAA compliant? What HIPAA requires of a scheduling vendor, where systems leak PHI, and the questions to ask before you buy.","image":"https://www.tsbhealthcare.com/assets/img/og.jpg","author":{"@type":"Organization","name":"TSB Healthcare"},"publisher":{"@type":"Organization","name":"TSB Healthcare","logo":{"@type":"ImageObject","url":"https://www.tsbhealthcare.com/assets/img/tsb-logo.svg"}},"datePublished":"2026-08-14","dateModified":"2026-08-14","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.tsbhealthcare.com/blog/hipaa-compliant-scheduling-software/"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.tsbhealthcare.com/"},{"@type":"ListItem","position":2,"name":"Resources","item":"https://www.tsbhealthcare.com/blog/"},{"@type":"ListItem","position":3,"name":"HIPAA-Compliant Scheduling Software","item":"https://www.tsbhealthcare.com/blog/hipaa-compliant-scheduling-software/"}]},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Is scheduling software HIPAA compliant?","acceptedAnswer":{"@type":"Answer","text":"Not automatically. No software product is HIPAA compliant on its own — compliance describes how a covered entity and its vendors handle protected health information together. A scheduling vendor can be HIPAA-ready: willing to sign a Business Associate Agreement and shipping the required safeguards, such as access controls, audit logs, encryption in transit and at rest, and breach notification support. Whether your deployment is compliant depends on the BAA, the configuration, and your own policies."}},{"@type":"Question","name":"Do appointment reminders violate HIPAA?","acceptedAnswer":{"@type":"Answer","text":"Reminders are permitted — HIPAA treats them as part of treatment — but the content matters. A reminder that includes a diagnosis, test type or clinic specialty in an unencrypted SMS or email exposes more than the minimum necessary. The safe pattern is a minimal message: patient first name at most, date, time, and a secure link for details, with patient consent captured for the channel used."}},{"@type":"Question","name":"Does HIPAA apply to online self-scheduling forms?","acceptedAnswer":{"@type":"Answer","text":"Yes. The moment a patient submits an identifiable booking request — name plus an appointment with a healthcare provider — that data is PHI. The form must be served over TLS, stored encrypted, limited to necessary fields, and kept away from third-party scripts that could capture what the patient types."}},{"@type":"Question","name":"What is a BAA and does my scheduling vendor need one?","acceptedAnswer":{"@type":"Answer","text":"A Business Associate Agreement is the contract HIPAA requires between a covered entity and any vendor that creates, receives, maintains or transmits PHI on its behalf. A scheduling vendor that handles identifiable appointment data is a business associate, so a BAA is required before go-live. A vendor that refuses to sign one is telling you it cannot handle PHI — treat that as a hard stop."}},{"@type":"Question","name":"Are analytics or ad pixels on a booking page a HIPAA problem?","acceptedAnswer":{"@type":"Answer","text":"They can be a serious one. U.S. regulators have warned that tracking technologies on pages where patients book care can transmit identifiable health information to advertising and analytics companies that have no BAA. Audit every third-party script on your booking flow, and ask your vendor to disclose exactly what runs on theirs."}},{"@type":"Question","name":"Does HIPAA apply in Canada?","acceptedAnswer":{"@type":"Answer","text":"No — HIPAA is a U.S. law. Canadian organizations answer to PIPEDA federally and to provincial health privacy laws such as Ontario’s PHIPA and B.C.’s FIPPA. The safeguards look similar — encryption, access controls, breach reporting — but the vendor relationship differs: instead of a BAA, vendors act as agents or service providers under written agreements, and several provinces expect health data to stay in Canada."}}]}]}</script>
+</head>
+<body>
+<header class="nav"><div class="wrap nav-in">
+    <a class="brand" href="/tsb-healthcare-preview/" aria-label="TSB Healthcare home"><img src="/tsb-healthcare-preview/assets/img/tsb-logo.svg" alt="TSB Healthcare" width="150" height="26"></a>
+    <button class="nav-toggle" aria-label="Menu"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    <nav class="nav-links" aria-label="Primary">
+      <div class="nav-item has-mega">
+        <button class="mega-toggle" aria-expanded="false" aria-haspopup="true">Solutions <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+        <div class="mega">
+          <div class="mega-col">
+            <div class="mega-t">The system</div>
+            <a href="/tsb-healthcare-preview/slot-iq/"><b>Slot IQ&trade; platform</b><span>Six modules, one queue of truth</span></a>
+            <a href="/tsb-healthcare-preview/online-appointment-booking/"><b>Slot IQ Book — Online booking</b><span>24/7 self-scheduling</span></a>
+            <a href="/tsb-healthcare-preview/self-check-in-kiosks/"><b>Slot IQ Arrive — Kiosk check-in</b><span>Clear the front desk</span></a>
+            <a href="/tsb-healthcare-preview/staff-check-out/"><b>Slot IQ Flow — Staff dashboard</b><span>Call &amp; close out visits</span></a>
+            <a href="/tsb-healthcare-preview/waiting-room-display/"><b>Slot IQ Arrive — Waiting room display</b><span>The live queue on the wall</span></a>
+            <a href="/tsb-healthcare-preview/ai-scheduling-assistant/"><b>Slot IQ Assist — AI booking assistant</b><span>Finds the right appointment</span></a>
+            <a href="/tsb-healthcare-preview/patient-flow-analytics/"><b>Slot IQ Insight — Analytics</b><span>Compare and balance sites</span></a>
+            <a href="/tsb-healthcare-preview/patient-queue-management/"><b>Slot IQ Flow — Queue engine</b><span>Virtual waiting room</span></a>
+            <a href="/tsb-healthcare-preview/patient-intake-software/"><b>Patient intake</b><span>Forms done before arrival</span></a>
+          </div>
+          <div class="mega-col">
+            <div class="mega-t">Scheduling software</div>
+            <a href="/tsb-healthcare-preview/patient-scheduling-software/"><b>Patient scheduling</b><span>The scheduling engine</span></a>
+            <a href="/tsb-healthcare-preview/patient-flow-management-software/"><b>Patient flow management</b><span>Arrival to completion</span></a>
+            <a href="/tsb-healthcare-preview/healthcare-scheduling-software/"><b>Healthcare scheduling</b><span>Patients, not staff shifts</span></a>
+            <a href="/tsb-healthcare-preview/clinic-scheduling-software/"><b>Clinic scheduling</b><span>Offices &amp; practices</span></a>
+            <a href="/tsb-healthcare-preview/hospital-scheduling-software/"><b>Hospital scheduling</b><span>Departments &amp; systems</span></a>
+          </div>
+          <div class="mega-col">
+            <div class="mega-t">By setting</div>
+            <a href="/tsb-healthcare-preview/solutions/hospitals/"><b>Hospitals &amp; systems</b><span>Multi-site patient flow</span></a>
+            <a href="/tsb-healthcare-preview/solutions/government-public-sector/"><b>Government &amp; public sector</b><span>Health authorities at scale</span></a>
+            <a href="/tsb-healthcare-preview/solutions/diagnostic-labs/"><b>Diagnostic labs</b><span>Draws, drop-offs, kits</span></a>
+            <a href="/tsb-healthcare-preview/solutions/medical-imaging/"><b>Medical imaging</b><span>MRI, CT &amp; X-ray</span></a>
+            <a href="/tsb-healthcare-preview/solutions/immunization-public-health/"><b>Public health</b><span>Mass immunization</span></a>
+            <div class="mega-t" style="padding-top:16px">Also on the platform</div>
+            <a href="/tsb-healthcare-preview/patient-access-platform/"><b>Patient access platform</b><span>The whole access journey</span></a>
+            <a href="/tsb-healthcare-preview/appointment-reminder-software/"><b>Appointment reminders</b><span>Confirm, cancel, refill</span></a>
+          </div>
+          <a class="mega-all" href="/tsb-healthcare-preview/solutions/">See all solutions &rarr;</a>
+        </div>
+      </div>
+      <div class="nav-item has-mega">
+        <button class="mega-toggle" aria-expanded="false" aria-haspopup="true">Resources <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+        <div class="mega narrow">
+          <div class="mega-col">
+            <a href="/tsb-healthcare-preview/blog/"><b>Guides &amp; resources</b><span>Playbooks and deep dives</span></a>
+            <a href="/tsb-healthcare-preview/roi-calculator/"><b>ROI calculator</b><span>Size your recoverable capacity</span></a>
+          </div>
+        </div>
+      </div>
+      <a href="/tsb-healthcare-preview/case-studies/">Case Studies</a>
+      <a href="/tsb-healthcare-preview/contact/">Contact</a>
+    </nav>
+    <div class="nav-right"><a class="btn btn-primary" href="/tsb-healthcare-preview/book-a-demo/">Request a Demo</a></div>
+  </div></header>
+<main>
+<section class="hero">
+    <canvas class="hero-fx" aria-hidden="true"></canvas>
+    <div class="wrap hero-grid">
+      <div><div class="crumbs"><a href="/tsb-healthcare-preview/">Home</a><span>/</span><a href="/tsb-healthcare-preview/blog/">Resources</a><span>/</span>HIPAA-Compliant Scheduling Software</div><span class="pill"><span class="d"></span> Compliance guide</span>
+        <h1><span class="ac">HIPAA-Compliant Patient Scheduling Software:</span> what to look for</h1>
+        <p class="lede">Scheduling software is not HIPAA compliant by default. Here is what the law actually requires of a scheduling vendor, where appointment systems leak PHI, and the exact questions to ask in procurement.</p>
+        <div class="hero-cta"><a class="btn btn-primary" href="/tsb-healthcare-preview/book-a-demo/">Request a Demo <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+        <div class="hero-note"><div class="avs"><span style="background-image:url(/tsb-healthcare-preview/assets/img/clinical.jpg)"></span><span style="background-image:url(/tsb-healthcare-preview/assets/img/kiosk.jpg)"></span><span style="background-image:url(/tsb-healthcare-preview/assets/img/staff.jpg)"></span><span style="background-image:url(/tsb-healthcare-preview/assets/img/display.jpg)"></span></div><p><b>4 health providers</b> &middot; <b>69 sites</b> &middot; <b>4M+ appointments</b> &middot; <b>live since 2018</b></p></div>
+      </div>
+      <div class="reveal"><div class="hero-photo"><div class="frame"><picture><source srcset="/tsb-healthcare-preview/assets/img/staff.webp" type="image/webp"><img src="/tsb-healthcare-preview/assets/img/staff.jpg" width="1000" height="608" alt="A healthcare operations leader reviewing scheduling software security settings on a dashboard"></picture></div><div class="hero-badge b1"><div class="bi"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.4 8.2-8 9-4.6-.8-8-4-8-9V6z"/><path d="M9.2 12.2l2 2 3.6-4"/></svg></div><div><div class="bt">BAA + safeguards</div><div class="bv">What compliant looks like</div></div></div><div class="hero-badge b2"><div class="bi"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/></svg></div><div><div class="bt">Procurement-ready</div><div class="bv">10-question checklist</div></div></div></div></div>
+    </div>
+  </section>
+<section class="section"><div class="wrap narrow"><div class="prose">
+<p class="tbl-note">By TSB Healthcare &middot; Published August 14, 2026</p>
+<p><b>Is scheduling software HIPAA compliant?</b> Not by itself. No software product is
+&ldquo;HIPAA compliant&rdquo; out of the box &mdash; compliance is a property of how your organization and
+its vendors handle protected health information together. What a vendor <em>can</em> be is HIPAA-ready:
+willing to sign a Business Associate Agreement and built with the safeguards the law requires. This guide
+covers what HIPAA-compliant patient scheduling software actually looks like, where scheduling systems leak
+PHI in practice, and what to ask a vendor before you sign.</p>
+<p class="tbl-note">This article is general information for healthcare operations and IT teams, not legal advice. Involve your privacy officer and counsel in any compliance decision.</p>
+<h2>Appointment data is PHI</h2>
+<p>It is tempting to treat a schedule as administrative data. HIPAA does not. A patient&rsquo;s name
+attached to an appointment with a healthcare provider is protected health information, because the fact of
+receiving care is itself health information. Add an appointment type &mdash; &ldquo;MRI,&rdquo;
+&ldquo;oncology follow-up,&rdquo; &ldquo;methadone clinic&rdquo; &mdash; and the record becomes more
+sensitive still. Every system that touches that data, from the booking form to the reminder message to the
+waiting-room display, is inside HIPAA&rsquo;s scope.</p>
+<h2>What HIPAA actually requires of a scheduling vendor</h2>
+<p>A scheduling vendor that creates, receives, maintains or transmits PHI on your behalf is a business
+associate under HIPAA. That status carries specific obligations, and your procurement review should verify
+each one:</p>
+<ul>
+<li><b>A signed Business Associate Agreement (BAA).</b> Required before any PHI flows. A vendor that will not sign one cannot lawfully handle your appointment data.</li>
+<li><b>Access controls.</b> Unique user accounts, role-based permissions, and automatic session timeouts, so a front-desk login cannot browse data the role does not need.</li>
+<li><b>Audit logging.</b> A record of who viewed, created or changed appointment records, retained long enough to investigate an incident months later.</li>
+<li><b>Encryption in transit and at rest.</b> TLS on every connection and encrypted storage. Encryption is technically an &ldquo;addressable&rdquo; safeguard, but in practice unencrypted PHI is indefensible.</li>
+<li><b>Minimum necessary handling.</b> The system should collect and expose only the data each workflow needs &mdash; a queue display does not need a diagnosis, and a reminder does not need a full name.</li>
+<li><b>Breach notification support.</b> The vendor must be able to detect an incident, tell you what was exposed, and support your notification obligations on the regulatory clock.</li>
+<li><b>Data return and disposal.</b> When the contract ends, PHI comes back to you or is verifiably destroyed.</li>
+</ul>
+<h2>Where scheduling systems leak PHI in practice</h2>
+<p>Most scheduling-related privacy incidents do not come from a hacked database. They come from ordinary
+features configured carelessly. Four places deserve specific scrutiny.</p>
+<h3>1. Reminder content in SMS and email</h3>
+<p>Reminders are allowed &mdash; but SMS and standard email are not encrypted end to end, so the content
+must be minimal. &ldquo;Reminder: appointment Thu 9:40, tap to confirm&rdquo; is defensible.
+&ldquo;Reminder: your colposcopy at the women&rsquo;s clinic&rdquo; is not. Look for software that lets you
+control reminder templates centrally and strips clinical detail out of unsecured channels by default.</p>
+<h3>2. Waiting-room displays</h3>
+<p>A called-next screen that shows full patient names announces to the whole lobby who is being treated
+where. Displays should use ticket numbers, initials or partial names. TSB&rsquo;s queue displays are built
+this way &mdash; see <a href="/tsb-healthcare-preview/patient-queue-management/">patient queue management</a> for how called-next
+screens work without exposing identities.</p>
+<h3>3. Unsecured self-scheduling forms</h3>
+<p>An online booking form is often built quickly and reviewed rarely. It must run over TLS, store
+submissions encrypted, ask only for what booking requires, and avoid parking form data in low-governance
+tools like shared spreadsheets or generic form builders that were never designed for PHI.</p>
+<h3>4. Third-party analytics and ad pixels on booking pages</h3>
+<p>This is the risk most organizations miss. Analytics tags, session-recording tools and advertising
+pixels embedded on a booking page can transmit what the page knows &mdash; URL, form fields, button clicks
+&mdash; to the third party that operates the tag. On a page where a patient picks a clinic and an
+appointment type, that transmission can amount to disclosing PHI to an ad network with no BAA in place.
+U.S. regulators have repeatedly warned about exactly this pattern, and it has driven a wave of breach
+notifications and litigation. Audit every script on your scheduling pages, and ask your vendor for a list
+of every third party that loads on theirs. &ldquo;None&rdquo; is the right answer for the booking flow.</p>
+<h2>The procurement checklist: what to ask a vendor</h2>
+<p>Put these questions in your RFP or security questionnaire, in writing:</p>
+<ul>
+<li>Will you sign our BAA, and do you accept liability as a business associate?</li>
+<li>What PHI does your system store, and can it operate with less? Where is it hosted, and in which country or region?</li>
+<li>Is data encrypted in transit and at rest? Which standards and key-management practices?</li>
+<li>How are user roles and permissions structured? Is every access logged, and how long are audit logs retained?</li>
+<li>What exactly appears in SMS and email reminders, and can we control the templates?</li>
+<li>What do waiting-room and called-next displays show by default?</li>
+<li>What third-party scripts, analytics or pixels load on patient-facing booking pages?</li>
+<li>What is your breach detection and notification process, and what are your committed timelines to us?</li>
+<li>What happens to our data at contract end?</li>
+<li>Can you support a Privacy Impact Assessment and complete our security questionnaire?</li>
+</ul>
+<p>A credible vendor answers all ten quickly. Hesitation on the BAA, the pixel question or the audit-log
+question is a signal worth taking seriously.</p>
+<h2>North of the border: PHIPA, PIPEDA and provincial rules</h2>
+<p>Canadian health organizations are not covered by HIPAA, but the questions rhyme. Federally, PIPEDA
+governs commercial handling of personal information. Provincially, health-specific laws apply &mdash;
+Ontario&rsquo;s PHIPA, B.C.&rsquo;s FIPPA for public bodies, and their counterparts elsewhere. The
+practical differences for a scheduling purchase:</p>
+<ul>
+<li><b>No BAA &mdash; but an agreement all the same.</b> Vendors act as agents or service providers of the health information custodian, under written agreements that bind them to the custodian&rsquo;s obligations.</li>
+<li><b>Data residency expectations.</b> Several provinces expect &mdash; and public-sector procurement often requires &mdash; personal health information to be stored in Canada. Ask where the servers are, not just who the vendor is.</li>
+<li><b>Consent and breach rules differ by province</b>, including mandatory breach reporting to provincial commissioners in specific circumstances.</li>
+</ul>
+<p>A vendor serving both markets should handle HIPAA and the Canadian frameworks without treating either
+as an afterthought.</p>
+<h2>How TSB approaches this</h2>
+<p>TSB Healthcare&rsquo;s platform takes the least-data path: the booking and flow layer is PHI-minimal by design, holding a patient&rsquo;s name, email and phone only, which shrinks the breach surface and shortens privacy review. Data is encrypted in transit, access is role-based with login and activity logging, analytics are aggregate-only, and in-region data residency options are confirmed per deployment for HIPAA, PIPEDA and FIPPA requirements. The platform has supported health-authority Privacy Impact Assessment and security review processes since 2018 and completed an independent penetration test in 2024. The full detail, including what we do not claim, is on our <a href="/tsb-healthcare-preview/security/">security &amp; compliance</a> page.</p>
+<p>If you are earlier in the evaluation, start with our guides to
+<a href="/tsb-healthcare-preview/blog/best-patient-scheduling-software/">choosing patient scheduling software</a> and
+<a href="/tsb-healthcare-preview/blog/patient-flow-management-guide/">patient flow management</a> &mdash; compliance is one
+column in a bigger scorecard.</p>
+</div></div></section>
+<section class="section" id="faq"><div class="wrap">
+    <div class="shead center reveal"><span class="eyebrow">Questions, answered</span><h2>Frequently asked questions</h2></div>
+    <div class="faq-list"><details class="faq"><summary>Is scheduling software HIPAA compliant?<span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary><div class="fa">Not automatically. No software product is HIPAA compliant on its own &mdash; compliance describes how a covered entity and its vendors handle protected health information together. A scheduling vendor can be HIPAA-ready: willing to sign a Business Associate Agreement and shipping the required safeguards, such as access controls, audit logs, encryption in transit and at rest, and breach notification support. Whether your deployment is compliant depends on the BAA, the configuration, and your own policies.</div></details><details class="faq"><summary>Do appointment reminders violate HIPAA?<span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary><div class="fa">Reminders are permitted &mdash; HIPAA treats them as part of treatment &mdash; but the content matters. A reminder that includes a diagnosis, test type or clinic specialty in an unencrypted SMS or email exposes more than the minimum necessary. The safe pattern is a minimal message: patient first name at most, date, time, and a secure link for details, with patient consent captured for the channel used.</div></details><details class="faq"><summary>Does HIPAA apply to online self-scheduling forms?<span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary><div class="fa">Yes. The moment a patient submits an identifiable booking request &mdash; name plus an appointment with a healthcare provider &mdash; that data is PHI. The form must be served over TLS, stored encrypted, limited to necessary fields, and kept away from third-party scripts that could capture what the patient types.</div></details><details class="faq"><summary>What is a BAA and does my scheduling vendor need one?<span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary><div class="fa">A Business Associate Agreement is the contract HIPAA requires between a covered entity and any vendor that creates, receives, maintains or transmits PHI on its behalf. A scheduling vendor that handles identifiable appointment data is a business associate, so a BAA is required before go-live. A vendor that refuses to sign one is telling you it cannot handle PHI &mdash; treat that as a hard stop.</div></details><details class="faq"><summary>Are analytics or ad pixels on a booking page a HIPAA problem?<span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary><div class="fa">They can be a serious one. U.S. regulators have warned that tracking technologies on pages where patients book care can transmit identifiable health information to advertising and analytics companies that have no BAA. Audit every third-party script on your booking flow, and ask your vendor to disclose exactly what runs on theirs.</div></details><details class="faq"><summary>Does HIPAA apply in Canada?<span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary><div class="fa">No &mdash; HIPAA is a U.S. law. Canadian organizations answer to PIPEDA federally and to provincial health privacy laws such as Ontario&rsquo;s PHIPA and B.C.&rsquo;s FIPPA. The safeguards look similar &mdash; encryption, access controls, breach reporting &mdash; but the vendor relationship differs: instead of a BAA, vendors act as agents or service providers under written agreements, and several provinces expect health data to stay in Canada.</div></details></div>
+  </div></section>
+<section class="section-sm"><div class="wrap">
+    <div class="shead reveal"><span class="eyebrow">Explore the platform</span><h2 style="font-size:clamp(24px,3vw,32px)">Keep exploring</h2></div>
+    <div class="related"><a class="rcard reveal" href="/tsb-healthcare-preview/security/"><span><b>Security &amp; compliance</b><span>How TSB protects data</span></span><span class="arw"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a><a class="rcard reveal" href="/tsb-healthcare-preview/blog/best-patient-scheduling-software/"><span><b>Best patient scheduling software</b><span>The full buying guide</span></span><span class="arw"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a><a class="rcard reveal" href="/tsb-healthcare-preview/online-appointment-booking/"><span><b>Slot IQ Book — Online booking</b><span>24/7 self-scheduling</span></span><span class="arw"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a></div>
+  </div></section>
+<section class="section cta-band" id="demo"><div class="wrap"><div class="cta-card reveal">
+    <h2>Bring your privacy team to the demo</h2><p>We&rsquo;ll walk your IT and privacy stakeholders through the architecture, the data flows and the questionnaire answers &mdash; in one 30-minute session.</p>
+    <div class="btns"><a class="btn btn-primary" href="/tsb-healthcare-preview/book-a-demo/">Book a demo <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a><a class="btn btn-light" href="/tsb-healthcare-preview/roi-calculator/">Calculate your recovery</a></div>
+  </div></div></section>
+<section class="trusted"><div class="wrap">
+    <div class="t">Trusted by Leading Health Organizations</div>
+    <div class="logo-row">
+      <img src="/tsb-healthcare-preview/assets/img/partner-2.png" width="138" height="35" alt="Vancouver Coastal Health" loading="lazy">
+      <img src="/tsb-healthcare-preview/assets/img/partner-3.png" width="150" height="41" alt="Fraser Health" loading="lazy">
+      <img src="/tsb-healthcare-preview/assets/img/partner-4.png" width="97" height="53" alt="Interior Health" loading="lazy">
+      <img src="/tsb-healthcare-preview/assets/img/partner-1.png" width="180" height="48" alt="Provincial Health Services Authority" loading="lazy">
+      <img src="/tsb-healthcare-preview/assets/img/partner-5.png" width="169" height="44" alt="Providence Health Care" loading="lazy">
+      <span class="more">and more&hellip;</span>
+    </div>
+  </div></section>
+</main>
+<div class="sticky-cta" aria-hidden="true"><div class="sticky-in">
+    <div class="stext">See the capacity you could recover with TSB.</div>
+    <div class="sbtns">
+      <a class="btn btn-light" href="/tsb-healthcare-preview/roi-calculator/">Get the ROI report</a>
+      <a class="btn btn-primary" href="/tsb-healthcare-preview/book-a-demo/">Book a demo</a>
+      <button class="sclose" aria-label="Dismiss"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+  </div></div>
+<div class="vlight" aria-hidden="true"><div class="vbox"><button class="vclose" aria-label="Close video">Close &#10005;</button><video controls playsinline preload="none" poster="/assets/video/video-poster.jpg"><source src="/tsb-healthcare-preview/assets/video/tsb-overview.mp4" type="video/mp4"></video></div></div>
+<footer class="site"><div class="wrap">
+    <div class="foot">
+      <div class="brand"><img src="/tsb-healthcare-preview/assets/img/tsb-logo.svg" width="150" height="26" alt="TSB Healthcare"><p>Slot IQ™ by TSB Healthcare — scheduling, arrival and intelligence for healthcare, behind your existing front door.</p></div>
+      <div><h2 class="fcol-h">Platform</h2>
+        <a href="/tsb-healthcare-preview/slot-iq/">Slot IQ&trade; platform</a>
+        <a href="/tsb-healthcare-preview/online-appointment-booking/">Slot IQ Book — Online booking</a>
+        <a href="/tsb-healthcare-preview/self-check-in-kiosks/">Slot IQ Arrive — Kiosk check-in</a>
+        <a href="/tsb-healthcare-preview/staff-check-out/">Slot IQ Flow — Staff dashboard</a>
+        <a href="/tsb-healthcare-preview/waiting-room-display/">Slot IQ Arrive — Waiting room display</a>
+        <a href="/tsb-healthcare-preview/ai-scheduling-assistant/">Slot IQ Assist — AI booking assistant</a>
+        <a href="/tsb-healthcare-preview/patient-flow-analytics/">Slot IQ Insight — Analytics</a>
+        <a href="/tsb-healthcare-preview/patient-queue-management/">Slot IQ Flow — Queue engine</a>
+        <a href="/tsb-healthcare-preview/patient-intake-software/">Patient intake software</a>
+        <a href="/tsb-healthcare-preview/appointment-reminder-software/">Appointment reminders</a>
+        <a href="/tsb-healthcare-preview/patient-access-platform/">Patient access platform</a></div>
+      <div><h2 class="fcol-h">Scheduling software</h2>
+        <a href="/tsb-healthcare-preview/patient-scheduling-software/">Patient scheduling</a>
+        <a href="/tsb-healthcare-preview/patient-flow-management-software/">Patient flow management</a>
+        <a href="/tsb-healthcare-preview/healthcare-scheduling-software/">Healthcare scheduling</a>
+        <a href="/tsb-healthcare-preview/clinic-scheduling-software/">Clinic scheduling</a>
+        <a href="/tsb-healthcare-preview/hospital-scheduling-software/">Hospital scheduling</a></div>
+      <div><h2 class="fcol-h">Solutions</h2>
+        <a href="/tsb-healthcare-preview/solutions/">All solutions</a>
+        <a href="/tsb-healthcare-preview/solutions/hospitals/">Hospitals &amp; systems</a>
+        <a href="/tsb-healthcare-preview/solutions/government-public-sector/">Government &amp; public sector</a>
+        <a href="/tsb-healthcare-preview/solutions/diagnostic-labs/">Diagnostic labs</a>
+        <a href="/tsb-healthcare-preview/solutions/medical-imaging/">Medical imaging</a>
+        <a href="/tsb-healthcare-preview/solutions/immunization-public-health/">Public health</a></div>
+      <div><h2 class="fcol-h">Resources</h2>
+        <a href="/tsb-healthcare-preview/blog/">Guides &amp; resources</a>
+        <a href="/tsb-healthcare-preview/case-studies/">Case studies</a>
+        <a href="/tsb-healthcare-preview/roi-calculator/">ROI calculator</a>
+        <a href="/tsb-healthcare-preview/security/">Security &amp; compliance</a>
+        <a href="/tsb-healthcare-preview/compare/qless-alternative/">vs. QLess</a>
+        <a href="/tsb-healthcare-preview/compare/qmatic-alternative/">vs. Qmatic</a>
+        <a href="/tsb-healthcare-preview/compare/phreesia-alternative/">vs. Phreesia</a>
+        <a href="/tsb-healthcare-preview/about/">About us</a>
+        <a href="/tsb-healthcare-preview/contact/">Contact</a>
+        <a href="mailto:info@tsbhealthcare.com">info@tsbhealthcare.com</a></div>
+    </div>
+    <div class="foot-bottom"><span>&copy; 2026 TSB Healthcare. All rights reserved.</span><span>Serving healthcare across the U.S. &amp; Canada</span></div>
+  </div></footer>
+<script src="/tsb-healthcare-preview/assets/js/site.js" defer></script>
+</body>
+</html>

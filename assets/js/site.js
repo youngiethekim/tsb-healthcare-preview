@@ -7,7 +7,7 @@
       time instantly after they request a demo.
    Until these are set, forms still validate and show a success message.
    ===================================================================== */
-var TSB_WEB3FORMS_KEY = "";
+var TSB_WEB3FORMS_KEY = "f4d26f85-8346-487c-a4ef-618ff332c38c";
 var TSB_CALENDLY_URL = "";
 function tsbSubmitLead(form, extra) {
   return new Promise(function (resolve) {
@@ -35,12 +35,11 @@ function tsbSubmitLead(form, extra) {
     window.addEventListener("scroll", onScroll, { passive: true });
     var toggle = nav.querySelector(".nav-toggle");
     if (toggle) toggle.addEventListener("click", function () { nav.classList.toggle("open"); });
-    var mega = nav.querySelector(".mega-toggle");
-    if (mega) {
+    nav.querySelectorAll(".mega-toggle").forEach(function (mega) {
       var item = mega.closest(".nav-item");
       mega.addEventListener("click", function (e) { e.stopPropagation(); var o = item.classList.toggle("open"); mega.setAttribute("aria-expanded", o); });
       document.addEventListener("click", function (e) { if (!item.contains(e.target)) item.classList.remove("open"); });
-    }
+    });
     nav.querySelectorAll(".nav-links a").forEach(function (a) {
       a.addEventListener("click", function () { nav.classList.remove("open"); });
     });
@@ -264,6 +263,22 @@ function tsbSubmitLead(form, extra) {
     };
     var extra = {}; groups.forEach(function (g) { extra[g] = sel[g] || ""; }); extra._subject = "New demo request — TSB HealthCare";
     tsbSubmitLead(bform, extra).then(done);
+  });
+})();
+
+/* ---- contact form ---- */
+(function () {
+  "use strict";
+  var cform = document.getElementById("contact-form");
+  if (!cform) return;
+  cform.addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (!cform.checkValidity()) { cform.reportValidity(); return; }
+    tsbSubmitLead(cform, { _subject: "New contact message — TSB HealthCare website" }).then(function () {
+      cform.style.display = "none";
+      var ok = cform.parentNode.querySelector(".bok");
+      if (ok) ok.classList.add("show");
+    });
   });
 })();
 

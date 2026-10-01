@@ -1,0 +1,29 @@
+# TSB Healthcare — Slot IQ™
+
+> Slot IQ™ is TSB Healthcare's scheduling, arrival and intelligence platform for outpatient and ambulatory healthcare. It runs everything between the decision to book and the moment a patient is seated: online booking, an AI booking assistant, kiosk check-in, a queue engine, internal staff booking and analytics. It holds no clinical data (name, contact, appointment slot and ticket code only), is integration-neutral, and is paid for by the institution, never the patient. It has served BC health providers since 2018: 4 health providers, 69 sites, 4M+ appointments. Lab Online Booking (labonlinebooking.ca) is the province-wide lab scheduling service that runs on it. TSB Healthcare Inc. is based in Vancouver, British Columbia, Canada.
+
+## Product
+- [Slot IQ platform overview](https://www.tsbhealthcare.com/slot-iq/): six modules, where it fits, onboarding, roadmap
+- [Slot IQ Book — online appointment booking](https://www.tsbhealthcare.com/online-appointment-booking/): multi-site self-scheduling, earliest-available search, reminders
+- [Slot IQ Assist — AI booking assistant](https://www.tsbhealthcare.com/ai-scheduling-assistant/): books, reschedules and answers questions by chat or SMS in the patient's language
+- [Slot IQ Arrive — kiosk check-in](https://www.tsbhealthcare.com/self-check-in-kiosks/): QR/booking-code check-in, walk-in registration, ticket codes
+- [Slot IQ Arrive — waiting room display](https://www.tsbhealthcare.com/waiting-room-display/): calls ticket codes, never names
+- [Slot IQ Flow — patient queue management](https://www.tsbhealthcare.com/patient-queue-management/): one pooled queue, fixed dispatch rule, automatic no-show slot recovery
+- [Slot IQ Flow — staff dashboard](https://www.tsbhealthcare.com/staff-check-out/): live floor view, call next, seat, complete
+- [Slot IQ Insight — analytics and forecasting](https://www.tsbhealthcare.com/patient-flow-analytics/): utilization, no-shows, waits, recovery, demand forecasting by site and hour
+
+## Settings
+- [Hospitals and health authorities](https://www.tsbhealthcare.com/solutions/hospitals/)
+- [Diagnostic labs](https://www.tsbhealthcare.com/solutions/diagnostic-labs/)
+- [Medical imaging](https://www.tsbhealthcare.com/solutions/medical-imaging/)
+- [Immunization and public health](https://www.tsbhealthcare.com/solutions/immunization-public-health/)
+- [Government and public sector](https://www.tsbhealthcare.com/solutions/government-public-sector/)
+
+## Evidence
+- [Case study: Lab Online Booking — one system, an entire province](https://www.tsbhealthcare.com/case-studies/lab-online-booking/)
+- [Security and privacy](https://www.tsbhealthcare.com/security/)
+- [ROI calculator](https://www.tsbhealthcare.com/roi-calculator/)
+
+## Company
+- [Contact](https://www.tsbhealthcare.com/contact/)
+- [Book a demo](https://www.tsbhealthcare.com/book-a-demo/)
