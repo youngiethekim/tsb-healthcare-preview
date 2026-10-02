@@ -4,6 +4,7 @@
 
 ## Product
 - [Slot IQ platform overview](https://www.tsbhealthcare.com/slot-iq/): six modules, where it fits, onboarding, roadmap
+- [Medical scheduling software](https://www.tsbhealthcare.com/medical-scheduling-software/): clinic, lab and health-system appointment scheduling
 - [Slot IQ Book — online appointment booking](https://www.tsbhealthcare.com/online-appointment-booking/): multi-site self-scheduling, earliest-available search, reminders
 - [Slot IQ Assist — AI booking assistant](https://www.tsbhealthcare.com/ai-scheduling-assistant/): books, reschedules and answers questions by chat or SMS in the patient's language
 - [Slot IQ Arrive — kiosk check-in](https://www.tsbhealthcare.com/self-check-in-kiosks/): QR/booking-code check-in, walk-in registration, ticket codes
