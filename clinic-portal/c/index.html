@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Book your lab visit | Lab Online Booking</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="../../assets/img/favicon.svg">
+<link rel="stylesheet" href="../portal.css">
+<style>
+  .land { max-width: 520px; margin: 0 auto; padding: 28px 16px 48px; }
+  .land .card { padding: 26px; }
+  .land h1 { font-size: 26px; margin-top: 4px; }
+  .land .logo { max-width: 160px; max-height: 80px; display: block; margin-bottom: 14px; }
+  .land .have { background: var(--paper); border-radius: 12px; padding: 14px 16px; margin-top: 18px; }
+  .land .have ul { margin: 8px 0 0; padding-left: 20px; }
+  .land .btn-primary { margin-top: 20px; padding: 15px 18px; font-size: 17px; }
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in">
+  <span class="mark"><span class="mark-dot"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6L5 19a2 2 0 0 0 1.8 2.9h10.4A2 2 0 0 0 19 19l-5-10V3"/></svg></span><span>Lab Online Booking</span></span>
+</div></header>
+<div class="land" id="land" hidden>
+  <div class="card">
+    <img class="logo" id="logo" alt="" hidden>
+    <p class="muted small">Patients of</p>
+    <h1 id="name"></h1>
+    <p class="muted" style="margin-top:10px">Book your outpatient lab visit online. It takes about two minutes.</p>
+    <div class="have">
+      <b>Have ready</b>
+      <ul><li>Your lab requisition from your doctor</li><li>Your BC Services Card</li></ul>
+    </div>
+    <a class="btn btn-primary btn-block" id="book" href="#">Book a lab visit</a>
+    <p class="tiny" style="margin-top:14px">Books hospital and community health authority labs.</p>
+  </div>
+  <p class="tiny" id="demo-sim" hidden style="text-align:center;margin-top:14px">Demo: <a href="#" id="sim">simulate a completed booking</a> to see attribution on the clinic dashboard.</p>
+</div>
+<script src="../config.js"></script>
+<script src="../store.js"></script>
+<script>
+(function () {
+  var CFG = window.CLINIC_PORTAL_CONFIG, S = window.ClinicStore;
+  var q = new URLSearchParams(location.search);
+  // Fallback rule: unknown, pending, rejected or suspended goes to the normal
+  // booking home page with no error. A printed code must never dead-end.
+  if (!CFG.enabled) return location.replace(CFG.fallbackUrl);
+  var c = S.resolve({ code: q.get("code"), region: q.get("r"), slug: q.get("s") });
+  if (!c) return location.replace(CFG.fallbackUrl);
+  var medium = q.get("code") ? (q.get("m") || "link") : "link";
+  S.trackVisit(c.id, medium);
+  document.getElementById("name").textContent = c.display_name;
+  if (c.logo) { var l = document.getElementById("logo"); l.src = c.logo; l.alt = c.display_name; l.hidden = false; }
+  var book = document.getElementById("book");
+  book.href = CFG.bookingUrl.replace("{region}", encodeURIComponent(c.region_id));
+  book.addEventListener("click", function () { S.trackBooking("booking_started"); });
+  if (CFG.mode === "demo") {
+    document.getElementById("demo-sim").hidden = false;
+    document.getElementById("sim").onclick = function (e) {
+      e.preventDefault(); S.trackBooking("booking_started"); S.trackBooking("booking_completed");
+      this.parentNode.textContent = "Recorded one booking started and one completed. Open the clinic dashboard to see it.";
+    };
+  }
+  document.getElementById("land").hidden = false;
+})();
+</script>
+</body>
+</html>

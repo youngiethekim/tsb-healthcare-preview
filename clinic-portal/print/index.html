@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Printable | Lab Online Booking</title>
+<meta name="robots" content="noindex,nofollow">
+<style id="pagesize"></style>
+<style>
+  @font-face { font-family: "Hanken"; src: url(../../assets/fonts/hanken.woff2) format("woff2"); font-weight: 100 900; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { font-family: "Hanken", system-ui, sans-serif; color: #0a2740; background: #e9eef1; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .bar { position: sticky; top: 0; background: #0a2740; color: #fff; padding: 10px 16px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; font-size: 14px; z-index: 2; }
+  .bar button { font: inherit; font-weight: 700; background: #157a99; color: #fff; border: 0; border-radius: 8px; padding: 8px 14px; cursor: pointer; }
+  .bar a { color: #9fdcef; }
+  .stage { padding: 24px 12px; display: flex; justify-content: center; overflow-x: auto; }
+  .sheet { background: #fff; box-shadow: 0 10px 40px -10px rgba(0,0,0,.25); display: flex; flex-direction: column; align-items: center; text-align: center; overflow: hidden; position: relative; }
+  .band { width: 100%; background: #0a2740; color: #fff; font-weight: 800; letter-spacing: -.01em; display: flex; align-items: center; justify-content: center; gap: .4em; }
+  .band i { display: inline-block; width: 1.2em; height: 1.2em; border-radius: .3em; background: linear-gradient(135deg,#2bb0d2,#157a99); }
+  .body { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; }
+  .headline { font-weight: 800; letter-spacing: -.02em; line-height: 1.1; }
+  .action { font-weight: 800; color: #157a99; }
+  .qr svg { display: block; width: 100%; height: 100%; }
+  .short { font-family: ui-monospace, Menlo, monospace; font-weight: 700; }
+  .remind, .cover { color: #33505f; }
+  .foot { width: 100%; border-top: 1px solid #d4e2e8; color: #33505f; display: flex; justify-content: space-between; align-items: center; gap: 1em; }
+  .foot img { max-height: 3em; max-width: 40%; }
+  .err { max-width: 480px; margin: 60px auto; background: #fff; padding: 24px; border-radius: 12px; }
+
+  /* Poster: Letter 8.5 x 11 in */
+  .poster { width: 8.5in; height: 11in; }
+  .poster .band { font-size: 22pt; padding: .35in; }
+  .poster .body { padding: .5in .7in; gap: .22in; }
+  .poster .headline { font-size: 38pt; }
+  .poster .action { font-size: 24pt; }
+  .poster .qr { width: 3.6in; height: 3.6in; }
+  .poster .short { font-size: 15pt; }
+  .poster .remind { font-size: 15pt; }
+  .poster .cover { font-size: 12pt; }
+  .poster .foot { font-size: 12pt; padding: .3in .6in; }
+
+  /* Counter card: 4 x 6 in */
+  .card { width: 4in; height: 6in; }
+  .card .band { font-size: 12pt; padding: .16in; }
+  .card .body { padding: .2in .28in; gap: .1in; }
+  .card .headline { font-size: 17pt; }
+  .card .action { font-size: 13pt; }
+  .card .qr { width: 2.1in; height: 2.1in; }
+  .card .short { font-size: 9.5pt; }
+  .card .remind { font-size: 9.5pt; }
+  .card .cover { font-size: 8pt; }
+  .card .foot { font-size: 8.5pt; padding: .12in .25in; }
+
+  /* Stand label: 4.4 x 4.9 in */
+  .label { width: 4.4in; height: 4.9in; }
+  .label .band { font-size: 12pt; padding: .14in; }
+  .label .body { padding: .16in .3in; gap: .08in; }
+  .label .headline { font-size: 15pt; }
+  .label .action { font-size: 14pt; }
+  .label .qr { width: 1.9in; height: 1.9in; }
+  .label .short { font-size: 9pt; }
+  .label .remind { font-size: 9pt; }
+  .label .cover { font-size: 7.5pt; }
+  .label .foot { font-size: 8.5pt; padding: .1in .25in; }
+
+  @media print {
+    body { background: #fff; }
+    .bar { display: none; }
+    .stage { padding: 0; display: block; }
+    .sheet { box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+<div class="bar"><b id="title">Printable</b><span id="size"></span><span style="flex:1"></span><span>Print at actual size (100%). Use "Save as PDF" for a file.</span><button onclick="window.print()">Print / Save as PDF</button></div>
+<div class="stage" id="stage"></div>
+<script src="../config.js"></script>
+<script src="../vendor/qrcode.js"></script>
+<script src="../qr.js"></script>
+<script src="../store.js"></script>
+<script>
+(function () {
+  var S = window.ClinicStore;
+  var SPECS = {
+    poster: { name: "Poster", size: "8.5in 11in", label: "Letter, 8.5 × 11 in" },
+    card: { name: "Counter card", size: "4in 6in", label: "4 × 6 in" },
+    label: { name: "Stand label", size: "4.4in 4.9in", label: "4.4 × 4.9 in" }
+  };
+  var type = new URLSearchParams(location.search).get("type");
+  var spec = SPECS[type] || SPECS.poster; if (!SPECS[type]) type = "poster";
+  var stage = document.getElementById("stage");
+  function fail(msg) { stage.innerHTML = ""; var d = document.createElement("div"); d.className = "err"; d.textContent = msg; stage.appendChild(d); }
+
+  var me = S.me();
+  if (!me) return fail("Please sign in to the clinic portal first.");
+  var c;
+  try { c = S.kit(); } catch (e) { return fail(e.message); }
+
+  document.getElementById("title").textContent = spec.name;
+  document.getElementById("size").textContent = spec.label;
+  document.title = spec.name + " | " + c.display_name;
+  document.getElementById("pagesize").textContent = "@page { size: " + spec.size + "; margin: 0; }";
+
+  var shortTxt = c.links.short.replace(/^https?:\/\//, "");
+  // Built with DOM APIs so the clinic name is always treated as text.
+  var sheet = el("div", "sheet " + type);
+  var band = el("div", "band"); band.appendChild(el("i")); band.appendChild(document.createTextNode("Lab Online Booking")); sheet.appendChild(band);
+  var body = el("div", "body");
+  body.appendChild(el("div", "headline", "Need bloodwork? Book your lab visit before you leave."));
+  body.appendChild(el("div", "action", "Scan or tap to book"));
+  var qr = el("div", "qr"); qr.innerHTML = ClinicQR.svg(c.links.qr); body.appendChild(qr);
+  body.appendChild(el("div", "short", shortTxt));
+  body.appendChild(el("div", "remind", "Bring your requisition and your BC Services Card."));
+  body.appendChild(el("div", "cover", "Books hospital and community health authority labs."));
+  sheet.appendChild(body);
+  var foot = el("div", "foot");
+  foot.appendChild(el("span", "", "Lab Online Booking"));
+  if (c.public_logo) { var img = document.createElement("img"); img.src = c.public_logo; img.alt = c.display_name; foot.appendChild(img); }
+  else foot.appendChild(el("b", "", c.display_name));
+  sheet.appendChild(foot);
+  stage.appendChild(sheet);
+
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+})();
+</script>
+</body>
+</html>
