@@ -219,7 +219,7 @@
     var body = c.logo_status === "approved"
       ? "Your logo appears next to the Lab Online Booking name on every printable. You can turn it off for any format on the print page."
       : c.logo_status === "pending" ? "Thanks. Our team reviews logos within two business days. Until then your clinic name prints as text."
-      : "Add your clinic logo to the posters, signs and handouts. Until you do, your clinic name prints as text.";
+      : "Add your clinic logo to the posters, signs and handouts. Upload it here, or click the dashed \u201cYour logo here\u201d box on any printable. Until it's approved, your clinic name prints in that spot.";
     return '<div class="card"><div class="row">' + (c.logo_data ? '<img class="logo-prev" src="' + esc(c.logo_data) + '" alt="Your clinic logo">' : "") + '<div style="flex:1;min-width:220px"><div class="row"><h2>Your logo on printables</h2>' + state + '</div><p class="muted small" style="margin-top:4px">' + body + "</p></div></div>" +
       '<form id="klf" class="row" style="margin-top:14px" novalidate><input id="klogo" type="file" accept="image/png,image/jpeg" aria-label="Logo file"><button class="btn btn-ghost btn-sm" type="submit">' + (c.logo_data ? "Replace logo" : "Upload logo") + '</button><span class="tiny">PNG or JPG, 1 MB at most. No health authority logos. A new logo is reviewed before it prints.</span><div class="form-msg" hidden style="flex-basis:100%"></div></form></div>';
   }

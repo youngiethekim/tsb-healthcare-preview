@@ -37,10 +37,19 @@
 
   function header(d) {
     var brand = '<div class="brand">' + LEAF + '<div><div class="bn">Lab Online Booking</div><div class="bt">Accessible healthcare for BC.</div></div></div>';
+    var cname = '<div class="cname' + (d.slot ? " print-only" : "") + '"><span>For patients of</span><b>' + esc(d.name) + "</b></div>";
     var right = d.logo
       ? '<span class="vr"></span><img class="clogo" src="' + esc(d.logo) + '" alt="' + esc(d.name) + '">'
-      : '<span class="vr"></span><div class="cname"><span>For patients of</span><b>' + esc(d.name) + "</b></div>";
+      : '<span class="vr"></span>' + (d.slot ? logoSlot(d) : "") + cname;
     return '<header class="hdr">' + brand + right + "</header>";
+  }
+  // Screen-only "Your logo here" box. Never prints: print.css hides it, and the
+  // clinic name prints in its place until TSB approves a logo.
+  function logoSlot(d) {
+    if (d.pendingLogo) {
+      return '<button type="button" class="logo-slot has-img" data-logo-slot aria-label="Replace your clinic logo"><img src="' + esc(d.pendingLogo) + '" alt=""><span class="ls-tag">In review · won\'t print yet</span></button>';
+    }
+    return '<button type="button" class="logo-slot" data-logo-slot aria-label="Upload your clinic logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg><span><b>Your logo here</b><small>Click to upload</small></span></button>';
   }
   var SWOOSH = '<svg class="swoosh" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path d="M3 14C80 3 200 1 297 6" fill="none" stroke="#2f7fe0" stroke-width="5" stroke-linecap="round"/></svg>';
   function qrCard(d, cls) {
@@ -132,8 +141,25 @@
   photoBox.checked = q.get("photo") !== "0";
   veeBox.checked = q.get("vee") !== "0";
   var note = document.getElementById("note");
-  note.textContent = c.logo_status === "pending" ? "Your logo is waiting for review. It appears here once approved."
-    : !c.public_logo ? "Add your logo in Clinic profile." : "";
+  function setNote() {
+    note.classList.remove("bad");
+    note.textContent = c.logo_status === "pending" ? "Your logo is in review. Until it's approved, your clinic name prints in that spot."
+      : !c.public_logo && !isAdmin ? "Click \u201cYour logo here\u201d to add your logo." : "";
+  }
+  setNote();
+
+  // Upload straight from the logo spot on the preview.
+  var fileIn = document.createElement("input");
+  fileIn.type = "file"; fileIn.accept = "image/png,image/jpeg"; fileIn.hidden = true; document.body.appendChild(fileIn);
+  stage.addEventListener("click", function (e) { if (!isAdmin && e.target.closest("[data-logo-slot]")) fileIn.click(); });
+  fileIn.addEventListener("change", async function () {
+    var file = fileIn.files[0]; fileIn.value = ""; if (!file) return;
+    try {
+      await S.uploadLogo(file);
+      c = S.kit(); logoBox.disabled = !c.public_logo; logoBox.checked = !!c.public_logo;
+      setNote(); render();
+    } catch (err) { note.textContent = err.message; note.classList.add("bad"); }
+  });
 
   function render() {
     var f = FORMATS[fmt];
@@ -146,6 +172,8 @@
       logo: logoBox.checked ? c.public_logo : null,
       photo: photoBox.checked,
       vee: veeBox.checked,
+      slot: !isAdmin && !c.public_logo,
+      pendingLogo: c.logo_status === "pending" ? c.logo_data : null,
       qr: ClinicQR.svg(c.links.qr),
       shortTxt: c.links.short.replace(/^https?:\/\//, "").replace(/^labonlinebooking\.ca/i, "LabOnlineBooking.ca")
     });

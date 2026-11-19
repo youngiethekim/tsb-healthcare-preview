@@ -24,7 +24,7 @@ approval the **Booking kit** unlocks.
 | `store.js` | Data layer. Demo adapter today. Holds every rule (approval gate, single-use links, rate limits, clinic isolation). |
 | `vee.js` | Vee, the portal's guide character (an original test-tube mascot). Gives tips in speech bubbles on each screen, on the patient page, and optionally on printables. Tips can be dismissed and brought back with **Tips** in the header. |
 | `qr.js`, `vendor/qrcode.js` | QR generation: error correction H, 4-module quiet zone, black on white, SVG and 1024 px PNG. Library: qrcode-generator 2.0.4 (MIT, Kazuhiko Arase). |
-| `print/` | Print templates in the Lab Online Booking poster style (`templates.js`, `print.css`, `img/lab-desk.webp`). Clinic formats: poster (Letter), large poster (Tabloid 11×17), countertop sign (5×7), counter card (4×6), table tent (Letter, folds to 8.5×5.5) and patient handouts (4 per Letter sheet). Options: clinic logo, photo, Vee. "Save as PDF" gives a one-page PDF at the exact size. The NFC stand label (4.4×4.9) is printed by TSB from the admin stand queue. |
+| `print/` | Print templates in the Lab Online Booking poster style (`templates.js`, `print.css`, `img/lab-desk.webp`). Clinic formats: poster (Letter), large poster (Tabloid 11×17), countertop sign (5×7), counter card (4×6), table tent (Letter, folds to 8.5×5.5) and patient handouts (4 per Letter sheet). Options: clinic logo, photo, Vee. Until a logo is approved, each format shows a dashed "Your logo here" box in the logo spot. It is on screen only (it never prints), and clicking it uploads the logo. "Save as PDF" gives a one-page PDF at the exact size. The NFC stand label (4.4×4.9) is printed by TSB from the admin stand queue. |
 | `c/` | Public patient landing page (`?code=XXXXXX&m=qr`, or `?r=vch&s=pacific-blvd`). Records the visit and links into booking. |
 | `config.js` | Feature flag, base domain, regions, stand cap, timeouts. |
 | `tests/e2e.js` | Playwright acceptance test covering section 12 of the brief. |
@@ -86,6 +86,8 @@ python3 -m http.server 8765    # from the repo root
 npm i playwright jsqr pngjs && node clinic-portal/tests/e2e.js
 ```
 
-The test registers "Pacific Blvd Clinic" in VCH and runs the full journey. It
+`tests/logo-slot.js` checks the "Your logo here" placeholder: it shows on screen, never prints, uploads on click, and gives way to the approved logo.
+
+The main test registers "Pacific Blvd Clinic" in VCH and runs the full journey. It
 decodes the downloaded QR PNG and checks the printables, attribution, stand
 fulfilment, clinic isolation, suspension fallback and rate limits.
