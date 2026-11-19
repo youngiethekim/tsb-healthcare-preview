@@ -204,14 +204,12 @@ home = f'''
 <section class="section" aria-labelledby="ha">
   <div class="wrap">
     <h2 class="ha-title" id="ha">Participating Health Authorities</h2>
-    <!-- Replace each text wordmark with the authority's official logo file
-         (assets/img/ha/*.svg) once usage approval is in hand. -->
     <ul class="ha-list">
-      <li><a class="ha ha--vch" href="{{r}}locations/?ha=vch"><span class="ha-name">Vancouver<b>Coastal<span>Health</span></b></span></a></li>
-      <li><a class="ha ha--fh" href="{{r}}locations/?ha=fh"><span class="ha-name">fraserhealth</span></a></li>
-      <li><a class="ha ha--ih" href="{{r}}locations/?ha=ih"><span class="ha-name">Interior Health</span></a></li>
-      <li><a class="ha ha--ph" href="{{r}}locations/?ha=phc"><span class="ha-name">Providence<small>Health Care</small></span></a></li>
-      <li><a class="ha ha--phsa" href="{{r}}locations/?ha=phsa"><span class="ha-name">Provincial Health<br>Services Authority<br>(PHSA)</span></a></li>
+      <li><a class="ha" href="{{r}}locations/?ha=vch"><img src="{{r}}assets/img/ha/vch.png" width="138" height="35" alt="Vancouver Coastal Health"></a></li>
+      <li><a class="ha" href="{{r}}locations/?ha=fh"><img src="{{r}}assets/img/ha/fraser-health.png" width="150" height="41" alt="Fraser Health"></a></li>
+      <li><a class="ha" href="{{r}}locations/?ha=ih"><img src="{{r}}assets/img/ha/interior-health.png" width="97" height="53" alt="Interior Health"></a></li>
+      <li><a class="ha" href="{{r}}locations/?ha=phc"><img src="{{r}}assets/img/ha/providence.png" width="169" height="44" alt="Providence Health Care"></a></li>
+      <li><a class="ha" href="{{r}}locations/?ha=phsa"><img src="{{r}}assets/img/ha/phsa.png" width="180" height="48" alt="Provincial Health Services Authority"></a></li>
     </ul>
   </div>
 </section>

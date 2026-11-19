@@ -240,22 +240,16 @@ a.card:hover { box-shadow: var(--shadow-card); transform: translateY(-2px); }
 .ha-list { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 26px 0 10px; padding: 0; list-style: none; }
 .ha-list li { flex: 1; display: flex; justify-content: center; align-items: center; min-height: 66px; padding: 0 12px; }
 .ha-list li + li { border-left: 2px solid #c6d3e3; }
-.ha { display: flex; align-items: center; gap: 8px; text-decoration: none; color: inherit; line-height: 1.05; }
-.ha-mark { width: 40px; height: 40px; flex: none; }
-.ha-name { font-weight: 700; font-size: 20px; letter-spacing: -.02em; }
-.ha-name small { display: block; font-size: 15px; font-weight: 700; }
-.ha--vch .ha-name { color: #7bb73f; font-size: 15px; } .ha--vch .ha-name b { display: block; font-size: 21px; color: #6aab2e; } .ha--vch .ha-name b span { color: #2b7cc0; }
-.ha--fh .ha-name { color: #1f3f8f; font-size: 24px; font-weight: 600; letter-spacing: -.04em; }
-.ha--ih .ha-name { color: #1d4f9c; font-size: 21px; font-weight: 600; }
-.ha--ph .ha-name { color: #1b2b4b; font-size: 19px; }
-.ha--phsa .ha-name { color: #1b2b4b; font-size: 15px; line-height: 1.12; }
+.ha { display: flex; align-items: center; justify-content: center; text-decoration: none; transition: transform .2s var(--ease); }
+.ha:hover { transform: translateY(-2px); }
+.ha img { width: auto; max-width: 100%; height: auto; max-height: 53px; }
 .ha-note { text-align: center; font-size: 13.5px; color: var(--muted); }
 @media (max-width: 980px) {
   .ha-list { flex-wrap: wrap; justify-content: center; gap: 14px 0; }
   .ha-list li { flex: 0 0 33.33%; }
   .ha-list li + li { border-left: 0; }
 }
-@media (max-width: 560px) { .ha-title::before, .ha-title::after { display: none; } .ha-title { text-align: center; } .ha-list li { flex-basis: 50%; padding: 0 6px; } .ha-name { font-size: 17px; } .ha--fh .ha-name { font-size: 20px; } }
+@media (max-width: 560px) { .ha-title::before, .ha-title::after { display: none; } .ha-title { text-align: center; } .ha-list li { flex-basis: 50%; padding: 0 6px; } }
 
 /* -----------------------------------------------------------------
    Footer

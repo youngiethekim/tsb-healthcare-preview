@@ -28,7 +28,7 @@ The AI Booking Assistant panel is on every page. It opens from **Chat Now** or f
 assets/css/lob.css     All styles. Design tokens are at the top (:root).
 assets/js/data.js      Config + SAMPLE data (authorities, locations, postal prefixes).
 assets/js/lob.js       Header menus, counter, search, booking flow, manage, assistant.
-assets/img/            hero-lab.webp (cropped from the mockup), favicon.svg
+assets/img/            hero-lab.webp (cropped from the mockup), favicon.svg, ha/ (authority logos)
 assets/fonts/          Hanken Grotesk (variable, self-hosted)
 build.py               Optional. Regenerates the 7 pages from one header/footer.
 ```
@@ -78,7 +78,7 @@ Match these to the fields the production booking flow already collects.
 
 ## Before launch
 
-1. **Health authority logos.** The homepage shows text wordmarks in each authority's colours, not their logos. Put the official files in `assets/img/ha/` only after each authority approves the use. The clinic portal brief says authority logos never appear on printables, so check that this homepage use is approved.
+1. **Health authority logos** are in `assets/img/ha/`, the same files the TSB site uses (`assets/img/partner-*.png`). They are small (about 100–180px wide), so get higher-resolution or SVG versions for sharp display on high-density screens.
 2. **Counter figure.** The mockup says 4,500,000+. The case study says 4M+ across four providers, and the mockup lists five authorities. Confirm the number and the list.
 3. **Hero photo.** `hero-lab.webp` is cropped from the mockup at low resolution. Replace it with the full-resolution original.
 4. **Copy.** The FAQ, privacy and accessibility text is placeholder. Have it reviewed.
