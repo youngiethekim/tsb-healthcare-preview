@@ -27,11 +27,11 @@
         <div class="menu">
           <a href="../locations/">All participating locations<small>Search by city or postal code</small></a>
           <hr>
-          <a href="../locations/?ha=vch">Vancouver Coastal Health</a>
-          <a href="../locations/?ha=fh">Fraser Health</a>
-          <a href="../locations/?ha=ih">Interior Health</a>
-          <a href="../locations/?ha=phc">Providence Health Care</a>
-          <a href="../locations/?ha=phsa">Provincial Health Services Authority</a>
+          <a href="../locations/vancouver-coastal-health/">Vancouver Coastal Health</a>
+          <a href="../locations/fraser-health/">Fraser Health</a>
+          <a href="../locations/interior-health/">Interior Health</a>
+          <a href="../locations/providence-health-care/">Providence Health Care</a>
+          <a href="../locations/phsa/">Provincial Health Services Authority</a>
         </div>
       </div>
       <span class="nav-sep" aria-hidden="true"></span>
@@ -67,6 +67,9 @@
       <button class="btn btn-primary">Find Labs <svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></button>
     </form>
   </div>
+  <h2 class="sub-h">Browse by health authority</h2>
+  <ul class="org-strip"><li><a href="../locations/vancouver-coastal-health/"><img src="../assets/img/ha/vch.png" width="138" height="35" alt="Vancouver Coastal Health"></a></li><li><a href="../locations/fraser-health/"><img src="../assets/img/ha/fraser-health.png" width="150" height="41" alt="Fraser Health"></a></li><li><a href="../locations/interior-health/"><img src="../assets/img/ha/interior-health.png" width="97" height="53" alt="Interior Health"></a></li><li><a href="../locations/providence-health-care/"><img src="../assets/img/ha/providence.png" width="169" height="44" alt="Providence Health Care"></a></li><li><a href="../locations/phsa/"><img src="../assets/img/ha/phsa.png" width="180" height="48" alt="Provincial Health Services Authority"></a></li></ul>
+  <h2 class="sub-h">All locations</h2>
   <div class="loc-layout">
     <aside class="filters"><h2>Health authority</h2><label><input type="checkbox" value="vch" checked> Vancouver Coastal Health</label><label><input type="checkbox" value="fh" checked> Fraser Health</label><label><input type="checkbox" value="ih" checked> Interior Health</label><label><input type="checkbox" value="phc" checked> Providence Health Care</label><label><input type="checkbox" value="phsa" checked> PHSA</label></aside>
     <div><p class="loc-count" id="loc-count" aria-live="polite"></p><div class="loc-list" id="loc-list"></div></div>

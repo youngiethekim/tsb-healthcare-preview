@@ -19,6 +19,8 @@ at the top of every page says so. Remove it when the pages are wired to Slot IQ.
 | `/manage/` | `manage/index.html` | "Sign In / Manage Your Booking": look up with confirmation code + last name, then cancel or rebook |
 | `/help/` | `help/index.html` | FAQs with anchors `#booking #before #changes #contact #privacy #accessibility` |
 | `/for-clinics/` | `for-clinics/index.html` | Clinic resources, links to the existing `/clinic-portal/` |
+| `/locations/{org}/` | `locations/fraser-health/index.html` etc. | **Health authority page** (one per authority): logo, stats, search limited to that authority, community filter, its locations with next opening, before-you-book info, other authorities |
+| `/locations/{org}/{location}/` | `locations/fraser-health/surrey-central/index.html` etc. | **Location page** (one per lab): open/closed now, next available times (tap one to go straight to details), services, before you go, address and map, weekly hours with today highlighted, accessibility, parking and transit, nearby labs |
 
 The AI Booking Assistant panel is on every page. It opens from **Chat Now** or from any URL ending in `#assistant`.
 
@@ -26,11 +28,13 @@ The AI Booking Assistant panel is on every page. It opens from **Chat Now** or f
 
 ```
 assets/css/lob.css     All styles. Design tokens are at the top (:root).
-assets/js/data.js      Config + SAMPLE data (authorities, locations, postal prefixes).
+data/sample-data.json  SAMPLE data: authorities, locations, postal prefixes. Edit this one.
+assets/js/data.js      GENERATED from the JSON by build.py, for the scripts.
 assets/js/lob.js       Header menus, counter, search, booking flow, manage, assistant.
 assets/img/            hero-lab.webp (cropped from the mockup), favicon.svg, ha/ (authority logos)
 assets/fonts/          Hanken Grotesk (variable, self-hosted)
-build.py               Optional. Regenerates the 7 pages from one header/footer.
+build.py               Regenerates every page from one header/footer and the JSON data,
+                       including one page per health authority and per location.
 ```
 
 Header and footer are the same on every page, between `<!-- partial: header -->`
@@ -39,6 +43,21 @@ partial (`@include('lob.header')`) and drop `build.py`. To change the header
 without Laravel, edit `build.py` and run `python3 build.py`.
 
 All paths are relative, so the folder works at a domain root or in a subfolder.
+
+### Organization and location templates
+
+`build.py` holds the two templates (search for `ORGANIZATION + LOCATION TEMPLATES`).
+In Laravel they become two Blade views fed by the existing records:
+
+| Route | View | Data it needs |
+|---|---|---|
+| `/locations/{organization:slug}` | `lob.organization` | name, slug, logo, short description, its locations |
+| `/locations/{organization:slug}/{location:slug}` | `lob.location` | name, organization, city, address, where in the building, services, per-day hours, accessibility list, parking/transit text |
+
+Open/closed status, "Next" tags and next available times are filled in the browser
+from the availability API, so the page HTML can be cached. Book links pass
+`?lab=`, `?ha=`, or `?lab=&date=YYYY-MM-DD&time={minutes}` into `/book/`.
+Address, building and parking text in the sample data are placeholders.
 
 ## Design tokens
 

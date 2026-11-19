@@ -17,6 +17,8 @@
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
     });
   }
+  function haSlug(id) { var h = HAS.filter(function (x) { return x.id === id; })[0]; return h ? h.slug : ""; }
+  function locUrl(l) { return root + "locations/" + haSlug(l.ha) + "/" + l.id + "/"; }
   function haName(id) { var h = HAS.filter(function (x) { return x.id === id; })[0]; return h ? h.name : ""; }
   function locById(id) { return LOCS.filter(function (l) { return l.id === id; })[0]; }
   function store(key, val) {
@@ -116,7 +118,7 @@
     var next = nextAvailable(l);
     var nextTxt = next ? "Next: " + next.toLocaleDateString("en-CA", { weekday: "short", month: "short", day: "numeric" }) : "No openings in 3 weeks";
     return '<article class="loc">' +
-      "<h3>" + esc(l.name) + "</h3>" +
+      '<h3><a href="' + locUrl(l) + '">' + esc(l.name) + "</a></h3>" +
       '<div class="meta"><span>' + esc(l.city) + "</span><span>" + esc(haName(l.ha)) + "</span><span>" + esc(l.hours) + "</span></div>" +
       '<div class="tags">' + l.services.map(function (s) { return '<span class="tag">' + esc(s) + "</span>"; }).join("") + '<span class="tag next">' + esc(nextTxt) + "</span></div>" +
       (pick
@@ -181,6 +183,12 @@
     if (!app) return;
     var params = new URLSearchParams(location.search);
     var state = { lab: locById(params.get("lab")) || null, day: null, time: null };
+    var haParam = params.get("ha");
+    if (state.lab && /^\d{4}-\d{2}-\d{2}$/.test(params.get("date") || "")) {
+      var dp = params.get("date").split("-"); state.day = new Date(+dp[0], +dp[1] - 1, +dp[2]);
+      var tp = parseInt(params.get("time"), 10);
+      if (slotsFor(state.lab, state.day).indexOf(tp) > -1) state.time = tp;
+    }
     var steps = $$(".progress li");
 
     function setStep(n) {
@@ -199,8 +207,8 @@
         '<p class="loc-count" id="bk-count" style="margin-top:16px"></p><div class="loc-list" id="bk-list"></div></section>';
       var q = $("#bk-q"); q.value = params.get("q") || "";
       function run() {
-        var r = searchLocations(q.value);
-        $("#bk-count").textContent = r.matched ? r.list.length + " locations" : "No exact match. Showing all participating locations.";
+        var r = searchLocations(q.value, haParam ? [haParam] : null);
+        $("#bk-count").textContent = r.matched ? r.list.length + " locations" + (haParam ? " in " + haName(haParam) : "") : "No exact match. Showing all participating locations.";
         $("#bk-list").innerHTML = r.list.map(function (l) { return locCard(l, true); }).join("");
       }
       $("#bk-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
@@ -303,7 +311,7 @@
         '<div class="actions" style="justify-content:center"><a class="btn btn-outline" href="' + root + 'manage/">Manage booking</a><button class="btn btn-ghost" onclick="window.print()">Print</button></div></section>';
     }
 
-    if (state.lab) stepTime(); else stepLab();
+    if (state.lab && state.time != null) stepDetails(); else if (state.lab) stepTime(); else stepLab();
   }
 
   function fld(name, label, type, ac, req, extra) {
@@ -402,6 +410,64 @@
     if (location.hash === "#assistant") open();
   }
 
+  /* ---------------- Next-available tags on server-rendered cards ---------------- */
+  function fillNextTags() {
+    $$("[data-next]").forEach(function (el) {
+      var l = locById(el.getAttribute("data-next")); if (!l) return;
+      var n = nextAvailable(l);
+      el.textContent = n ? "Next: " + n.toLocaleDateString("en-CA", { weekday: "short", month: "short", day: "numeric" }) : "No openings in 3 weeks";
+    });
+  }
+
+  /* ---------------- Organization page ---------------- */
+  function initOrg() {
+    var list = $("#org-list");
+    if (!list) return;
+    $$(".city-chip").forEach(function (chip) {
+      chip.addEventListener("click", function () {
+        var c = chip.getAttribute("data-city");
+        $$(".city-chip").forEach(function (x) { x.setAttribute("aria-pressed", x === chip); });
+        $$(".loc", list).forEach(function (card) { card.hidden = !!c && card.getAttribute("data-city") !== c; });
+      });
+    });
+  }
+
+  /* ---------------- Location page ---------------- */
+  // API: open/closed should use the site's per-day hours and holiday calendar.
+  function openStatus(hours, now) {
+    var m = hours.match(/(\w{3})–(\w{3}) (\d{1,2}):(\d{2})–(\d{1,2}):(\d{2})/);
+    if (!m) return null;
+    var days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    var a = days.indexOf(m[1]), b = days.indexOf(m[2]), d = now.getDay();
+    var mins = now.getHours() * 60 + now.getMinutes(), open = +m[3] * 60 + +m[4], close = +m[5] * 60 + +m[6];
+    var dayOpen = d >= a && d <= b;
+    if (dayOpen && mins >= open && mins < close) return { open: true, text: "Open now · closes " + fmtTime(close) };
+    if (dayOpen && mins < open) return { open: false, text: "Closed · opens " + fmtTime(open) + " today" };
+    return { open: false, text: "Closed now" };
+  }
+  function initLocation() {
+    var st = $("[data-open-status]");
+    if (st) {
+      var s = openStatus(st.getAttribute("data-hours"), new Date());
+      if (s) { st.textContent = s.text; st.classList.add(s.open ? "is-open" : "is-closed"); }
+      var dow = (new Date().getDay() + 6) % 7, row = $('.hours tr[data-dow="' + dow + '"]');
+      if (row) { row.classList.add("today"); row.querySelector("th").insertAdjacentHTML("beforeend", ' <span class="today-tag">Today</span>'); }
+    }
+    var box = $("#next-times");
+    if (!box) return;
+    var l = locById(box.getAttribute("data-lab")), d = new Date(); d.setHours(0, 0, 0, 0);
+    var html = "", shown = 0;
+    for (var i = 0; i < 21 && shown < 2; i++) {
+      var day = new Date(d); day.setDate(d.getDate() + i);
+      var s2 = slotsFor(l, day); if (!s2.length) continue;
+      shown++;
+      var label = i === 0 ? "Today" : i === 1 ? "Tomorrow" : day.toLocaleDateString("en-CA", { weekday: "long" });
+      html += '<p class="slot-group">' + label + " · " + day.toLocaleDateString("en-CA", { month: "long", day: "numeric" }) + '</p><div class="slots">' +
+        s2.slice(0, 8).map(function (t) { return '<a class="slot" href="' + root + "book/?lab=" + l.id + "&date=" + ymd(day) + "&time=" + t + '">' + fmtTime(t) + "</a>"; }).join("") + "</div>";
+    }
+    box.innerHTML = html || '<div class="empty">No openings in the next 3 weeks. Try a <a href="' + root + 'locations/">nearby lab</a>.</div>';
+  }
+
   document.documentElement.classList.add("js");
   initHeader();
   initCounter();
@@ -410,4 +476,7 @@
   initBook();
   initManage();
   initAssistant();
+  fillNextTags();
+  initOrg();
+  initLocation();
 })();
