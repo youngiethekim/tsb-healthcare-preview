@@ -1,0 +1,681 @@
+<title>LabOnlineBooking Redesign</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: a framed, working booking app on top (task area + sticky "Your visit" summary),
+   then the design rationale below it as a plain reading column. */
+:root {
+  --bg: #eef4f7;
+  --surface: #ffffff;
+  --surface-2: #f5f9fb;
+  --ink: #102a3a;
+  --ink-soft: #46606f;
+  --muted: #6d8794;
+  --line: #dbe7ec;
+  --accent: #0f7590;
+  --accent-ink: #ffffff;
+  --accent-soft: #e3f3f8;
+  --navy: #0a2740;
+  --ok: #1d7a4c;
+  --ok-soft: #e4f4ec;
+  --warn: #8a5a00;
+  --warn-soft: #fff4dc;
+  --danger: #b3261e;
+  --danger-soft: #fdecea;
+  --focus: #26a9cc;
+  --f: "Hanken Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --r: 14px;
+  --fs: 16px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0a1820; --surface: #10232e; --surface-2: #142b37; --ink: #e5f0f4; --ink-soft: #a6bcc7; --muted: #84a0ad;
+  --line: #22404e; --accent: #4cc3e0; --accent-ink: #06202c; --accent-soft: #123947; --navy: #071722;
+  --ok: #6fd3a0; --ok-soft: #12352a; --warn: #f2c46b; --warn-soft: #3a2d10; --danger: #ff8a80; --danger-soft: #3d1b19;
+  --focus: #7fdcf2; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0a1820; --surface: #10232e; --surface-2: #142b37; --ink: #e5f0f4; --ink-soft: #a6bcc7; --muted: #84a0ad;
+  --line: #22404e; --accent: #4cc3e0; --accent-ink: #06202c; --accent-soft: #123947; --navy: #071722;
+  --ok: #6fd3a0; --ok-soft: #12352a; --warn: #f2c46b; --warn-soft: #3a2d10; --danger: #ff8a80; --danger-soft: #3d1b19;
+  --focus: #7fdcf2; color-scheme: dark; }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f); font-size: var(--fs); line-height: 1.55; -webkit-font-smoothing: antialiased; }
+h1, h2, h3, h4 { margin: 0; line-height: 1.15; letter-spacing: -0.02em; text-wrap: balance; }
+p { margin: 0; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 6px; }
+.page { max-width: 1120px; margin: 0 auto; padding-block: 28px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 40px; }
+
+/* intro */
+.intro { display: grid; gap: 10px; max-width: 68ch; }
+.eyebrow { font-size: 12.5px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--accent); }
+.intro h1 { font-size: clamp(28px, 4vw, 40px); font-weight: 800; }
+.intro p { color: var(--ink-soft); font-size: 17px; }
+
+/* ===== the app ===== */
+.app { background: var(--surface); border: 1px solid var(--line); border-radius: 22px; overflow: hidden; box-shadow: 0 30px 60px -36px rgba(8,32,54,.35); font-size: calc(var(--fs) * var(--scale, 1)); }
+.app.large { --scale: 1.15; }
+.bar { background: var(--navy); color: #fff; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 12px 20px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.05em; letter-spacing: -.01em; background: none; border: 0; color: #fff; cursor: pointer; padding: 4px 0; }
+.brand .mark { width: 30px; height: 30px; border-radius: 9px; background: linear-gradient(135deg,#2bb0d2,#157a99); display: grid; place-items: center; }
+.bar-tools { margin-left: auto; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.bar-btn { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.22); color: #fff; border-radius: 9px; padding: 7px 12px; font-size: .86em; font-weight: 600; cursor: pointer; }
+.bar-btn[aria-pressed="true"] { background: #fff; color: #0a2740; }
+.bar select.bar-btn { padding-right: 8px; }
+.bar select.bar-btn option { color: #102a3a; }
+.proto-note { background: var(--warn-soft); color: var(--warn); font-size: .82em; font-weight: 600; padding: 7px 20px; border-bottom: 1px solid var(--line); }
+
+.progress { display: flex; gap: 6px; padding: 16px 22px 0; list-style: none; margin: 0; }
+.progress li { flex: 1; min-width: 0; }
+.progress .seg { height: 5px; border-radius: 99px; background: var(--line); }
+.progress li.done .seg, .progress li.now .seg { background: var(--accent); }
+.progress .lbl { display: block; font-size: .76em; font-weight: 600; color: var(--muted); margin-top: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.progress li.now .lbl { color: var(--ink); }
+@media (max-width: 600px) { .progress li:not(.now) .lbl { visibility: hidden; } .progress li.now .lbl { overflow: visible; } .hide-sm { display: none; } .bar { padding: 10px 16px; } .bar-tools { margin-left: 0; } }
+
+.body { display: grid; grid-template-columns: minmax(0,1fr) 300px; gap: 0; min-height: 520px; }
+.main { padding: 22px 26px 30px; min-width: 0; display: grid; gap: 20px; align-content: start; }
+.side { border-left: 1px solid var(--line); background: var(--surface-2); padding: 22px; }
+.app.no-side .body { grid-template-columns: 1fr; }
+.app.no-side .side { display: none; }
+@media (max-width: 820px) {
+  .body { grid-template-columns: 1fr; }
+  .side { border-left: 0; border-top: 1px solid var(--line); order: -1; padding: 12px 18px; }
+  .main { padding: 18px 18px 26px; }
+  .side .sum-list { display: none; }
+  .side.open .sum-list { display: grid; }
+  .side .sum-toggle { display: flex; }
+}
+
+.step-head { display: grid; gap: 6px; }
+.step-head h2 { font-size: 1.55em; font-weight: 800; }
+.step-head h2:focus { outline: none; }
+.step-head p { color: var(--ink-soft); }
+.back { justify-self: start; background: none; border: 0; color: var(--accent); font-weight: 700; padding: 4px 0; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 11px; padding: 13px 20px; font-weight: 700; border: 1.5px solid transparent; cursor: pointer; min-height: 48px; }
+.btn-primary { background: var(--accent); color: var(--accent-ink); }
+.btn-primary:hover { filter: brightness(1.08); }
+.btn-primary:disabled { opacity: .45; cursor: not-allowed; filter: none; }
+.btn-ghost { background: transparent; border-color: var(--line); color: var(--ink); }
+.btn-ghost:hover { border-color: var(--accent); }
+.btn-danger { background: var(--danger); color: #fff; }
+.actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.actions .hint { color: var(--muted); font-size: .88em; }
+
+/* home */
+.home-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
+@media (max-width: 720px) { .home-grid { grid-template-columns: 1fr; } }
+.tile { text-align: left; background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--r); padding: 18px; display: grid; gap: 6px; cursor: pointer; align-content: start; }
+.tile:hover { border-color: var(--accent); }
+.tile.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.tile .t { font-weight: 800; font-size: 1.12em; }
+.tile .d { font-size: .92em; opacity: .85; }
+.tile .ic { width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); margin-bottom: 4px; }
+.tile.primary .ic { background: rgba(255,255,255,.2); color: inherit; }
+.panel { border: 1px solid var(--line); border-radius: var(--r); padding: 16px 18px; display: grid; gap: 10px; background: var(--surface-2); }
+.panel h3 { font-size: 1em; font-weight: 800; }
+.checklist { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.checklist li { display: grid; grid-template-columns: 22px 1fr; gap: 10px; color: var(--ink-soft); }
+.checklist li svg { color: var(--ok); margin-top: 3px; }
+.callout { border-radius: 12px; padding: 12px 14px; font-size: .93em; display: grid; grid-template-columns: 20px 1fr; gap: 10px; }
+.callout.info { background: var(--accent-soft); color: var(--ink); }
+.callout.warn { background: var(--warn-soft); color: var(--warn); }
+.callout svg { margin-top: 2px; }
+.callout a { color: inherit; font-weight: 700; }
+
+/* option cards (radio) */
+.opts { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
+@media (max-width: 600px) { .opts { grid-template-columns: 1fr; } }
+.opt { position: relative; display: grid; grid-template-columns: 22px 1fr auto; gap: 12px; align-items: start; border: 1.5px solid var(--line); border-radius: var(--r); padding: 14px 16px; cursor: pointer; background: var(--surface); }
+.opt:hover { border-color: var(--accent); }
+.opt input { position: absolute; opacity: 0; pointer-events: none; }
+.opt .dot { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--muted); margin-top: 2px; display: grid; place-items: center; }
+.opt:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+.opt:has(input:checked) .dot { border-color: var(--accent); }
+.opt:has(input:checked) .dot::after { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
+.opt:has(input:focus-visible) { outline: 3px solid var(--focus); outline-offset: 2px; }
+.opt .t { font-weight: 700; }
+.opt .d { font-size: .88em; color: var(--ink-soft); }
+.opt .tag { font-size: .76em; font-weight: 700; color: var(--muted); white-space: nowrap; font-family: var(--mono); }
+.seg-ctl { display: inline-flex; border: 1.5px solid var(--line); border-radius: 11px; padding: 3px; gap: 3px; flex-wrap: wrap; }
+.seg-ctl button { border: 0; background: transparent; border-radius: 8px; padding: 8px 14px; font-weight: 700; cursor: pointer; color: var(--ink-soft); }
+.seg-ctl button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.field-label { font-weight: 700; font-size: .95em; }
+
+/* locations */
+.search { display: flex; gap: 8px; flex-wrap: wrap; }
+.search .inp { flex: 1 1 240px; }
+.inp { width: 100%; border: 1.5px solid var(--line); background: var(--surface); border-radius: 11px; padding: 12px 14px; min-height: 48px; }
+.inp:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px var(--accent-soft); }
+.inp.bad { border-color: var(--danger); }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip { border: 1.5px solid var(--line); background: var(--surface); border-radius: 99px; padding: 6px 12px; font-size: .86em; font-weight: 600; cursor: pointer; color: var(--ink-soft); }
+.chip[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--ink); }
+.list-meta { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: center; color: var(--muted); font-size: .88em; }
+.locs { display: grid; gap: 10px; }
+.loc { text-align: left; width: 100%; border: 1.5px solid var(--line); background: var(--surface); border-radius: var(--r); padding: 14px 16px; display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 6px 14px; cursor: pointer; }
+.loc:hover { border-color: var(--accent); }
+.loc .n { font-weight: 800; font-size: 1.04em; }
+.loc .a { color: var(--ink-soft); font-size: .9em; }
+.loc .meta { grid-column: 1 / -1; display: flex; gap: 6px; flex-wrap: wrap; }
+.pill { font-size: .76em; font-weight: 700; border-radius: 99px; padding: 3px 9px; background: var(--surface-2); color: var(--ink-soft); border: 1px solid var(--line); }
+.pill.ok { background: var(--ok-soft); color: var(--ok); border-color: transparent; }
+.next { text-align: right; }
+.next .k { font-size: .74em; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 700; }
+.next .v { font-weight: 800; color: var(--accent); white-space: nowrap; }
+.dist { font-family: var(--mono); font-size: .8em; color: var(--muted); }
+.empty { border: 1.5px dashed var(--line); border-radius: var(--r); padding: 22px; text-align: center; color: var(--ink-soft); display: grid; gap: 10px; justify-items: center; }
+
+/* time */
+.days { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(68px, 1fr); gap: 8px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: thin; }
+.day { border: 1.5px solid var(--line); background: var(--surface); border-radius: 12px; padding: 9px 4px; text-align: center; cursor: pointer; display: grid; gap: 1px; }
+.day .w { font-size: .74em; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.day .n { font-size: 1.25em; font-weight: 800; font-variant-numeric: tabular-nums; }
+.day .c { font-size: .72em; font-weight: 600; color: var(--ok); }
+.day[disabled] { opacity: .5; cursor: not-allowed; background: var(--surface-2); }
+.day[disabled] .c { color: var(--muted); }
+.day[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.day[aria-pressed="true"] .w, .day[aria-pressed="true"] .c { color: inherit; opacity: .85; }
+.slot-group { display: grid; gap: 8px; }
+.slot-group h3 { font-size: .82em; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; }
+.slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; }
+.slot { border: 1.5px solid var(--line); background: var(--surface); border-radius: 10px; padding: 11px 6px; font-weight: 700; cursor: pointer; font-variant-numeric: tabular-nums; min-height: 46px; }
+.slot:hover { border-color: var(--accent); }
+.slot[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.earliest { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: space-between; border: 1.5px solid var(--accent); background: var(--accent-soft); border-radius: var(--r); padding: 12px 14px; }
+.earliest b { display: block; }
+
+/* form */
+.form { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px 14px; }
+.form .full { grid-column: 1 / -1; }
+@media (max-width: 600px) { .form { grid-template-columns: 1fr; } }
+.f { display: grid; gap: 6px; align-content: start; }
+.f label { font-weight: 700; font-size: .93em; }
+.f .help { font-size: .84em; color: var(--muted); }
+.f .err { font-size: .84em; color: var(--danger); font-weight: 600; }
+.f .opt-l { font-weight: 500; color: var(--muted); }
+.checks { display: flex; gap: 16px; flex-wrap: wrap; }
+.checks label { display: inline-flex; gap: 8px; align-items: center; font-weight: 600; cursor: pointer; }
+.checks input { width: 20px; height: 20px; accent-color: var(--accent); }
+.err-sum { border: 1.5px solid var(--danger); background: var(--danger-soft); color: var(--danger); border-radius: 12px; padding: 12px 14px; font-weight: 600; font-size: .93em; }
+
+/* review & summary */
+.rev { border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+.rev-row { display: grid; grid-template-columns: 120px minmax(0,1fr) auto; gap: 12px; padding: 14px 16px; border-top: 1px solid var(--line); align-items: start; }
+.rev-row:first-child { border-top: 0; }
+.rev-row .k { color: var(--muted); font-weight: 700; font-size: .86em; }
+.rev-row .v { font-weight: 600; }
+.rev-row .v small { display: block; font-weight: 500; color: var(--ink-soft); font-size: .88em; }
+.link { background: none; border: 0; color: var(--accent); font-weight: 700; cursor: pointer; padding: 2px 0; }
+@media (max-width: 560px) { .rev-row { grid-template-columns: 1fr auto; } .rev-row .k { grid-column: 1 / -1; } }
+
+.sum-toggle { display: none; width: 100%; background: none; border: 0; justify-content: space-between; align-items: center; font-weight: 800; cursor: pointer; padding: 6px 0; }
+.sum-h { font-weight: 800; font-size: .82em; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 12px; }
+@media (max-width: 820px) { .sum-h { display: none; } }
+.sum-list { display: grid; gap: 14px; margin-top: 4px; }
+.sum-item { display: grid; gap: 2px; }
+.sum-item .k { font-size: .76em; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); }
+.sum-item .v { font-weight: 700; }
+.sum-item .v.none { color: var(--muted); font-weight: 500; }
+.sum-help { border-top: 1px solid var(--line); padding-top: 14px; font-size: .88em; color: var(--ink-soft); display: grid; gap: 4px; }
+.sum-help b { color: var(--ink); }
+
+/* confirmation */
+.done-head { display: grid; gap: 10px; justify-items: start; }
+.done-badge { width: 52px; height: 52px; border-radius: 50%; background: var(--ok-soft); color: var(--ok); display: grid; place-items: center; }
+.code { font-family: var(--mono); font-size: 1.35em; letter-spacing: .06em; background: var(--surface-2); border: 1px dashed var(--line); border-radius: 10px; padding: 8px 14px; display: inline-block; }
+.two { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
+@media (max-width: 640px) { .two { grid-template-columns: 1fr; } }
+.toast { border-radius: 12px; padding: 12px 14px; background: var(--ok-soft); color: var(--ok); font-weight: 700; }
+
+/* ===== rationale ===== */
+.why { display: grid; gap: 22px; }
+.why > header { display: grid; gap: 8px; max-width: 68ch; }
+.why h2 { font-size: clamp(24px, 3vw, 30px); font-weight: 800; }
+.why > header p { color: var(--ink-soft); }
+.changes { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 0 36px; }
+@media (max-width: 760px) { .changes { grid-template-columns: 1fr; } }
+.chg { border-top: 1px solid var(--line); padding: 18px 0; display: grid; grid-template-columns: 34px minmax(0,1fr); gap: 4px 12px; }
+.chg .no { font-family: var(--mono); color: var(--accent); font-size: .9em; padding-top: 2px; grid-row: span 3; }
+.chg h3 { font-size: 1.06em; font-weight: 800; }
+.chg .prob { color: var(--ink-soft); font-size: .95em; }
+.chg .fix { font-size: .95em; }
+.chg .fix b, .chg .prob b { font-weight: 700; color: var(--ink); }
+.next-steps { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 22px 24px; display: grid; gap: 12px; }
+.next-steps h3 { font-size: 1.15em; font-weight: 800; }
+.next-steps ol { margin: 0; padding-left: 20px; display: grid; gap: 8px; color: var(--ink-soft); max-width: 72ch; }
+.next-steps b { color: var(--ink); }
+
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (prefers-reduced-motion: no-preference) {
+  .main > * { animation: rise .28s ease both; }
+  @keyframes rise { from { transform: translateY(6px); } to { transform: none; } }
+}
+</style>
+
+<div class="page">
+  <header class="intro">
+    <span class="eyebrow">Redesign prototype · patient booking</span>
+    <h1>LabOnlineBooking.ca, rebuilt around the patient's task</h1>
+    <p>A clickable prototype of the booking flow. Try it: book a test, or use “Change or cancel” to look up a sample appointment. The design notes are under the prototype.</p>
+  </header>
+
+  <section class="app" id="app" aria-label="Booking prototype">
+    <div class="bar">
+      <button class="brand" id="go-home" type="button" aria-label="LabOnlineBooking home">
+        <span class="mark" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6L5 18a2 2 0 0 0 1.8 3h10.4A2 2 0 0 0 19 18l-5-9V3"/></svg></span>
+        LabOnlineBooking
+      </button>
+      <div class="bar-tools">
+        <button class="bar-btn" id="manage-top" type="button">My bookings</button>
+        <button class="bar-btn" id="textsize" type="button" aria-pressed="false" title="Larger text">A<span aria-hidden="true" style="font-size:1.2em">A</span><span class="hide-sm"> Larger text</span></button>
+        <label class="sr" for="lang">Language</label>
+        <select class="bar-btn" id="lang" title="Prototype is English only">
+          <option>English</option><option>Français</option><option>中文</option><option>ਪੰਜਾਬੀ</option><option>한국어</option><option>Tiếng Việt</option>
+        </select>
+      </div>
+    </div>
+    <div class="proto-note">Prototype: locations, times and the booking code are sample data. Nothing is sent anywhere.</div>
+    <ol class="progress" id="progress" aria-label="Booking progress"></ol>
+    <div class="body">
+      <div class="main" id="main" aria-live="polite"></div>
+      <aside class="side" id="side" aria-label="Your visit"></aside>
+    </div>
+  </section>
+
+  <section class="why" aria-labelledby="why-h">
+    <header>
+      <span class="eyebrow">Design notes</span>
+      <h2 id="why-h">What changed and why</h2>
+      <p>Most people who open a lab booking site are holding a paper requisition, often on a phone, sometimes for a parent. They want one thing: a time at a lab that can do their test. Each change below removes a step, a guess, or a dead end on the way to that.</p>
+    </header>
+    <div class="changes">
+      <article class="chg"><span class="no">01</span><h3>Three clear doors on the home screen</h3>
+        <p class="prob"><b>Problem:</b> booking, changing a booking and finding a lab compete with notices and long text.</p>
+        <p class="fix"><b>Change:</b> one primary button (Book a lab test) and two secondary ones. Notices shrink to a short “Before you book” checklist.</p></article>
+      <article class="chg"><span class="no">02</span><h3>Ask for the test first</h3>
+        <p class="prob"><b>Problem:</b> picking a location first lets people book a site that can't do their test, and they find out at the counter.</p>
+        <p class="fix"><b>Change:</b> the test choice filters locations, so every lab shown can do it. “I'm not sure” is a valid answer.</p></article>
+      <article class="chg"><span class="no">03</span><h3>Show the next opening on every location</h3>
+        <p class="prob"><b>Problem:</b> patients open location after location hunting for a time.</p>
+        <p class="fix"><b>Change:</b> each card shows its next available time, distance, health authority and access features. Sort by nearest or earliest.</p></article>
+      <article class="chg"><span class="no">04</span><h3>An “earliest time” shortcut</h3>
+        <p class="prob"><b>Problem:</b> calendars make people scan day by day.</p>
+        <p class="fix"><b>Change:</b> a one-tap earliest slot, a date strip with open-slot counts, and times grouped into morning, afternoon and evening.</p></article>
+      <article class="chg"><span class="no">05</span><h3>Fewer, plainer form fields</h3>
+        <p class="prob"><b>Problem:</b> long forms with unclear formats cause errors and abandoned bookings.</p>
+        <p class="fix"><b>Change:</b> only what the lab needs. Each field says where to find the value (the PHN is on the BC Services Card). Errors appear next to the field and in a summary at the top.</p></article>
+      <article class="chg"><span class="no">06</span><h3>“Your visit” summary that stays in view</h3>
+        <p class="prob"><b>Problem:</b> by step four people forget what they picked and press Back, losing their place.</p>
+        <p class="fix"><b>Change:</b> a summary panel (a collapsible bar on phones) with a Change link for each choice. The review page works the same way.</p></article>
+      <article class="chg"><span class="no">07</span><h3>Change or cancel without an account</h3>
+        <p class="prob"><b>Problem:</b> people who can't find a self-serve change usually phone the lab or don't show up.</p>
+        <p class="fix"><b>Change:</b> look up a booking with the code and date of birth, then reschedule or cancel with an on-page confirmation.</p></article>
+      <article class="chg"><span class="no">08</span><h3>Built for older eyes and other languages</h3>
+        <p class="prob"><b>Problem:</b> many lab patients are seniors or read English as a second language.</p>
+        <p class="fix"><b>Change:</b> a Larger text toggle, a language menu in the header, 48px touch targets, visible focus, real form labels, and a dark mode that follows the device.</p></article>
+      <article class="chg"><span class="no">09</span><h3>Say where LifeLabs is booked</h3>
+        <p class="prob"><b>Problem:</b> patients mix up the two BC networks and search here for a LifeLabs centre.</p>
+        <p class="fix"><b>Change:</b> one line on the home screen and in empty search results points them to LifeLabs' own site.</p></article>
+      <article class="chg"><span class="no">10</span><h3>A confirmation page that answers “now what?”</h3>
+        <p class="prob"><b>Problem:</b> a bare confirmation number leaves people unsure what to bring or how to prepare.</p>
+        <p class="fix"><b>Change:</b> the code, what to bring, fasting instructions for that test, directions, and a manage-booking link on one screen.</p></article>
+    </div>
+    <div class="next-steps">
+      <h3>Suggested next steps</h3>
+      <ol>
+        <li><b>Send screenshots of the live site</b> (home, location list, time picker, form, confirmation). I couldn't load labonlinebooking.ca from this environment, so these notes are based on how the booking flow is described in the TSB site content plus common lab-booking problems. With screenshots I can make a direct before-and-after for each screen.</li>
+        <li><b>Pull funnel numbers</b>: how many visitors start a booking, and where they drop off. That shows which of the changes above to build first.</li>
+        <li><b>Test with five patients</b>, including two seniors and one person booking for a family member, using this prototype and the current site side by side.</li>
+        <li><b>Check what the scheduling platform already supports</b> (test types per site, next-available queries, lookup by code) so the front end only promises what the back end can do.</li>
+      </ol>
+    </div>
+  </section>
+</div>
+
+<script>
+(function () {
+  const $ = (s, r = document) => r.querySelector(s);
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const icon = {
+    flask: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6L5 18a2 2 0 0 0 1.8 3h10.4A2 2 0 0 0 19 18l-5-9V3"/></svg>',
+    cal: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>',
+    pin: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>',
+    check: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>',
+    info: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg>',
+    back: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>',
+    chev: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
+    big: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>'
+  };
+
+  const TESTS = [
+    { id: 'blood', name: 'Blood test', d: 'Most routine blood work on a requisition.', len: '10 min', svc: 'blood' },
+    { id: 'urine', name: 'Urine sample', d: 'Bring the container if your clinic gave you one.', len: '5 min', svc: 'blood' },
+    { id: 'both', name: 'Blood and urine', d: 'Both boxes ticked on your requisition.', len: '15 min', svc: 'blood' },
+    { id: 'ecg', name: 'ECG (heart tracing)', d: 'Wear a top that is easy to open at the front.', len: '15 min', svc: 'ecg' },
+    { id: 'gtt', name: 'Glucose tolerance test', d: 'Takes 2 to 3 hours. Fasting is required.', len: '2–3 h', svc: 'gtt', fast: true },
+    { id: 'unsure', name: "I'm not sure", d: 'Pick this and bring your requisition. Lab staff will check it.', len: 'varies', svc: 'blood' }
+  ];
+  const ORGS = ['Fraser Health', 'Vancouver Coastal Health', 'Interior Health', 'Providence Health Care'];
+  const LOCS = [
+    { id: 'sur', name: 'Surrey Outpatient Lab', addr: '13750 96 Ave, Surrey', city: 'surrey v3v', org: 0, km: 2.1, svc: ['blood','ecg','gtt'], feat: ['Wheelchair access','Free parking','Open Saturday'], hrs: 'Mon–Fri 7:00–4:30 · Sat 8:00–12:00', sat: true, busy: 0.55 },
+    { id: 'lan', name: 'Langley Outpatient Lab', addr: '22051 Fraser Hwy, Langley', city: 'langley v3a', org: 0, km: 11.8, svc: ['blood','ecg'], feat: ['Wheelchair access','Free parking'], hrs: 'Mon–Fri 7:00–3:30', sat: false, busy: 0.3 },
+    { id: 'bby', name: 'Burnaby Outpatient Lab', addr: '3935 Kincaid St, Burnaby', city: 'burnaby v5g', org: 0, km: 14.6, svc: ['blood','ecg','gtt'], feat: ['Wheelchair access','Transit nearby'], hrs: 'Mon–Fri 7:00–4:00 · Sat 8:00–12:00', sat: true, busy: 0.7 },
+    { id: 'van', name: 'Vancouver Outpatient Lab, Broadway', addr: '899 W 12th Ave, Vancouver', city: 'vancouver v5z', org: 1, km: 24.0, svc: ['blood','ecg','gtt'], feat: ['Wheelchair access','Transit nearby'], hrs: 'Mon–Fri 7:00–5:00', sat: false, busy: 0.8 },
+    { id: 'phc', name: 'Downtown Outpatient Lab, Burrard', addr: '1081 Burrard St, Vancouver', city: 'vancouver v6z downtown', org: 3, km: 26.3, svc: ['blood','ecg'], feat: ['Wheelchair access','Transit nearby'], hrs: 'Mon–Fri 7:30–4:00', sat: false, busy: 0.6 },
+    { id: 'nsh', name: 'North Shore Outpatient Lab', addr: '231 E 15th St, North Vancouver', city: 'north vancouver v7l', org: 1, km: 29.5, svc: ['blood'], feat: ['Free parking'], hrs: 'Mon–Fri 7:00–3:00 · Sat 8:00–11:30', sat: true, busy: 0.4 },
+    { id: 'kel', name: 'Kelowna Outpatient Lab', addr: '2268 Pandosy St, Kelowna', city: 'kelowna v1y', org: 2, km: 388, svc: ['blood','ecg','gtt'], feat: ['Wheelchair access','Free parking'], hrs: 'Mon–Fri 7:00–4:00', sat: false, busy: 0.5 },
+    { id: 'kam', name: 'Kamloops Outpatient Lab', addr: '311 Columbia St, Kamloops', city: 'kamloops v2c', org: 2, km: 342, svc: ['blood','gtt'], feat: ['Wheelchair access'], hrs: 'Mon–Fri 7:00–3:30', sat: false, busy: 0.35 }
+  ];
+  const STEPS = ['Test', 'Location', 'Time', 'Your details', 'Review'];
+
+  // deterministic pseudo-random availability
+  function rnd(seed) { let h = 2166136261; for (const c of seed) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return ((h >>> 0) % 1000) / 1000; }
+  const today = new Date(); today.setHours(0,0,0,0);
+  const DAYS = Array.from({ length: 14 }, (_, i) => { const d = new Date(today); d.setDate(d.getDate() + i); return d; });
+  const fmtTime = m => { let h = Math.floor(m / 60), mm = m % 60, ap = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12; return h + ':' + String(mm).padStart(2, '0') + ' ' + ap; };
+  const fmtDay = (d, long) => d.toLocaleDateString('en-CA', long ? { weekday: 'long', month: 'long', day: 'numeric' } : { weekday: 'short', month: 'short', day: 'numeric' });
+  const rel = d => { const diff = Math.round((d - today) / 864e5); return diff === 0 ? 'Today' : diff === 1 ? 'Tomorrow' : fmtDay(d); };
+  function slotsFor(loc, d, testId) {
+    const dow = d.getDay();
+    if (dow === 0 || (dow === 6 && !loc.sat)) return null; // closed
+    const start = 7 * 60 + (loc.id === 'phc' ? 30 : 0), end = dow === 6 ? 11 * 60 + 40 : (loc.id === 'van' ? 16 * 60 + 40 : 15 * 60 + 40);
+    const step = testId === 'gtt' ? 60 : 10;
+    const lastStart = testId === 'gtt' ? Math.min(end, 10 * 60) : end;
+    const out = [];
+    const nowMin = new Date().getHours() * 60 + new Date().getMinutes();
+    const isToday = +d === +today;
+    for (let m = start; m <= lastStart; m += step) {
+      if (isToday && m < nowMin + 30) continue;
+      if (rnd(loc.id + d.toDateString() + m) < loc.busy + (isToday ? 0.15 : 0)) continue;
+      out.push(m);
+    }
+    return out;
+  }
+  function nextOpen(loc, testId) {
+    for (const d of DAYS) { const s = slotsFor(loc, d, testId); if (s && s.length) return { d, m: s[0] }; }
+    return null;
+  }
+
+  const S = {
+    view: 'home', test: null, who: 'me', loc: null, day: null, time: null,
+    q: '', orgs: [], sort: 'near', p: { first: '', last: '', dob: '', phn: '', phone: '', email: '', text: true, mail: false, notes: '' },
+    errs: {}, rescheduling: false, sideOpen: false, mstate: null
+  };
+  const testObj = () => TESTS.find(t => t.id === S.test);
+  const locObj = () => LOCS.find(l => l.id === S.loc);
+  const app = $('#app'), main = $('#main'), side = $('#side'), prog = $('#progress');
+  const stepIdx = { test: 0, loc: 1, time: 2, details: 3, review: 4 };
+
+  function go(view, focus = true) {
+    S.view = view; render();
+    if (focus) { const h = main.querySelector('h2'); if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); } app.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' }); }
+  }
+
+  function renderProgress() {
+    const i = stepIdx[S.view];
+    if (i === undefined) { prog.hidden = true; return; }
+    prog.hidden = false;
+    prog.innerHTML = STEPS.map((s, k) => `<li class="${k < i ? 'done' : k === i ? 'now' : ''}" ${k === i ? 'aria-current="step"' : ''}><span class="seg"></span><span class="lbl">${k + 1}. ${s}</span></li>`).join('');
+  }
+
+  function renderSide() {
+    const show = stepIdx[S.view] !== undefined;
+    app.classList.toggle('no-side', !show);
+    if (!show) { side.innerHTML = ''; return; }
+    const t = testObj(), l = locObj();
+    const filled = [t, l, S.time != null].filter(Boolean).length;
+    const item = (k, v, view) => `<div class="sum-item"><span class="k">${k}</span>${v ? `<span class="v">${v}</span>` : '<span class="v none">Not chosen yet</span>'}${v && view && S.view !== view ? `<button class="link" data-go="${view}" type="button">Change</button>` : ''}</div>`;
+    side.className = 'side' + (S.sideOpen ? ' open' : '');
+    side.innerHTML = `
+      <button class="sum-toggle" type="button" aria-expanded="${S.sideOpen}" id="sumtog"><span>Your visit · ${filled} of 3 chosen</span>${icon.chev}</button>
+      <div class="sum-h">Your visit</div>
+      <div class="sum-list">
+        ${item('Test', t && esc(t.name) + (S.who === 'other' ? ' <small style="font-weight:500;color:var(--ink-soft)">for someone else</small>' : ''), 'test')}
+        ${item('Location', l && `${esc(l.name)}<br><small style="font-weight:500;color:var(--ink-soft)">${esc(l.addr)}</small>`, 'loc')}
+        ${item('Time', S.time != null && `${fmtDay(S.day, true)}<br>${fmtTime(S.time)}`, 'time')}
+        <div class="sum-help"><b>Need help booking?</b><span>Call the lab you're visiting, or 8-1-1 for health questions.</span></div>
+      </div>`;
+    $('#sumtog').onclick = () => { S.sideOpen = !S.sideOpen; renderSide(); };
+  }
+
+  const head = (title, sub, backTo) => `<div class="step-head">${backTo ? `<button class="back" type="button" data-go="${backTo}">${icon.back} Back</button>` : ''}<h2>${title}</h2>${sub ? `<p>${sub}</p>` : ''}</div>`;
+
+  const V = {
+    home() {
+      return `
+        <div class="step-head"><h2>Book a lab visit</h2><p>For participating public and hospital outpatient labs in British Columbia.</p></div>
+        <div class="home-grid">
+          <button class="tile primary" type="button" data-go="test"><span class="ic">${icon.flask}</span><span class="t">Book a lab test</span><span class="d">About 2 minutes. Have your requisition ready.</span></button>
+          <button class="tile" type="button" data-go="manage"><span class="ic">${icon.cal}</span><span class="t">Change or cancel</span><span class="d">Use your booking code and date of birth.</span></button>
+          <button class="tile" type="button" data-go="loc" data-browse="1"><span class="ic">${icon.pin}</span><span class="t">Find a lab</span><span class="d">Hours, address and next available time.</span></button>
+        </div>
+        <div class="panel"><h3>Before you book</h3>
+          <ul class="checklist">
+            <li>${icon.check}<span>Your lab requisition from your doctor or nurse practitioner.</span></li>
+            <li>${icon.check}<span>Your BC Personal Health Number (on your BC Services Card).</span></li>
+            <li>${icon.check}<span>A mobile number or email for your confirmation and reminder.</span></li>
+          </ul>
+        </div>
+        <div class="callout info">${icon.info}<span>Booking a LifeLabs Patient Service Centre? LifeLabs uses its own site: <a href="https://appointments.lifelabs.com/" target="_blank" rel="noopener">appointments.lifelabs.com</a>.</span></div>`;
+    },
+    test() {
+      return `
+        ${head('What do you need done?', 'Check the boxes ticked on your requisition. We only show labs that can do this test.', 'home')}
+        <div style="display:grid;gap:8px"><span class="field-label" id="who-l">Who is the appointment for?</span>
+          <div class="seg-ctl" role="group" aria-labelledby="who-l">
+            <button type="button" data-who="me" aria-pressed="${S.who === 'me'}">Me</button>
+            <button type="button" data-who="other" aria-pressed="${S.who === 'other'}">Someone else</button>
+          </div></div>
+        <fieldset style="border:0;padding:0;margin:0;display:grid;gap:10px"><legend class="field-label" style="margin-bottom:8px">Test</legend>
+          <div class="opts">${TESTS.map(t => `
+            <label class="opt"><input type="radio" name="test" id="t-${t.id}" value="${t.id}" ${S.test === t.id ? 'checked' : ''}><span class="dot"></span>
+              <span><span class="t">${t.name}</span><br><span class="d">${t.d}</span></span><span class="tag">${t.len}</span></label>`).join('')}
+          </div></fieldset>
+        ${S.who === 'other' ? `<div class="callout info">${icon.info}<span>Use their requisition and their details on the next steps, and book with their knowledge.</span></div>` : ''}
+        <div class="actions"><button class="btn btn-primary" type="button" data-go="loc" ${S.test ? '' : 'disabled'}>Continue to location</button>${S.test ? '' : '<span class="hint">Choose a test to continue</span>'}</div>`;
+    },
+    loc() {
+      const t = testObj();
+      const q = S.q.trim().toLowerCase();
+      let list = LOCS.filter(l => (!t || l.svc.includes(t.svc)) && (!S.orgs.length || S.orgs.includes(l.org)) && (!q || (l.name + ' ' + l.addr + ' ' + l.city).toLowerCase().includes(q)));
+      const withNext = list.map(l => ({ l, n: nextOpen(l, S.test || 'blood') }));
+      withNext.sort((a, b) => S.sort === 'near' ? a.l.km - b.l.km : (a.n ? +a.n.d * 1e4 + a.n.m : Infinity) - (b.n ? +b.n.d * 1e4 + b.n.m : Infinity));
+      const hidden = t ? LOCS.length - LOCS.filter(l => l.svc.includes(t.svc)).length : 0;
+      return `
+        ${head(t ? 'Choose a lab' : 'Find a lab', t ? `Showing labs that do <b>${esc(t.name.toLowerCase())}</b>.` : 'Browse participating labs. Pick a test first to see only the labs that can do it.', t ? 'test' : 'home')}
+        <form class="search" role="search" id="sform"><label class="sr" for="q">City, postal code or lab name</label>
+          <input class="inp" id="q" placeholder="City, postal code or lab name" value="${esc(S.q)}" autocomplete="postal-code">
+          <button class="btn btn-ghost" type="submit">Search</button></form>
+        <div class="chips" role="group" aria-label="Health authority">${ORGS.map((o, i) => `<button type="button" class="chip" data-org="${i}" aria-pressed="${S.orgs.includes(i)}">${o}</button>`).join('')}</div>
+        <div class="list-meta"><span>${withNext.length} lab${withNext.length === 1 ? '' : 's'}${hidden ? ` · ${hidden} hidden because they don't do this test` : ''} · distances from Surrey (sample)</span>
+          <div class="seg-ctl" role="group" aria-label="Sort"><button type="button" data-sort="near" aria-pressed="${S.sort === 'near'}">Nearest</button><button type="button" data-sort="soon" aria-pressed="${S.sort === 'soon'}">Earliest time</button></div></div>
+        <div class="locs">${withNext.length ? withNext.map(({ l, n }) => `
+          <button class="loc" type="button" data-loc="${l.id}" aria-label="${esc(l.name)}, next available ${n ? rel(n.d) + ' ' + fmtTime(n.m) : 'none in 2 weeks'}">
+            <span><span class="n">${esc(l.name)}</span><br><span class="a">${esc(l.addr)} · <span class="dist">${l.km} km</span></span><br><span class="a">${esc(l.hrs)}</span></span>
+            <span class="next"><span class="k">Next available</span><br><span class="v">${n ? rel(n.d) + ', ' + fmtTime(n.m) : 'None in 2 weeks'}</span></span>
+            <span class="meta"><span class="pill">${ORGS[l.org]}</span>${l.feat.map(f => `<span class="pill ok">${f}</span>`).join('')}</span>
+          </button>`).join('') : `
+          <div class="empty"><b>No labs match “${esc(S.q)}”.</b><span>Try a nearby city, clear the health authority filters, or check LifeLabs at appointments.lifelabs.com.</span><button class="btn btn-ghost" type="button" id="clear">Clear search and filters</button></div>`}
+        </div>`;
+    },
+    time() {
+      const l = locObj(), t = testObj() || TESTS[0];
+      if (!S.day) { const n = nextOpen(l, t.id); S.day = n ? n.d : DAYS[0]; }
+      const slots = slotsFor(l, S.day, t.id) || [];
+      const n = nextOpen(l, t.id);
+      const groups = [['Morning', 0, 720], ['Afternoon', 720, 1020], ['Evening', 1020, 1440]].map(([g, a, b]) => [g, slots.filter(m => m >= a && m < b)]).filter(g => g[1].length);
+      return `
+        ${S.rescheduling ? `<div class="callout warn">${icon.info}<span>You're moving booking <b>LOB-7K3Q-92</b>. Your current time stays booked until you confirm a new one.</span></div>` : ''}
+        ${head('Pick a time', `At <b>${esc(l.name)}</b>. ${t.fast ? 'Fasting test: morning times only.' : 'Times are shown in Pacific time.'}`, S.rescheduling ? 'manage' : 'loc')}
+        ${n ? `<div class="earliest"><span><b>Earliest: ${rel(n.d)}, ${fmtTime(n.m)}</b><span style="color:var(--ink-soft);font-size:.9em">${fmtDay(n.d, true)}</span></span><button class="btn btn-ghost" type="button" id="take-earliest">Choose this time</button></div>` : ''}
+        <div class="days" role="group" aria-label="Date">${DAYS.map(d => { const s = slotsFor(l, d, t.id); const c = s ? s.length : 0; return `
+          <button class="day" type="button" data-day="${+d}" aria-pressed="${+d === +S.day}" ${c ? '' : 'disabled'} aria-label="${fmtDay(d, true)}, ${s ? c + ' times open' : 'closed'}">
+            <span class="w">${d.toLocaleDateString('en-CA', { weekday: 'short' })}</span><span class="n">${d.getDate()}</span><span class="c">${s ? (c ? c + ' open' : 'Full') : 'Closed'}</span></button>`; }).join('')}</div>
+        <h3 style="font-size:1.05em;font-weight:800">${fmtDay(S.day, true)}</h3>
+        ${groups.length ? groups.map(([g, ms]) => `<div class="slot-group"><h3>${g}</h3><div class="slots">${ms.map(m => `<button class="slot" type="button" data-time="${m}" aria-pressed="${S.time === m && +S.day === +(S.pickedDay || 0)}">${fmtTime(m)}</button>`).join('')}</div></div>`).join('') : `<div class="empty">No open times this day. Pick another date above.</div>`}
+        <div class="actions"><button class="btn btn-primary" type="button" id="time-next" ${S.time != null && +S.pickedDay === +S.day ? '' : 'disabled'}>${S.rescheduling ? 'Review new time' : 'Continue to your details'}</button></div>`;
+    },
+    details() {
+      const p = S.p, e = S.errs, other = S.who === 'other';
+      const errs = Object.keys(e);
+      const fld = (id, label, attrs, help, cls = '') => `<div class="f ${cls}"><label for="p-${id}">${label}</label>${help ? `<span class="help" id="h-${id}">${help}</span>` : ''}
+        <input class="inp ${e[id] ? 'bad' : ''}" id="p-${id}" data-p="${id}" value="${esc(p[id])}" ${attrs} aria-describedby="${help ? 'h-' + id : ''} ${e[id] ? 'e-' + id : ''}" ${e[id] ? 'aria-invalid="true"' : ''}>
+        ${e[id] ? `<span class="err" id="e-${id}">${e[id]}</span>` : ''}</div>`;
+      return `
+        ${head(other ? "The patient's details" : 'Your details', other ? 'Enter the details of the person having the test, as on their BC Services Card.' : 'As shown on your BC Services Card. The lab uses this to match your requisition.', 'time')}
+        ${errs.length ? `<div class="err-sum" role="alert" id="errsum">Please fix ${errs.length} field${errs.length > 1 ? 's' : ''}: ${errs.map(k => `<a href="#p-${k}" style="color:inherit">${{ first: 'first name', last: 'last name', dob: 'date of birth', phn: 'Personal Health Number', phone: 'mobile number', email: 'email' }[k]}</a>`).join(', ')}.</div>` : ''}
+        <form class="form" id="pform" novalidate>
+          ${fld('first', 'Legal first name', 'autocomplete="given-name"')}
+          ${fld('last', 'Last name', 'autocomplete="family-name"')}
+          ${fld('dob', 'Date of birth', 'type="date" autocomplete="bday" max="' + today.toISOString().slice(0, 10) + '"')}
+          ${fld('phn', 'Personal Health Number (PHN)', 'inputmode="numeric" placeholder="9123 456 789" maxlength="12"', '10 digits, on the back of the BC Services Card.')}
+          ${fld('phone', 'Mobile number', 'type="tel" inputmode="tel" autocomplete="tel" placeholder="604 555 0123"', 'For your confirmation and reminder.')}
+          ${fld('email', 'Email <span class="opt-l">(optional)</span>', 'type="email" autocomplete="email"')}
+          <div class="f full"><span class="field-label">Send my reminder by</span><div class="checks">
+            <label><input type="checkbox" id="r-text" data-pc="text" ${p.text ? 'checked' : ''}> Text message</label>
+            <label><input type="checkbox" id="r-mail" data-pc="mail" ${p.mail ? 'checked' : ''}> Email</label></div></div>
+          <div class="f full"><label for="p-notes">Anything the lab should know? <span class="opt-l">(optional)</span></label><span class="help" id="h-notes">For example: wheelchair user, needs an interpreter, fear of needles.</span>
+            <textarea class="inp" id="p-notes" data-p="notes" rows="2" aria-describedby="h-notes">${esc(p.notes)}</textarea></div>
+          <div class="actions full"><button class="btn btn-primary" type="submit">Review booking</button><span class="hint">Nothing is booked until you confirm.</span></div>
+        </form>`;
+    },
+    review() {
+      const t = testObj(), l = locObj(), p = S.p;
+      const row = (k, v, to) => `<div class="rev-row"><span class="k">${k}</span><span class="v">${v}</span>${to ? `<button class="link" type="button" data-go="${to}">Change</button>` : '<span></span>'}</div>`;
+      return `
+        ${head(S.rescheduling ? 'Confirm your new time' : 'Check and confirm', 'Make sure everything is right. You can change any line.', S.rescheduling ? 'time' : 'details')}
+        <div class="rev">
+          ${row('Test', `${esc(t.name)}<small>${t.len === 'varies' ? 'Length varies' : 'About ' + t.len}${t.fast ? ' · Fasting required' : ''}</small>`, S.rescheduling ? null : 'test')}
+          ${row('Location', `${esc(l.name)}<small>${esc(l.addr)}</small>`, S.rescheduling ? null : 'loc')}
+          ${row('Date and time', `${fmtDay(S.day, true)}<small>${fmtTime(S.time)}, arrive 5 minutes early</small>`, 'time')}
+          ${S.rescheduling ? '' : row(S.who === 'other' ? 'Patient' : 'You', `${esc(p.first)} ${esc(p.last)}<small>PHN ${esc(p.phn)} · born ${esc(p.dob)}</small>`, 'details')}
+          ${S.rescheduling ? '' : row('Reminder', `${[p.text && 'Text to ' + esc(p.phone), p.mail && 'Email to ' + esc(p.email)].filter(Boolean).join('<br>') || 'No reminder'}`, 'details')}
+        </div>
+        ${t.fast ? `<div class="callout warn">${icon.info}<span>This test needs fasting. Have nothing but water for 10 to 12 hours before your appointment, unless your doctor told you otherwise.</span></div>` : ''}
+        <div class="actions"><button class="btn btn-primary" type="button" id="confirm">${S.rescheduling ? 'Confirm new time' : 'Confirm booking'}</button></div>`;
+    },
+    done() {
+      const t = testObj(), l = locObj();
+      const maps = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(l.addr + ', BC');
+      return `
+        <div class="done-head"><span class="done-badge">${icon.big}</span><h2>${S.rescheduling ? 'Your booking is moved' : "You're booked"}</h2>
+          <p style="color:var(--ink-soft)">${fmtDay(S.day, true)} at <b style="color:var(--ink)">${fmtTime(S.time)}</b>, ${esc(l.name)}. ${S.p.text ? 'A text confirmation is on its way to ' + esc(S.p.phone || 'your phone') + '.' : ''}</p>
+          <span>Booking code <span class="code">LOB-7K3Q-92</span></span></div>
+        <div class="two">
+          <div class="panel"><h3>Bring with you</h3><ul class="checklist">
+            <li>${icon.check}<span>Your lab requisition</span></li><li>${icon.check}<span>Your BC Services Card</span></li>
+            ${t.id === 'urine' || t.id === 'both' ? `<li>${icon.check}<span>Your urine container, if the clinic gave you one</span></li>` : ''}
+            ${t.id === 'gtt' ? `<li>${icon.check}<span>Something to read. You'll stay 2 to 3 hours.</span></li>` : ''}</ul></div>
+          <div class="panel"><h3>Getting there</h3><p style="color:var(--ink-soft)">${esc(l.addr)}<br>${esc(l.hrs)}</p><p>${l.feat.map(f => `<span class="pill ok" style="margin-right:4px">${f}</span>`).join('')}</p>
+            <a class="link" href="${maps}" target="_blank" rel="noopener">Get directions</a></div>
+        </div>
+        ${t.fast ? `<div class="callout warn">${icon.info}<span>Fasting: nothing but water for 10 to 12 hours before ${fmtTime(S.time)}.</span></div>` : ''}
+        <div class="actions"><button class="btn btn-ghost" type="button" data-go="manage" data-prefill="1">Change or cancel this booking</button><button class="btn btn-ghost" type="button" id="again">Book another test</button></div>`;
+    },
+    manage() {
+      const m = S.mstate;
+      if (m && m.found) {
+        return `
+          ${head('Your booking', 'Booking code <span class="code" style="font-size:1em;padding:2px 8px">LOB-7K3Q-92</span>', 'home')}
+          ${m.cancelled ? `<div class="toast" role="status">Cancelled. The time is released for other patients. A confirmation text is on its way.</div>
+            <div class="actions"><button class="btn btn-primary" type="button" id="again">Book a new time</button></div>` : `
+          <div class="rev">
+            <div class="rev-row"><span class="k">Test</span><span class="v">Blood test</span><span></span></div>
+            <div class="rev-row"><span class="k">Location</span><span class="v">Surrey Outpatient Lab<small>13750 96 Ave, Surrey</small></span><span></span></div>
+            <div class="rev-row"><span class="k">When</span><span class="v">${fmtDay(DAYS[3], true)}<small>8:20 AM</small></span><span></span></div>
+          </div>
+          ${m.confirmCancel ? `<div class="panel" role="alertdialog" aria-labelledby="cc-h"><h3 id="cc-h">Cancel this booking?</h3><p style="color:var(--ink-soft)">The time will be released for other patients. You can book again any time.</p>
+            <div class="actions"><button class="btn btn-danger" type="button" id="do-cancel">Yes, cancel booking</button><button class="btn btn-ghost" type="button" id="keep">Keep booking</button></div></div>` : `
+          <div class="actions"><button class="btn btn-primary" type="button" id="resched">Change date or time</button><button class="btn btn-ghost" type="button" id="ask-cancel">Cancel booking</button></div>`}`}`;
+      }
+      return `
+        ${head('Change or cancel a booking', 'No account needed. Your booking code is in your confirmation text or email.', 'home')}
+        ${m && m.err ? `<div class="err-sum" role="alert">${m.err}</div>` : ''}
+        <form class="form" id="mform" novalidate>
+          <div class="f"><label for="m-code">Booking code</label><span class="help" id="h-mc">Looks like LOB-7K3Q-92</span><input class="inp" id="m-code" aria-describedby="h-mc" autocomplete="off" value="${m && m.code || ''}" placeholder="LOB-"></div>
+          <div class="f"><label for="m-dob">Patient's date of birth</label><span class="help">&nbsp;</span><input class="inp" id="m-dob" type="date" value="${m && m.dob || ''}"></div>
+          <div class="actions full"><button class="btn btn-primary" type="submit">Find my booking</button><button class="link" type="button" id="fillsample">Use sample booking</button></div>
+        </form>
+        <div class="callout info">${icon.info}<span>Lost your code? Use “Forgot code” and we'll text it to the mobile number on the booking. (Not in this prototype.)</span></div>`;
+    }
+  };
+
+  function validate() {
+    const p = S.p, e = {};
+    if (!p.first.trim()) e.first = 'Enter a first name.';
+    if (!p.last.trim()) e.last = 'Enter a last name.';
+    if (!p.dob) e.dob = 'Enter a date of birth.';
+    if (p.phn.replace(/\D/g, '').length !== 10) e.phn = 'A PHN has 10 digits. You entered ' + p.phn.replace(/\D/g, '').length + '.';
+    if (p.phone.replace(/\D/g, '').length < 10) e.phone = 'Enter a 10-digit number, including area code.';
+    if (p.email && !/^\S+@\S+\.\S+$/.test(p.email)) e.email = 'Check the email address, for example name@example.com.';
+    if (p.mail && !p.email) e.email = 'Add an email, or untick Email reminders.';
+    return e;
+  }
+
+  function render() {
+    main.innerHTML = V[S.view]();
+    renderProgress(); renderSide();
+    bind();
+  }
+
+  function bind() {
+    main.querySelectorAll('[data-go]').forEach(b => b.onclick = () => {
+      if (b.dataset.browse) Object.assign(S, { test: null, loc: null, day: null, time: null, rescheduling: false });
+      if (b.dataset.go === 'manage') { S.mstate = b.dataset.prefill ? { found: true } : null; S.rescheduling = false; }
+      if (b.dataset.go === 'loc' && S.view === 'test' && S.loc && !locObj().svc.includes(testObj().svc)) { S.loc = null; S.time = null; }
+      go(b.dataset.go);
+    });
+    side.querySelectorAll('[data-go]').forEach(b => b.onclick = () => go(b.dataset.go));
+    main.querySelectorAll('input[name=test]').forEach(r => r.onchange = () => { S.test = r.value; render(); $('#t-' + r.value).focus(); });
+    main.querySelectorAll('[data-who]').forEach(b => b.onclick = () => { S.who = b.dataset.who; render(); });
+    const sf = $('#sform'); if (sf) {
+      sf.onsubmit = ev => { ev.preventDefault(); S.q = $('#q').value; render(); $('#q').focus(); };
+      $('#q').oninput = ev => { S.q = ev.target.value; const pos = ev.target.selectionStart; render(); const q = $('#q'); q.focus(); q.setSelectionRange(pos, pos); };
+    }
+    main.querySelectorAll('[data-org]').forEach(b => b.onclick = () => { const i = +b.dataset.org; S.orgs = S.orgs.includes(i) ? S.orgs.filter(x => x !== i) : [...S.orgs, i]; render(); });
+    main.querySelectorAll('[data-sort]').forEach(b => b.onclick = () => { S.sort = b.dataset.sort; render(); });
+    const cl = $('#clear'); if (cl) cl.onclick = () => { S.q = ''; S.orgs = []; render(); };
+    main.querySelectorAll('[data-loc]').forEach(b => b.onclick = () => {
+      if (S.loc !== b.dataset.loc) { S.day = null; S.time = null; }
+      S.loc = b.dataset.loc;
+      if (!S.test) { go('test'); return; }
+      go('time');
+    });
+    main.querySelectorAll('[data-day]').forEach(b => b.onclick = () => { S.day = new Date(+b.dataset.day); render(); main.querySelector('.day[aria-pressed="true"]').focus(); });
+    main.querySelectorAll('[data-time]').forEach(b => b.onclick = () => { S.time = +b.dataset.time; S.pickedDay = S.day; render(); $('#time-next').focus(); });
+    const te = $('#take-earliest'); if (te) te.onclick = () => { const n = nextOpen(locObj(), S.test); S.day = n.d; S.pickedDay = n.d; S.time = n.m; render(); $('#time-next').focus(); };
+    const tn = $('#time-next'); if (tn) tn.onclick = () => go(S.rescheduling ? 'review' : 'details');
+    const pf = $('#pform'); if (pf) {
+      pf.querySelectorAll('[data-p]').forEach(i => i.oninput = () => {
+        let v = i.value;
+        if (i.dataset.p === 'phn') { const d = v.replace(/\D/g, '').slice(0, 10); v = [d.slice(0, 4), d.slice(4, 7), d.slice(7)].filter(Boolean).join(' '); i.value = v; }
+        S.p[i.dataset.p] = v;
+        if (S.errs[i.dataset.p]) { const e = validate(); if (!e[i.dataset.p]) { delete S.errs[i.dataset.p]; i.classList.remove('bad'); i.removeAttribute('aria-invalid'); const em = $('#e-' + i.dataset.p); if (em) em.remove(); } }
+      });
+      pf.querySelectorAll('[data-pc]').forEach(c => c.onchange = () => { S.p[c.dataset.pc] = c.checked; });
+      pf.onsubmit = ev => { ev.preventDefault(); S.errs = validate(); if (Object.keys(S.errs).length) { render(); $('#errsum').focus ? ($('#errsum').setAttribute('tabindex', '-1'), $('#errsum').focus()) : 0; } else go('review'); };
+    }
+    const cf = $('#confirm'); if (cf) cf.onclick = () => go('done');
+    const ag = $('#again'); if (ag) ag.onclick = () => { Object.assign(S, { test: null, loc: null, day: null, time: null, rescheduling: false, mstate: null }); go('test'); };
+    const mf = $('#mform'); if (mf) {
+      $('#fillsample').onclick = () => { $('#m-code').value = 'LOB-7K3Q-92'; const d = new Date(1958, 4, 14); $('#m-dob').value = d.toISOString().slice(0, 10); };
+      mf.onsubmit = ev => { ev.preventDefault(); const code = $('#m-code').value.trim(), dob = $('#m-dob').value;
+        if (!code || !dob) { S.mstate = { code, dob, err: 'Enter both the booking code and the date of birth.' }; render(); return; }
+        S.mstate = { found: true }; go('manage'); };
+    }
+    const ac = $('#ask-cancel'); if (ac) ac.onclick = () => { S.mstate.confirmCancel = true; render(); $('#do-cancel').focus(); };
+    const kp = $('#keep'); if (kp) kp.onclick = () => { S.mstate.confirmCancel = false; render(); };
+    const dc = $('#do-cancel'); if (dc) dc.onclick = () => { S.mstate = { found: true, cancelled: true }; render(); };
+    const rs = $('#resched'); if (rs) rs.onclick = () => { Object.assign(S, { rescheduling: true, test: 'blood', loc: 'sur', day: null, time: null }); go('time'); };
+  }
+
+  $('#go-home').onclick = () => { S.rescheduling = false; go('home'); };
+  $('#manage-top').onclick = () => { S.mstate = null; S.rescheduling = false; go('manage'); };
+  $('#textsize').onclick = e => { const on = app.classList.toggle('large'); e.currentTarget.setAttribute('aria-pressed', on); };
+  render();
+})();
+</script>
