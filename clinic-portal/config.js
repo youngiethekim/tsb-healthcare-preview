@@ -26,6 +26,11 @@ window.CLINIC_PORTAL_CONFIG = {
     { id: "fraser", name: "Fraser Health" }
   ],
 
+  // Google Maps JavaScript API key for address autocomplete at sign-up.
+  // Leave empty to have clinics type their address. Restrict the key to this
+  // site's HTTP referrers and enable "Maps JavaScript API" + "Places API (New)".
+  googleMapsApiKey: "",
+
   emrOptions: ["Accuro", "MedAccess", "OSCAR Pro", "Juno EMR", "Profile EMR", "Wolf", "CHR", "Other"],
 
   // CLINIC_STAND_MONTHLY_CAP — approvals per month before requests wait.

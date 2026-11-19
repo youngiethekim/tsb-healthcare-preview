@@ -17,7 +17,7 @@ const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails++
 
   await page.goto(B + '#/register');
   await page.fill('#name', 'Dana MOA'); await page.fill('#email', 'dana@pacificblvd.ca');
-  await page.fill('#clinicName', 'Pacific Blvd Clinic'); await page.selectOption('#region', 'vch');
+  await page.fill('#clinicName', 'Pacific Blvd Clinic'); await page.fill('#a1', '123 Pacific Blvd'); await page.fill('#city', 'Vancouver'); await page.fill('#pc', 'V6B1A1');
   await page.click('button[type=submit]');
   ok(await page.locator('.err').isVisible(), 'terms checkbox required');
   await page.check('input[name=terms]'); await page.click('button[type=submit]');
@@ -144,7 +144,7 @@ const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails++
   await page.evaluate(() => localStorage.removeItem('lobcp:session'));
   await page.goto(B + '#/register');
   await page.fill('#name', 'Sam'); await page.fill('#email', 'sam@other.ca'); await page.fill('#clinicName', 'Other Clinic');
-  await page.selectOption('#region', 'fraser'); await page.check('input[name=terms]'); await page.click('button[type=submit]');
+  await page.fill('#a1', '9 King George Blvd'); await page.fill('#city', 'Surrey'); await page.fill('#pc', 'V3T 2W1'); await page.check('input[name=terms]'); await page.click('button[type=submit]');
   await page.goto(await page.locator('.demo-link').getAttribute('href')); await page.waitForSelector('[data-npc=pending]');
   ok(!(await page.textContent('body')).includes('Pacific Blvd'), 'clinic B sees nothing of clinic A');
   // suspend A

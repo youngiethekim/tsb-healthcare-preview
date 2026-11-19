@@ -9,7 +9,7 @@ let f = 0; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (
   const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message));
   await p.goto(B + '#/register');
   await p.fill('#name', 'Dana'); await p.fill('#email', 'dana@pb.ca'); await p.fill('#clinicName', 'Pacific Blvd Clinic');
-  await p.selectOption('#region', 'vch'); await p.check('input[name=terms]'); await p.click('button[type=submit]');
+  await p.fill('#a1', '123 Pacific Blvd'); await p.fill('#city', 'Vancouver'); await p.fill('#pc', 'V6B 1A1'); await p.check('input[name=terms]'); await p.click('button[type=submit]');
   await p.goto(await p.locator('.demo-link').getAttribute('href')); await p.waitForSelector('[data-npc=pending]');
   await p.goto(B + '#/admin'); await p.click('[data-act=approve]');
   const q = await ctx.newPage(); q.on('pageerror', e => errs.push(e.message));

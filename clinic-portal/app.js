@@ -136,11 +136,46 @@
       '<form id="f" novalidate><div class="field"><label for="name">Your name</label><input id="name" name="name" type="text" autocomplete="name" required></div>' +
       '<div class="field"><label for="email">Work email</label><input id="email" name="email" type="email" autocomplete="email" required><div class="hint">We send a sign-in link here. Use a clinic address, not a personal one.</div></div>' +
       '<div class="field"><label for="clinicName">Clinic name</label><input id="clinicName" name="clinicName" type="text" maxlength="120" required></div>' +
-      '<div class="field"><label for="region">Health authority region</label><select id="region" name="region" required>' + regionOptions() + "</select></div>" +
+      '<fieldset class="addr"><legend>Clinic address</legend>' +
+      '<div class="field" id="gsearch-w" hidden><label>Search for your address</label><div id="gsearch"></div><div class="hint">Pick your clinic from the list and we fill in the rest.</div></div>' +
+      '<div class="field"><label for="a1">Street address</label><input id="a1" name="address_line1" type="text" autocomplete="address-line1" required></div>' +
+      '<div class="field"><input aria-label="Suite or unit" name="address_line2" type="text" autocomplete="address-line2" placeholder="Suite or unit (optional)"></div>' +
+      '<div class="field f2"><div class="field"><label for="city">City</label><input id="city" name="city" type="text" autocomplete="address-level2" required></div>' +
+      '<div class="field"><label for="pc">Postal code</label><input id="pc" name="postal_code" type="text" maxlength="7" autocomplete="postal-code" required></div></div>' +
+      '<input type="hidden" name="district" id="district"><input type="hidden" name="province" id="province"><input type="hidden" name="lat" id="lat"><input type="hidden" name="lng" id="lng">' +
+      '<div id="where" class="where" aria-live="polite"></div>' +
+      '<div class="field" id="region-w" hidden><label for="region">Health authority</label><select id="region" name="region">' + regionOptions() + "</select></div></fieldset>" +
       '<div class="field"><label class="check"><input type="checkbox" name="terms"> <span>We will display Lab Online Booking materials unaltered, never charge patients for booking, and never enter patient information in this portal.</span></label></div>' +
       '<div class="field"><div class="form-msg" hidden></div></div><div class="field"><button class="btn btn-primary btn-block" type="submit">Register and email my sign-in link</button></div></form>' +
-      '<div id="sent"></div><p class="small muted">Already registered? <a href="#/login">Sign in</a></p>', npc("register", "Hi, I'm Vee! Let's get your clinic its own booking QR code. It takes about two minutes, and it's free.", { mood: "wave", sticky: true, big: true }));
-    bind($("#f"), async function (d, form) { var r = await S.register(d); form.hidden = true; $("#sent").innerHTML = sentBox(r); });
+      '<div id="sent"></div><p class="small muted">Already registered? <a href="#/login">Sign in</a></p>', npc("register", "Hi, I'm Vee! Let's get your clinic its own booking QR code. Just tell me your clinic's address and I'll work out your health authority. It's free and takes about two minutes.", { mood: "wave", sticky: true, big: true }));
+    var form = $("#f");
+    function updateWhere() {
+      var city = $("#city").value.trim(), box = $("#where"), regionW = $("#region-w");
+      if (!city) { box.innerHTML = ""; box.className = "where"; regionW.hidden = true; return; }
+      var w = S.regionFor({ city: city, district: $("#district").value, province: $("#province").value, region: regionW.hidden ? "" : $("#region").value });
+      if (w.region) {
+        box.className = "where ok";
+        box.innerHTML = icon("check", 16) + "<span>Health authority: <b>" + esc(w.region.name) + "</b>" + (w.source === "chosen" ? "" : ' <span class="tiny">(from your address)</span>') + "</span>";
+        return;
+      }
+      box.className = "where " + (w.source === "unknown" ? "info" : "warn");
+      box.innerHTML = "<span>" + esc(w.message) + "</span>";
+      regionW.hidden = w.source !== "unknown";
+    }
+    $("#city").addEventListener("input", function () { $("#district").value = ""; $("#province").value = ""; $("#region-w").hidden = true; $("#region").value = ""; updateWhere(); });
+    $("#region").addEventListener("change", updateWhere);
+    window.ClinicPlaces && ClinicPlaces.attach($("#gsearch"), function (a) {
+      $("#a1").value = a.address_line1; form.address_line2.value = a.address_line2 || "";
+      $("#city").value = a.city; $("#pc").value = a.postal_code;
+      $("#district").value = a.district || ""; $("#province").value = a.province || "";
+      $("#lat").value = a.lat == null ? "" : a.lat; $("#lng").value = a.lng == null ? "" : a.lng;
+      $("#region-w").hidden = true; $("#region").value = ""; updateWhere();
+    }).then(function (on) { $("#gsearch-w").hidden = !on; });
+    bind(form, async function (d) {
+      d.lat = d.lat === "" ? null : Number(d.lat); d.lng = d.lng === "" ? null : Number(d.lng);
+      if ($("#region-w").hidden) d.region = "";
+      var r = await S.register(d); form.hidden = true; $("#sent").innerHTML = sentBox(r);
+    });
   }
 
   async function viewAuth(token) {
@@ -302,7 +337,9 @@
         var acts = c.status === "pending" ? btn("approve", c.id, "Approve", "primary") + btn("reject", c.id, "Reject", "danger")
           : c.status === "approved" ? btn("suspend", c.id, "Suspend", "danger") : btn("approve", c.id, "Reinstate", "ghost");
         var logo = c.logo_status === "pending" ? '<img class="logo-prev" style="max-width:90px" src="' + esc(c.logo_data) + '" alt="">' + btn("logo-ok", c.id, "Approve logo", "ghost") + btn("logo-no", c.id, "Reject", "danger") : esc(c.logo_status);
-        return "<tr><td><b>" + esc(c.display_name) + '</b><br><span class="tiny">/' + esc(c.region_id + "/" + c.slug) + " · " + esc(c.short_code) + "</span></td><td>" + esc(c.region_id.toUpperCase()) + "</td><td>" + c.users.map(function (u) { return esc(u.email); }).join("<br>") + '</td><td><span class="pill ' + esc(c.status) + '">' + esc(c.status) + "</span></td><td>" + logo + '</td><td class="n">' + c.counts.all.booking_completed + '</td><td><div class="row">' + acts + "</div></td></tr>";
+        return "<tr><td><b>" + esc(c.display_name) + '</b><br><span class="tiny">/' + esc(c.region_id + "/" + c.slug) + " · " + esc(c.short_code) + "</span></td><td>" + (c.status === "pending"
+          ? '<select class="mini" data-region="' + c.id + '" aria-label="Health authority">' + S.regions.map(function (r) { return '<option value="' + esc(r.id) + '"' + (r.id === c.region_id ? " selected" : "") + ">" + esc(r.id.toUpperCase()) + "</option>"; }).join("") + "</select>"
+          : esc(c.region_id.toUpperCase())) + '<br><span class="tiny">' + esc({ city: "from city", district: "from district", chosen: "chosen by clinic", admin: "set by TSB" }[c.region_source] || "") + (c.city ? "<br>" + esc(c.city) : "") + "</span></td><td>" + c.users.map(function (u) { return esc(u.email); }).join("<br>") + '</td><td><span class="pill ' + esc(c.status) + '">' + esc(c.status) + "</span></td><td>" + logo + '</td><td class="n">' + c.counts.all.booking_completed + '</td><td><div class="row">' + acts + "</div></td></tr>";
       }).join("") + "</tbody></table></div>" : '<p class="muted" style="margin-top:8px">No clinics yet. <a href="#/register">Register one</a>.</p>') + "</div>";
 
     html += '<div class="card"><div class="row"><h2>Stand queue</h2><span class="spacer"></span><span class="tiny">Approved this month: ' + S.admin.approvedThisMonth() + " of " + CFG.standMonthlyCap + "</span></div>" + (stands.length ? '<div class="table-wrap" style="margin-top:10px"><table><thead><tr><th>Clinic</th><th>Ship to</th><th>NFC link to program</th><th>Status</th><th>Next step</th></tr></thead><tbody>' +
@@ -340,6 +377,9 @@
           viewAdmin();
         } catch (e) { alert(e.message); }
       };
+    });
+    $$("[data-region]").forEach(function (s) {
+      s.onchange = function () { try { S.admin.setRegion(+s.getAttribute("data-region"), s.value); viewAdmin(); } catch (e) { alert(e.message); } };
     });
     if ($("#csv")) $("#csv").onclick = function () {
       var q = function (v) { v = String(v); if (/^[=+\-@]/.test(v)) v = "'" + v; return '"' + v.replace(/"/g, '""') + '"'; };

@@ -23,6 +23,7 @@ approval the **Booking kit** unlocks.
 | `index.html`, `app.js` | Clinic portal screens: register, sign in, dashboard, booking kit, profile and logo, NFC stand, team. Also a demo-only TSB admin view. |
 | `store.js` | Data layer. Demo adapter today. Holds every rule (approval gate, single-use links, rate limits, clinic isolation). |
 | `vee.js` | Vee, the portal's guide character (an original test-tube mascot). Gives tips in speech bubbles on each screen, on the patient page, and optionally on printables. Tips can be dismissed and brought back with **Tips** in the header. |
+| `regions.js`, `places.js` | Sign-up asks for the clinic's address, not its region. `regions.js` works out the BC health authority from the city (or Google's regional district) and the form confirms it. `places.js` adds Google address autocomplete once `googleMapsApiKey` is set in `config.js`. Without a key, clinics type the address. Addresses outside Vancouver Coastal and Fraser Health get a friendly "coming later" message. If a city can't be matched, a dropdown appears. The TSB admin can correct the region before approving. |
 | `qr.js`, `vendor/qrcode.js` | QR generation: error correction H, 4-module quiet zone, black on white, SVG and 1024 px PNG. Library: qrcode-generator 2.0.4 (MIT, Kazuhiko Arase). |
 | `print/` | Print templates in the Lab Online Booking poster style (`templates.js`, `print.css`, `img/lab-desk.webp`). Clinic formats: poster (Letter), large poster (Tabloid 11×17), countertop sign (5×7), counter card (4×6), table tent (Letter, folds to 8.5×5.5) and patient handouts (4 per Letter sheet). Options: clinic logo, photo, Vee. Until a logo is approved, each format shows a dashed "Your logo here" box in the logo spot. It is on screen only (it never prints), and clicking it uploads the logo. "Save as PDF" gives a one-page PDF at the exact size. The NFC stand label (4.4×4.9) is printed by TSB from the admin stand queue. |
 | `c/` | Public patient landing page (`?code=XXXXXX&m=qr`, or `?r=vch&s=pacific-blvd`). Records the visit and links into booking. |
@@ -62,6 +63,8 @@ Keep the screens and swap `store.js` for `fetch()` calls. Suggested routes, matc
 | `trackBooking` | Hook at booking start and at booking confirmation (the one change to existing code) |
 | `admin.*` | `/admin/clinics…`, `/admin/clinic-stands`, `/admin/clinic-reports` |
 
+Google autocomplete: create a browser key with "Maps JavaScript API" and "Places API (New)" enabled, restricted to the site's HTTP referrers, and put it in `config.js`. On the server, check the region against the official health authority boundaries (BC Data Catalogue) using the stored latitude and longitude. The city table is a good first guess, not a legal boundary.
+
 Things that must move to the server for production. The demo can't enforce them because it runs in the browser:
 
 1. Token hashing, expiry, rate limiting and sessions (Laravel guard plus throttle middleware).
@@ -85,6 +88,8 @@ python3 -m http.server 8765    # from the repo root
 ```bash
 npm i playwright jsqr pngjs && node clinic-portal/tests/e2e.js
 ```
+
+`tests/address.js` checks address sign-up: region detection, the out-of-program and unknown-city paths, BC postal codes, the admin region fix, and Google autocomplete (mocked, so it runs offline).
 
 `tests/logo-slot.js` checks the "Your logo here" placeholder: it shows on screen, never prints, uploads on click, and gives way to the approved logo.
 

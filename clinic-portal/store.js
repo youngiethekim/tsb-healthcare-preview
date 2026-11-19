@@ -146,24 +146,45 @@
       if (!clean(f.name)) fail("Enter your name.");
       if (!validEmail(email)) fail("Enter a valid work email.");
       if (!clean(f.clinicName)) fail("Enter your clinic name.");
-      if (!region(f.region)) fail("Choose your health authority region.");
+      if (!clean(f.address_line1) || !clean(f.city)) fail("Enter your clinic's street address and city.");
+      var pcode = clean(f.postal_code, 7).toUpperCase().replace(/^([A-Z]\d[A-Z])\s?(\d[A-Z]\d)$/, "$1 $2");
+      if (!/^V\d[A-Z] \d[A-Z]\d$/.test(pcode)) fail("Enter a BC postal code, for example V6B 1A1.");
+      var where = this.regionFor(f);
+      if (!where.region) fail(where.message, "region");
       if (!f.terms) fail("Please accept the clinic terms to continue.");
       var res = tx(function (d) {
         if (d.clinic_users.some(function (u) { return u.email === email; })) return { exists: true };
         var name = clean(f.clinicName, 120);
-        var c = { id: id(d), name: name, display_name: name.slice(0, 60), region_id: f.region,
-          slug: makeSlug(d, name, f.region), previous_slugs: [], short_code: makeShortCode(d),
-          address_line1: "", address_line2: "", city: "", province: "BC", postal_code: "", phone: "",
+        var c = { id: id(d), name: name, display_name: name.slice(0, 60), region_id: where.region.id, region_source: where.source,
+          slug: makeSlug(d, name, where.region.id), previous_slugs: [], short_code: makeShortCode(d),
+          address_line1: clean(f.address_line1, 120), address_line2: clean(f.address_line2, 120), city: clean(f.city, 80), province: "BC",
+          postal_code: pcode, lat: typeof f.lat === "number" ? f.lat : null, lng: typeof f.lng === "number" ? f.lng : null, phone: "",
           physician_count: null, emr: "", status: "pending", approved_by: null, approved_at: null,
           rejection_reason: null, logo_data: null, logo_status: "none", terms_accepted_at: now(),
           stand_limit: 1, created_at: now(), updated_at: now(), deleted_at: null };
         d.clinics.push(c);
         d.clinic_users.push({ id: id(d), clinic_id: c.id, name: clean(f.name, 100), email: email, role: "owner",
           last_login_at: null, created_at: now() });
-        audit(d, "clinic_user", null, c.id, "registered", { region: f.region });
+        audit(d, "clinic_user", null, c.id, "registered", { region: where.region.id, region_source: where.source });
         return { exists: false };
       });
       return this.requestLink(email, res.exists ? null : "welcome");
+    },
+
+    // Health authority from the address. Returns { region, source, message }.
+    // region is null when the address is outside the program or can't be placed.
+    regionFor(a) {
+      if (a.region) {
+        var chosen = region(a.region);
+        return chosen ? { region: chosen, source: "chosen" } : { region: null, message: "Choose your health authority." };
+      }
+      if (a.province && String(a.province).toUpperCase() !== "BC") return { region: null, source: "outside", message: "Clinic codes are for clinics in British Columbia." };
+      var hit = window.ClinicRegions && ClinicRegions.lookup({ city: a.city, district: a.district });
+      if (!hit) return { region: null, source: "unknown", message: "We couldn't match that city to a health authority. Choose yours below." };
+      var inProgram = region(hit.id);
+      if (!inProgram) return { region: null, source: "not_in_program", ha: hit.name,
+        message: "Clinic codes are launching in " + CFG.regions.map(function (r) { return r.name; }).join(" and ") + " first. " + hit.name + " is coming later. Email " + CFG.supportEmail + " to be told when it opens." };
+      return { region: inProgram, source: hit.source };
     },
 
     async requestLink(emailIn, kind) {
@@ -380,6 +401,18 @@
           if (status === "approved") mail(d, to, "Your clinic is approved", "Your booking kit, QR code and stand request are ready in the clinic portal.");
           if (status === "rejected") mail(d, to, "About your clinic portal request", "We could not approve this request: " + c.rejection_reason + "\nQuestions? " + CFG.supportEmail);
           if (status === "suspended") mail(d, to, "Your clinic link is paused", "Your clinic link now opens the main Lab Online Booking page. Contact " + CFG.supportEmail + ".");
+        });
+      },
+      setRegion(clinicId, regionId) {
+        return tx(function (d) {
+          var c = d.clinics.filter(function (x) { return x.id === clinicId; })[0] || fail("Clinic not found.");
+          if (!region(regionId)) fail("Unknown region.");
+          if (c.status === "approved") fail("Change the region before approving. Approved clinics may already have printed links.");
+          if (c.region_id === regionId) return;
+          var from = c.region_id;
+          var slug = makeSlug(d, c.name, regionId);
+          c.region_id = regionId; c.region_source = "admin"; c.slug = slug; c.updated_at = now();
+          audit(d, "admin", "tsb-admin", c.id, "region_changed", { from: from, to: regionId });
         });
       },
       setLogo(clinicId, approve) {
