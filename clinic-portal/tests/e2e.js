@@ -23,7 +23,7 @@ const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails++
   await page.check('input[name=terms]'); await page.click('button[type=submit]');
   const link = await page.locator('.demo-link').getAttribute('href');
   ok(/#\/auth\/[0-9a-f]{64}$/.test(link), 'sign-in link issued');
-  await page.goto(link); await page.waitForSelector('.banner.pending');
+  await page.goto(link); await page.waitForSelector('[data-npc=pending]');
   ok(true, 'pending banner shown after sign-in');
   await page.screenshot({ path: OUT + '1-pending.png' });
   // single-use
@@ -75,17 +75,31 @@ const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails++
   const [dl2] = await Promise.all([page.waitForEvent('download'), page.click('#svg')]);
   ok(dl2.suggestedFilename().endsWith('.svg'), 'SVG download');
 
-  // printables
-  for (const t of ['poster', 'card', 'label']) {
-    const pp = await ctx.newPage(); await pp.goto(B + 'print/?type=' + t); await pp.waitForSelector('.sheet .qr svg');
-    const txt = await pp.textContent('.sheet');
-    ok(txt.includes('Need bloodwork?') && txt.includes('Pacific Blvd Clinic') && txt.includes('labonlinebooking.ca/c/' + code), t + ' copy + name + short link');
-    const qrw = await pp.$eval('.qr', e => e.getBoundingClientRect().width);
-    ok(qrw >= 96, t + ' QR >= 1in (' + qrw + 'px)');
-    await pp.screenshot({ path: OUT + '4-' + t + '.png' });
-    await pp.pdf({ path: OUT + t + '.pdf', preferCSSPageSize: true, printBackground: true });
+  // printables: every clinic format, QR >= 1 inch, required copy, exact page size, one page
+  const SIZES = { poster: [612, 792], tabloid: [792, 1224], counter: [360, 504], card: [288, 432], tent: [612, 792], handouts: [612, 792] };
+  for (const t of Object.keys(SIZES)) {
+    const pp = await ctx.newPage(); await pp.goto(B + 'print/?type=' + t); await pp.waitForSelector('.sheet .qrcard svg');
+    const txt = (await pp.textContent('.sheet')).toLowerCase();
+    ok(txt.includes('need bloodwork?') && txt.includes('book your lab visit') && txt.includes('pacific blvd clinic') &&
+       txt.includes(('labonlinebooking.ca/c/' + code).toLowerCase()) && txt.includes('bc services card'), t + ' copy + name + short link');
+    const widths = await pp.$$eval('.qrcard svg', els => els.map(e => e.getBoundingClientRect().width));
+    ok(Math.min(...widths) >= 96, t + ' every QR >= 1in (' + Math.round(Math.min(...widths)) + 'px)');
+    ok(!(await pp.locator('.sheet img.clogo').count()), t + ' unapproved logo not printed');
+    const pdf = await pp.pdf({ preferCSSPageSize: true, printBackground: true });
+    const s2 = pdf.toString('latin1'); const mb = s2.match(/\/MediaBox \[0 0 ([\d.]+) ([\d.]+)\]/);
+    ok((s2.match(/\/Type \/Page\b/g) || []).length === 1 && mb && Math.abs(mb[1] - SIZES[t][0]) < 1 && Math.abs(mb[2] - SIZES[t][1]) < 1, t + ' PDF is one page at ' + SIZES[t].join('x'));
     await pp.close();
   }
+  { const pp = await ctx.newPage(); await pp.goto(B + 'print/?type=label'); await pp.waitForSelector('.sheet');
+    ok(await pp.locator('.sheet.hero').count() === 1, 'stand label is not offered to clinics'); await pp.close(); }
+
+  // Vee: tip shows, "Got it" hides it for good, header "Tips" brings it back
+  await page.goto(B + '#/kit'); await page.waitForSelector('[data-npc=kit]');
+  await page.click('[data-npc=kit] [data-npc-close]'); await page.waitForTimeout(250);
+  await page.reload(); await page.waitForSelector('.print-tiles');
+  ok(!(await page.locator('[data-npc=kit]').count()), 'dismissed tip stays dismissed');
+  await page.click('#tips'); await page.waitForSelector('[data-npc=kit]');
+  ok(true, 'Tips button restores tips');
 
   // landing + attribution
   const land = await ctx.newPage();
@@ -114,6 +128,14 @@ const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails++
   await page.click('[data-act=st-shipped]');
   ok((await page.textContent('body')).includes('Tracking number: 1Z999AA10123456784'), 'shipped email with tracking');
 
+  // approved logo prints, and can be switched off per format
+  await page.goto(B + '#/admin'); await page.click('[data-act=logo-ok]');
+  { const pp = await ctx.newPage(); await pp.goto(B + 'print/?type=counter'); await pp.waitForSelector('.sheet img.clogo');
+    ok(true, 'approved logo appears on printables');
+    await pp.uncheck('#opt-logo'); ok(!(await pp.locator('.sheet img.clogo').count()), 'logo can be turned off');
+    await pp.uncheck('#opt-vee'); ok(!(await pp.locator('.sheet .vremind').count()) && (await pp.textContent('.sheet')).includes('BC Services Card'), 'Vee off keeps the reminder line');
+    await pp.close(); }
+
   // dashboard
   await page.goto(B + '#/'); await page.click('#seed'); await page.waitForTimeout(300);
   await page.screenshot({ path: OUT + '6-dashboard.png', fullPage: true });
@@ -123,7 +145,7 @@ const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails++
   await page.goto(B + '#/register');
   await page.fill('#name', 'Sam'); await page.fill('#email', 'sam@other.ca'); await page.fill('#clinicName', 'Other Clinic');
   await page.selectOption('#region', 'fraser'); await page.check('input[name=terms]'); await page.click('button[type=submit]');
-  await page.goto(await page.locator('.demo-link').getAttribute('href')); await page.waitForSelector('.banner.pending');
+  await page.goto(await page.locator('.demo-link').getAttribute('href')); await page.waitForSelector('[data-npc=pending]');
   ok(!(await page.textContent('body')).includes('Pacific Blvd'), 'clinic B sees nothing of clinic A');
   // suspend A
   await page.goto(B + '#/admin');

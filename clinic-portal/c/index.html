@@ -19,9 +19,10 @@
 </head>
 <body>
 <header class="top"><div class="top-in">
-  <span class="mark"><span class="mark-dot"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6L5 19a2 2 0 0 0 1.8 2.9h10.4A2 2 0 0 0 19 19l-5-10V3"/></svg></span><span>Lab Online Booking</span></span>
+  <span class="mark"><svg class="leaf" viewBox="0 0 100 100" aria-hidden="true"><path fill="#d8262c" d="M50 3l6 13 8-4-3 22 13-12 3 8 13-3-5 15 9 4-22 17 3 9-22-3 1 23h-8l1-23-22 3 3-9L6 46l9-4-5-15 13 3 3-8 13 12-3-22 8 4z"/></svg><span>Lab Online Booking<small>Accessible healthcare for BC.</small></span></span>
 </div></header>
 <div class="land" id="land" hidden>
+  <div class="npc"><div class="vee-w" id="vee"></div><div class="bubble"><div class="who-says">Vee</div><p>Hi, I'm Vee! Grab your requisition and your BC Services Card, then tap the big blue button.</p></div></div>
   <div class="card">
     <img class="logo" id="logo" alt="" hidden>
     <p class="muted small">Patients of</p>
@@ -38,6 +39,7 @@
 </div>
 <script src="../config.js"></script>
 <script src="../store.js"></script>
+<script src="../vee.js"></script>
 <script>
 (function () {
   var CFG = window.CLINIC_PORTAL_CONFIG, S = window.ClinicStore;
@@ -50,6 +52,7 @@
   var medium = q.get("code") ? (q.get("m") || "link") : "link";
   S.trackVisit(c.id, medium);
   document.getElementById("name").textContent = c.display_name;
+  document.getElementById("vee").innerHTML = Vee.svg({ mood: "wave" });
   if (c.logo) { var l = document.getElementById("logo"); l.src = c.logo; l.alt = c.display_name; l.hidden = false; }
   var book = document.getElementById("book");
   book.href = CFG.bookingUrl.replace("{region}", encodeURIComponent(c.region_id));

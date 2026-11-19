@@ -22,8 +22,9 @@ approval the **Booking kit** unlocks.
 |---|---|
 | `index.html`, `app.js` | Clinic portal screens: register, sign in, dashboard, booking kit, profile and logo, NFC stand, team. Also a demo-only TSB admin view. |
 | `store.js` | Data layer. Demo adapter today. Holds every rule (approval gate, single-use links, rate limits, clinic isolation). |
+| `vee.js` | Vee, the portal's guide character (an original test-tube mascot). Gives tips in speech bubbles on each screen, on the patient page, and optionally on printables. Tips can be dismissed and brought back with **Tips** in the header. |
 | `qr.js`, `vendor/qrcode.js` | QR generation: error correction H, 4-module quiet zone, black on white, SVG and 1024 px PNG. Library: qrcode-generator 2.0.4 (MIT, Kazuhiko Arase). |
-| `print/` | Print-ready poster (Letter), counter card (4×6 in) and stand label (4.4×4.9 in). "Save as PDF" produces a one-page PDF at the exact size. |
+| `print/` | Print templates in the Lab Online Booking poster style (`templates.js`, `print.css`, `img/lab-desk.webp`). Clinic formats: poster (Letter), large poster (Tabloid 11×17), countertop sign (5×7), counter card (4×6), table tent (Letter, folds to 8.5×5.5) and patient handouts (4 per Letter sheet). Options: clinic logo, photo, Vee. "Save as PDF" gives a one-page PDF at the exact size. The NFC stand label (4.4×4.9) is printed by TSB from the admin stand queue. |
 | `c/` | Public patient landing page (`?code=XXXXXX&m=qr`, or `?r=vch&s=pacific-blvd`). Records the visit and links into booking. |
 | `config.js` | Feature flag, base domain, regions, stand cap, timeouts. |
 | `tests/e2e.js` | Playwright acceptance test covering section 12 of the brief. |
@@ -33,6 +34,9 @@ approval the **Booking kit** unlocks.
 - **Passwordless sign-in.** The link works once, expires after 15 minutes and is stored only as a SHA-256 hash. Limit of 5 requests per email per hour. The reply is always the same "If that email is registered…" message. Sessions end after 12 hours idle.
 - **Approval gate.** Pending, rejected and suspended clinics get no kit, no stand and no live link. A public link for an unknown or unapproved clinic redirects to the booking home page with no error.
 - **Link rules.** The short code is 6 characters from `ABCDEFGHJKMNPQRSTUVWXYZ23456789`, random with retry on collision. The slug is built from the clinic name (40 characters at most, `-2`/`-3` on collision within the region). The QR code encodes `{baseUrl}/c/{code}?m=qr` and the NFC link is `?m=nfc`. The shareable link is `{baseUrl}/{region}/{slug}`.
+- **Printables.** Six clinic formats share one design scaled in `em`, so every size keeps the required copy, the typed short link and a QR code at least 1 inch wide. The clinic logo is optional and prints only after TSB approves it. Health authority logos never appear.
+- **NFC stand.** Coming later. Approved clinics can opt in now. The request waits in the admin stand queue.
+- **Motion.** Follows Emil Kowalski's design-engineering guidance: press feedback on buttons, custom ease-out curves under 300 ms, a bubble that grows from Vee's tail, a one-time confetti burst on approval, and no motion on repeated actions. `prefers-reduced-motion` turns movement into simple fades.
 - **Branding.** Display name up to 60 characters. One PNG/JPG logo, 1 MB at most. The real file type is checked from its bytes and the image is re-encoded, which strips metadata. A logo appears publicly only after admin approval.
 - **Attribution.** Visit, booking started and booking completed. One visit per browser session per clinic. Known bots and link previewers are skipped. The reference expires after 24 hours. Events store clinic, medium, type and time, and nothing else.
 - **Stand.** Available only after approval. One open request per clinic. Admin queue shows the exact NFC link, a monthly cap, the fulfilment checklist, and a required tag ID and tracking number before "shipped".

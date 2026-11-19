@@ -13,8 +13,44 @@
   function $$(sel, root) { return Array.prototype.slice.call((root || app).querySelectorAll(sel)); }
   function go(path) { location.hash = "#" + path; }
   function toast(msg) {
-    var t = document.createElement("div"); t.className = "toast"; t.textContent = msg; document.body.appendChild(t);
-    setTimeout(function () { t.remove(); }, 2200);
+    var t = document.createElement("div"); t.className = "toast"; t.setAttribute("role", "status"); t.textContent = msg; document.body.appendChild(t);
+    setTimeout(function () { t.classList.add("out"); setTimeout(function () { t.remove(); }, 220); }, 2200);
+  }
+  var reduceMotion = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- Vee, the guide ---------- */
+  var TIPS_KEY = "lobcp:tips";
+  function tipsHidden() { try { return JSON.parse(localStorage.getItem(TIPS_KEY)) || {}; } catch (e) { return {}; } }
+  function hideTip(id) { var h = tipsHidden(); h[id] = 1; try { localStorage.setItem(TIPS_KEY, JSON.stringify(h)); } catch (e) {} }
+  // npc("kit", "Text", { mood, tone, big, cta: [label, href] }) — returns "" once dismissed.
+  function npc(id, text, o) {
+    o = o || {};
+    if (!o.sticky && tipsHidden()[id]) return "";
+    return '<div class="npc' + (o.big ? " big" : "") + '" data-npc="' + esc(id) + '"><div class="vee-w">' + Vee.svg({ mood: o.mood || "happy" }) + "</div>" +
+      '<div class="bubble' + (o.tone ? " tone-" + o.tone : "") + '"><div class="who-says">Vee</div><p>' + text + "</p>" +
+      (o.sticky ? "" : '<div class="acts">' + (o.cta ? '<a class="link-btn" href="' + esc(o.cta[1]) + '">' + esc(o.cta[0]) + " →</a>" : "") + '<button class="link-btn" type="button" data-npc-close>Got it</button></div>') + "</div></div>";
+  }
+  app.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-npc-close]"); if (!b) return;
+    var box = b.closest(".npc"); hideTip(box.getAttribute("data-npc"));
+    if (reduceMotion) return box.remove();
+    box.classList.add("leaving"); setTimeout(function () { box.remove(); }, 180);
+  });
+  function confetti(fromEl) {
+    if (reduceMotion || !fromEl || !fromEl.animate) return;
+    var r = fromEl.getBoundingClientRect(), x0 = r.left + r.width / 2, y0 = r.top + r.height / 3;
+    var layer = document.createElement("div"); layer.className = "confetti"; document.body.appendChild(layer);
+    var colors = ["#ef5b63", "#ffc94a", "#1f63c6", "#23a983", "#4fa3f7"];
+    for (var i = 0; i < 26; i++) {
+      var p = document.createElement("i"); p.style.left = x0 + "px"; p.style.top = y0 + "px"; p.style.background = colors[i % colors.length]; layer.appendChild(p);
+      var ang = (-160 + Math.random() * 140) * Math.PI / 180, dist = 90 + Math.random() * 170;
+      var dx = Math.cos(ang) * dist, dy = Math.sin(ang) * dist;
+      p.animate([{ transform: "translate(-50%,-50%) rotate(0deg)", opacity: 1 },
+                 { transform: "translate(" + dx + "px," + dy + "px) rotate(" + (Math.random() * 540 - 270) + "deg)", opacity: 1, offset: 0.6 },
+                 { transform: "translate(" + dx * 1.15 + "px," + (dy + 120) + "px) rotate(" + (Math.random() * 720 - 360) + "deg)", opacity: 0 }],
+                { duration: 1100 + Math.random() * 500, easing: "cubic-bezier(0.23, 1, 0.32, 1)", delay: Math.random() * 60, fill: "forwards" });
+    }
+    setTimeout(function () { layer.remove(); }, 1800);
   }
   function formData(form) {
     var o = {}; $$("input,select,textarea", form).forEach(function (el) { if (!el.name) return; o[el.name] = el.type === "checkbox" ? el.checked : el.value; }); return o;
@@ -35,8 +71,12 @@
   }
   function fmtDate(iso) { return iso ? new Date(iso).toLocaleDateString("en-CA", { year: "numeric", month: "short", day: "numeric" }) : ""; }
   function monthName(m) { var p = m.split("-"); return new Date(+p[0], +p[1] - 1, 15).toLocaleDateString("en-CA", { month: "short", year: "numeric" }); }
-  function copy(text) {
-    (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(function () { toast("Copied"); }, function () { window.prompt("Copy this link:", text); });
+  function copy(text, btn) {
+    (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(function () {
+      var l = btn && btn.querySelector(".lbl"); if (!l) return toast("Copied");
+      l.classList.add("swap"); setTimeout(function () { l.textContent = "Copied!"; l.classList.remove("swap"); }, 120);
+      clearTimeout(btn._t); btn._t = setTimeout(function () { l.classList.add("swap"); setTimeout(function () { l.textContent = "Copy"; l.classList.remove("swap"); }, 120); }, 1600);
+    }, function () { window.prompt("Copy this link:", text); });
   }
   function regionOptions(sel) {
     return '<option value="">Choose…</option>' + S.regions.map(function (r) { return '<option value="' + esc(r.id) + '"' + (r.id === sel ? " selected" : "") + ">" + esc(r.name) + "</option>"; }).join("");
@@ -47,19 +87,21 @@
     user: '<path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/>',
     stand: '<path d="M7 3h10v12H7zM10 18h4M9 21h6M12 15v6"/>',
     team: '<path d="M3 20v-1a5 5 0 0 1 5-5h2a5 5 0 0 1 5 5v1M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM17 11a3 3 0 1 0 0-6M21 20v-1a4 4 0 0 0-3-3.9"/>',
-    lock: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>'
+    lock: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+    check: '<circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.2 9.5"/>'
   };
   function icon(n, s) { return '<svg width="' + (s || 18) + '" height="' + (s || 18) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICON[n] + "</svg>"; }
 
   /* ---------- chrome ---------- */
   function renderWho(me) {
     if (!me) { who.innerHTML = ""; return; }
-    who.innerHTML = '<div class="who"><span>' + esc(me.user.name) + " · </span>" + esc(me.clinic.display_name) + '</div><button class="btn btn-ghost btn-sm" id="signout">Sign out</button>';
+    who.innerHTML = '<div class="who"><span>' + esc(me.user.name) + " · </span>" + esc(me.clinic.display_name) + '</div><button class="btn btn-ghost btn-sm tips-btn" id="tips" title="Show Vee\'s tips again">' + Vee.svg() + 'Tips</button><button class="btn btn-ghost btn-sm" id="signout">Sign out</button>';
     document.getElementById("signout").onclick = function () { S.signOut(); go("/login"); };
+    document.getElementById("tips").onclick = function () { try { localStorage.removeItem(TIPS_KEY); } catch (e) {} route(); };
   }
   function shell(me, active, inner) {
     var locked = me.clinic.status !== "approved";
-    var nav = [["/", "home", "Dashboard"], ["/kit", "qr", "Booking kit", locked], ["/profile", "user", "Clinic profile"], ["/stand", "stand", "NFC stand", locked], ["/team", "team", "Team"]];
+    var nav = [["/", "home", "Dashboard"], ["/kit", "qr", "Booking kit", locked], ["/profile", "user", "Clinic profile"], ["/stand", "stand", "NFC stand (soon)", locked], ["/team", "team", "Team"]];
     app.innerHTML = '<div class="shell"><nav class="side" aria-label="Portal">' + nav.map(function (n) {
       return '<a href="#' + n[0] + '"' + (n[0] === active ? ' aria-current="page"' : "") + ">" + icon(n[1]) + esc(n[2]) + (n[3] ? '<span class="lock">' + icon("lock", 14) + "</span>" : "") + "</a>";
     }).join("") + '</nav><main class="main">' + inner + "</main></div>";
@@ -75,7 +117,7 @@
   }
 
   /* ---------- auth screens ---------- */
-  function authPage(inner) { renderWho(null); app.innerHTML = '<div class="auth"><div class="card stack">' + inner + "</div></div>"; }
+  function authPage(inner, say) { renderWho(null); app.innerHTML = '<div class="auth"><div class="auth-wrap">' + (say || "") + '<div class="card stack">' + inner + "</div></div></div>"; }
   function sentBox(res) {
     return '<div class="ok-msg">' + esc(res.message) + "</div>" + (res.demoLink ?
       '<div class="banner info small"><div><b>Demo mode: no email is sent.</b>Open your sign-in link here: <a class="demo-link" href="' + esc(res.demoLink) + '">' + esc(res.demoLink.split("#")[1].slice(0, 22)) + "…</a></div></div>" : "");
@@ -85,7 +127,7 @@
     authPage('<h1>Sign in to your clinic portal</h1><p class="muted">Enter your work email and we will send you a sign-in link. No password needed.</p>' +
       '<form id="f" class="stack" novalidate><div class="field"><label for="email">Work email</label><input id="email" name="email" type="email" autocomplete="email" required></div>' +
       '<div class="form-msg" hidden></div><button class="btn btn-primary btn-block" type="submit">Email me a sign-in link</button></form>' +
-      '<div id="sent"></div><p class="small muted">New clinic? <a href="#/register">Register your clinic</a></p>');
+      '<div id="sent"></div><p class="small muted">New clinic? <a href="#/register">Register your clinic</a></p>', npc("login", "Welcome back! No password to remember. I'll email you a magic link.", { mood: "wave", sticky: true }));
     bind($("#f"), async function (d) { var r = await S.requestLink(d.email); $("#sent").innerHTML = sentBox(r); });
   }
 
@@ -97,7 +139,7 @@
       '<div class="field"><label for="region">Health authority region</label><select id="region" name="region" required>' + regionOptions() + "</select></div>" +
       '<div class="field"><label class="check"><input type="checkbox" name="terms"> <span>We will display Lab Online Booking materials unaltered, never charge patients for booking, and never enter patient information in this portal.</span></label></div>' +
       '<div class="field"><div class="form-msg" hidden></div></div><div class="field"><button class="btn btn-primary btn-block" type="submit">Register and email my sign-in link</button></div></form>' +
-      '<div id="sent"></div><p class="small muted">Already registered? <a href="#/login">Sign in</a></p>');
+      '<div id="sent"></div><p class="small muted">Already registered? <a href="#/login">Sign in</a></p>', npc("register", "Hi, I'm Vee! Let's get your clinic its own booking QR code. It takes about two minutes, and it's free.", { mood: "wave", sticky: true, big: true }));
     bind($("#f"), async function (d, form) { var r = await S.register(d); form.hidden = true; $("#sent").innerHTML = sentBox(r); });
   }
 
@@ -110,10 +152,16 @@
   /* ---------- dashboard ---------- */
   function viewDashboard(me) {
     var c = me.clinic, k = c.status === "approved" ? S.myCounts() : null;
-    var html = '<div class="page-h"><div><h1>' + esc(c.display_name) + '</h1><p class="muted">' + esc(c.region_name) + ' · <span class="pill ' + esc(c.status) + '">' + esc(c.status) + "</span></p></div></div>" + statusBanner(c);
+    var celebrate = false;
+    if (c.status === "approved") { try { celebrate = !localStorage.getItem("lobcp:yay:" + c.id); localStorage.setItem("lobcp:yay:" + c.id, "1"); } catch (e) {} }
+    var html = '<div class="page-h"><div><h1>' + esc(c.display_name) + '</h1><p class="muted">' + esc(c.region_name) + ' · <span class="pill ' + esc(c.status) + '">' + esc(c.status) + "</span></p></div></div>";
+    if (c.status === "pending") html += npc("pending", "You're in the queue! Our team reviews new clinics within two business days. While you wait, fill in your clinic profile so we can approve you faster.", { mood: "think", tone: "sun", big: true, sticky: true, cta: ["Edit profile", "#/profile"] });
+    else if (celebrate) html += npc("approved", "Woohoo, you're approved! Your QR code and printables are ready. Pop a countertop sign on the front desk and you're done.", { mood: "party", tone: "mint", big: true, cta: ["Open my booking kit", "#/kit"] });
+    else if (c.status === "approved") html += npc("dash", "This is where your scans show up. I count visits and bookings only, never anything about patients.", {});
+    else html += statusBanner(c);
     if (k) {
       var stat = function (label, key) {
-        return '<div class="card stat"><div class="k">' + label + '</div><div class="v">' + k.current[key].toLocaleString() + '</div><div class="s">Last month ' + k.last[key].toLocaleString() + " · All time " + k.all[key].toLocaleString() + "</div></div>";
+        return '<div class="card stat"><span class="chip ' + ({ visit: "c-sky", booking_started: "c-coral", booking_completed: "c-mint" })[key] + '">' + icon({ visit: "qr", booking_started: "home", booking_completed: "check" }[key]) + '</span><div class="k">' + label + '</div><div class="v">' + k.current[key].toLocaleString() + '</div><div class="s">Last month ' + k.last[key].toLocaleString() + " · All time " + k.all[key].toLocaleString() + "</div></div>";
       };
       html += '<div class="grid g3">' + stat("Visits this month", "visit") + stat("Bookings started", "booking_started") + stat("Bookings completed", "booking_completed") + "</div>";
       if (!k.all.visit) {
@@ -125,9 +173,10 @@
         }).join("") + "</tbody></table></div></div>";
     } else {
       html += '<div class="grid g2" style="margin-top:18px"><div class="card"><h3>1. Complete your profile</h3><p class="muted small" style="margin-top:6px">Address, phone and display name help us approve you faster.</p><a class="btn btn-ghost btn-sm" style="margin-top:12px" href="#/profile">Edit profile</a></div>' +
-        '<div class="card"><h3>2. Get your booking kit</h3><p class="muted small" style="margin-top:6px">After approval: your link, QR code, poster, counter card and a free NFC stand.</p></div></div>';
+        '<div class="card"><h3>2. Get your booking kit</h3><p class="muted small" style="margin-top:6px">After approval: your link, QR code, posters, signs and handouts, plus an opt-in for a free NFC stand.</p></div></div>';
     }
     shell(me, "/", html);
+    if (celebrate) setTimeout(function () { confetti($(".npc .vee-w")); }, 300);
   }
 
   /* ---------- booking kit ---------- */
@@ -138,26 +187,41 @@
     var L = c.links, file = "lob-" + c.short_code.toLowerCase();
     var preview = "c/?code=" + encodeURIComponent(c.short_code) + "&m=qr";
     var html = '<div class="page-h"><div><h1>Booking kit</h1><p class="muted">Your clinic\'s permanent link and QR code. They never change, so print as many as you like.</p></div></div>' +
-      '<div class="card"><div class="kit"><div><div class="qr-box" id="qr">' + ClinicQR.svg(L.qr) + '</div>' +
+      npc("kit", "This QR code is yours forever. It never changes, so print as many as you like. The countertop sign is my favourite for the front desk!", { mood: "wave" }) +
+      '<div class="card"><div class="kit"><div><div class="qr-box" id="qr"><span class="qr-sticker">Your code</span>' + ClinicQR.svg(L.qr) + '</div>' +
       '<p class="tiny" style="text-align:center;margin-top:8px">Code <span class="code">' + esc(c.short_code) + "</span></p></div>" +
       '<div class="stack"><div><h2>Download your QR code</h2><p class="muted small" style="margin-top:4px">High error correction, black on white. Print it at least 1 inch (2.5 cm) wide.</p></div>' +
       '<div class="row"><button class="btn btn-primary" id="png">Download PNG (1024 px)</button><button class="btn btn-ghost" id="svg">Download SVG</button></div>' +
-      '<div class="field"><label for="l-share">Shareable link (for text or email)</label><div class="linkline"><input id="l-share" type="text" readonly value="' + esc(L.share) + '"><button class="btn btn-ghost btn-sm" data-copy="' + esc(L.share) + '">Copy</button></div></div>' +
-      '<div class="field"><label for="l-short">Short link (printed under the QR code)</label><div class="linkline"><input id="l-short" type="text" readonly value="' + esc(L.short) + '"><button class="btn btn-ghost btn-sm" data-copy="' + esc(L.short) + '">Copy</button></div></div>' +
+      '<div class="field"><label for="l-share">Shareable link (for text or email)</label><div class="linkline"><input id="l-share" type="text" readonly value="' + esc(L.share) + '"><button class="btn btn-ghost btn-sm" data-copy="' + esc(L.share) + '"><span class="lbl">Copy</span></button></div></div>' +
+      '<div class="field"><label for="l-short">Short link (printed under the QR code)</label><div class="linkline"><input id="l-short" type="text" readonly value="' + esc(L.short) + '"><button class="btn btn-ghost btn-sm" data-copy="' + esc(L.short) + '"><span class="lbl">Copy</span></button></div></div>' +
       '<p class="small"><a href="' + esc(preview) + '" target="_blank" rel="noopener">Preview the page patients see →</a></p></div></div></div>' +
-      '<div class="card"><h2>Printables</h2><p class="muted small" style="margin-top:4px">Each opens a print-ready page. Choose "Save as PDF" or print directly. Use actual size (100%).</p>' +
-      '<div class="print-tiles" style="margin-top:14px">' +
-      tile("poster", "Poster", "Letter, 8.5 × 11 in", "Waiting room or exam room wall") +
-      tile("card", "Counter card", "4 × 6 in", "Front desk") +
-      tile("label", "Stand label", "4.4 × 4.9 in", "Fits the Lab Online Booking stand") + "</div></div>";
+      logoCard(c) +
+      '<div class="card"><h2>Printables</h2><p class="muted small" style="margin-top:4px">Pick a format to open it ready to print. Choose "Save as PDF" for a file, or print at actual size (100%). Every format uses your QR code and short link.</p>' +
+      '<div class="print-tiles" style="margin-top:14px">' + Object.keys(window.ClinicPrint.FORMATS).filter(function (k) { return !window.ClinicPrint.FORMATS[k].admin; }).map(function (k) { return tile(k, window.ClinicPrint.FORMATS[k]); }).join("") + "</div></div>";
     if (CFG.mode === "demo") html += '<div class="banner info small" style="margin-top:18px"><div><b>Demo note</b>The QR code encodes ' + esc(L.qr) + '. That address goes live when the portal ships on labonlinebooking.ca. Until then, use "Preview the page patients see".</div></div>';
     shell(me, "/kit", html);
     $("#png").onclick = function () { ClinicQR.downloadPNG(L.qr, file + "-qr.png"); };
     $("#svg").onclick = function () { ClinicQR.downloadSVG(L.qr, file + "-qr.svg"); };
-    $$("[data-copy]").forEach(function (b) { b.onclick = function () { copy(b.getAttribute("data-copy")); }; });
-    function tile(type, name, size, use) {
-      return '<div class="tile"><h3>' + name + '</h3><div class="small">' + size + '</div><div class="tiny">' + use + '</div><a class="btn btn-ghost btn-sm" target="_blank" rel="noopener" href="print/?type=' + type + '">Open printable</a></div>';
+    $$("[data-copy]").forEach(function (b) { b.onclick = function () { copy(b.getAttribute("data-copy"), b); }; });
+    if ($("#klf")) bind($("#klf"), async function () { await S.uploadLogo($("#klogo").files[0]); toast("Logo uploaded for review"); route(); });
+    function tile(type, f) {
+      var ratio = f.layout === "tent" || f.layout === "handouts" ? 8.5 / 11 : f.w / f.h;
+      return '<div class="tile"><a class="thumb" href="print/?type=' + type + '" target="_blank" rel="noopener" style="aspect-ratio:' + ratio.toFixed(4) + '" aria-label="Open ' + esc(f.name) + '">' +
+        '<iframe src="print/?type=' + type + '&embed=1" title="' + esc(f.name) + ' preview" loading="lazy" tabindex="-1"></iframe></a>' +
+        "<h3>" + esc(f.name) + '</h3><div class="small">' + esc(f.size) + '</div><div class="tiny">' + esc(f.use) + '</div><a class="btn btn-ghost btn-sm" target="_blank" rel="noopener" href="print/?type=' + type + '">Open printable</a></div>';
     }
+  }
+
+  function logoCard(c) {
+    var state = c.logo_status === "approved"
+      ? '<span class="pill approved">On your printables</span>'
+      : c.logo_status === "pending" ? '<span class="pill pending">Waiting for review</span>' : "";
+    var body = c.logo_status === "approved"
+      ? "Your logo appears next to the Lab Online Booking name on every printable. You can turn it off for any format on the print page."
+      : c.logo_status === "pending" ? "Thanks. Our team reviews logos within two business days. Until then your clinic name prints as text."
+      : "Add your clinic logo to the posters, signs and handouts. Until you do, your clinic name prints as text.";
+    return '<div class="card"><div class="row">' + (c.logo_data ? '<img class="logo-prev" src="' + esc(c.logo_data) + '" alt="Your clinic logo">' : "") + '<div style="flex:1;min-width:220px"><div class="row"><h2>Your logo on printables</h2>' + state + '</div><p class="muted small" style="margin-top:4px">' + body + "</p></div></div>" +
+      '<form id="klf" class="row" style="margin-top:14px" novalidate><input id="klogo" type="file" accept="image/png,image/jpeg" aria-label="Logo file"><button class="btn btn-ghost btn-sm" type="submit">' + (c.logo_data ? "Replace logo" : "Upload logo") + '</button><span class="tiny">PNG or JPG, 1 MB at most. No health authority logos. A new logo is reviewed before it prints.</span><div class="form-msg" hidden style="flex-basis:100%"></div></form></div>';
   }
 
   /* ---------- profile ---------- */
@@ -166,7 +230,8 @@
     var logo = c.logo_data ? '<img class="logo-prev" src="' + esc(c.logo_data) + '" alt="Your clinic logo">' : '<p class="muted small">No logo. Your display name appears as text.</p>';
     var logoState = { none: "", pending: '<span class="pill pending">Waiting for review</span>', approved: '<span class="pill approved">Approved</span>' }[c.logo_status] || "";
     var emrSel = CFG.emrOptions.map(function (o) { return '<option' + (o === c.emr ? " selected" : "") + ">" + esc(o) + "</option>"; }).join("");
-    var html = '<div class="page-h"><div><h1>Clinic profile</h1><p class="muted">Region: ' + esc(c.region_name) + ' · Link and code are set by Lab Online Booking and cannot be edited.</p></div></div>' + statusBanner(c) +
+    var html = '<div class="page-h"><div><h1>Clinic profile</h1><p class="muted">Region: ' + esc(c.region_name) + ' · Link and code are set by Lab Online Booking and cannot be edited.</p></div></div>' + (c.status === "pending" ? "" : statusBanner(c)) +
+      npc("profile", "Your display name is what patients see when they scan, so keep it short and friendly, like \u201cPacific Blvd Clinic\u201d.", {}) +
       '<div class="card"><form id="f" novalidate>' +
       '<div class="field"><label for="display_name">Display name (shown to patients)</label><input id="display_name" name="display_name" type="text" maxlength="60" value="' + esc(c.display_name) + '"><div class="hint">Up to 60 characters. Registered as: ' + esc(c.name) + "</div></div>" +
       '<div class="field"><label for="a1">Address</label><input id="a1" name="address_line1" type="text" autocomplete="address-line1" value="' + esc(c.address_line1) + '"></div>' +
@@ -190,32 +255,34 @@
     var c = me.clinic;
     if (c.status !== "approved") { shell(me, "/stand", '<div class="page-h"><h1>NFC stand</h1></div>' + statusBanner(c) + lockedCard("The free stand")); return; }
     var list = S.stands(), open = list.filter(function (s) { return ["requested", "approved", "programmed", "shipped"].indexOf(s.status) >= 0; })[0];
-    var html = '<div class="page-h"><div><h1>NFC stand</h1><p class="muted">A free countertop stand with your QR code and a tap-to-book NFC tag.</p></div></div>';
+    var html = '<div class="page-h"><div><h1>NFC stand</h1><p class="muted">A free countertop stand with your QR code and a tap-to-book NFC tag.</p></div></div>' +
+      npc("stand", "<b>Stands are coming soon!</b> Patients will just tap their phone to book. Opt in now and I'll make sure one ships to you when they're ready. Until then, a countertop sign from your booking kit does the job.", { mood: "think", tone: "sun", sticky: true });
     if (list.length) {
       html += '<div class="card"><h2>Your requests</h2><div class="table-wrap" style="margin-top:10px"><table><thead><tr><th>Requested</th><th>Ship to</th><th>Status</th><th>Tracking</th></tr></thead><tbody>' +
         list.map(function (s) { return "<tr><td>" + fmtDate(s.created_at) + "</td><td>" + esc(s.ship_to_name) + "<br><span class=tiny>" + esc(s.address_line1 + ", " + s.city) + '</span></td><td><span class="pill ' + esc(s.status) + '">' + esc(s.status) + "</span></td><td>" + (s.tracking_number ? '<span class="code">' + esc(s.tracking_number) + "</span>" : '<span class="tiny">Shown once shipped</span>') + "</td></tr>"; }).join("") +
         "</tbody></table></div></div>";
     }
     if (!open && !list.filter(function (s) { return s.status !== "cancelled"; }).length) {
-      html += '<div class="card"><h2>Request your free stand</h2><form id="f" style="margin-top:14px" novalidate>' +
+      html += '<div class="card"><h2>Opt in for a free stand</h2><p class="muted small" style="margin-top:4px">No cost to your clinic. We will email you when it ships, with a tracking number.</p><form id="f" style="margin-top:14px" novalidate>' +
         '<div class="field"><label for="sn">Contact name</label><input id="sn" name="ship_to_name" type="text" value="' + esc(me.user.name) + '"></div>' +
         '<div class="field"><label for="a1">Shipping address</label><input id="a1" name="address_line1" type="text" value="' + esc(c.address_line1) + '"></div>' +
         '<div class="field"><input aria-label="Address line 2" name="address_line2" type="text" placeholder="Suite or unit (optional)" value="' + esc(c.address_line2) + '"></div>' +
         '<div class="field f2"><div class="field"><label for="city">City</label><input id="city" name="city" type="text" value="' + esc(c.city) + '"></div><div class="field"><label for="pc">Postal code</label><input id="pc" name="postal_code" type="text" maxlength="7" value="' + esc(c.postal_code) + '"></div></div>' +
         '<input type="hidden" name="province" value="BC">' +
         '<div class="field"><label class="check"><input type="checkbox" name="display_confirm"> <span>We will display the stand at our front desk.</span></label></div>' +
-        '<div class="field"><div class="form-msg" hidden></div></div><div class="field"><button class="btn btn-primary" type="submit">Request stand</button></div></form></div>';
+        '<div class="field"><div class="form-msg" hidden></div></div><div class="field"><button class="btn btn-primary" type="submit">Opt in for a stand</button></div></form></div>';
     } else if (!open) {
       html += '<div class="banner info"><div>Your clinic has received its free stand. Need another? Email <a href="mailto:' + esc(CFG.supportEmail) + '">' + esc(CFG.supportEmail) + "</a>.</div></div>";
     }
     shell(me, "/stand", html);
-    if ($("#f")) bind($("#f"), async function (d) { S.requestStand(d); toast("Stand requested"); route(); });
+    if ($("#f")) bind($("#f"), async function (d) { S.requestStand(d); toast("You are on the list for a stand"); route(); });
   }
 
   /* ---------- team ---------- */
   function viewTeam(me) {
     var team = S.team(), owner = me.user.role === "owner";
-    var html = '<div class="page-h"><div><h1>Team</h1><p class="muted">Each clinic has one owner and can add one staff member.</p></div></div><div class="card"><table><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Last sign-in</th><th></th></tr></thead><tbody>' +
+    var html = '<div class="page-h"><div><h1>Team</h1><p class="muted">Each clinic has one owner and can add one staff member.</p></div></div>' +
+      npc("team", "Two heads are better than one. Invite a colleague so someone can always reprint the kit when you're away.", { mood: "wave" }) + '<div class="card"><table><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Last sign-in</th><th></th></tr></thead><tbody>' +
       team.map(function (u) { return "<tr><td>" + esc(u.name) + "</td><td>" + esc(u.email) + '</td><td><span class="pill">' + esc(u.role) + "</span></td><td>" + (u.last_login_at ? fmtDate(u.last_login_at) : '<span class="tiny">Not yet</span>') + "</td><td>" + (owner && u.role === "staff" ? '<button class="btn btn-danger btn-sm" data-rm="' + u.id + '">Remove</button>' : "") + "</td></tr>"; }).join("") + "</tbody></table></div>";
     if (owner && team.length < 2) {
       html += '<div class="card"><h2>Invite a colleague</h2><form id="f" style="margin-top:14px" novalidate><div class="f2"><div class="field"><label for="n">Name</label><input id="n" name="name" type="text"></div><div class="field"><label for="e">Work email</label><input id="e" name="email" type="email"></div></div><div class="field"><div class="form-msg" hidden></div></div><div class="field"><button class="btn btn-primary" type="submit">Send invite</button></div></form><div id="sent"></div></div>';
@@ -243,7 +310,7 @@
         var next = { requested: btn("st-approved", s.id, "Approve", "primary") + btn("st-cancelled", s.id, "Cancel", "danger"), approved: btn("st-programmed", s.id, "Mark programmed", "ghost"),
           programmed: '<input type="text" placeholder="NFC tag ID" id="uid' + s.id + '" style="padding:6px 8px;font-size:13px;max-width:130px"><input type="text" placeholder="Tracking #" id="trk' + s.id + '" style="padding:6px 8px;font-size:13px;max-width:130px">' + btn("st-shipped", s.id, "Mark shipped", "primary"),
           shipped: btn("st-delivered", s.id, "Mark delivered", "ghost") }[s.status] || "";
-        return "<tr><td>" + esc(s.clinic ? s.clinic.display_name : "") + "</td><td>" + esc(s.ship_to_name) + '<br><span class="tiny">' + esc([s.address_line1, s.address_line2, s.city, s.province, s.postal_code].filter(Boolean).join(", ")) + '</span></td><td><span class="code" style="letter-spacing:0;font-size:12.5px">' + esc(s.clinic ? s.clinic.links.nfc : "") + '</span></td><td><span class="pill ' + esc(s.status) + '">' + esc(s.status) + '</span></td><td><div class="row">' + next + "</div></td></tr>";
+        return "<tr><td>" + esc(s.clinic ? s.clinic.display_name : "") + "</td><td>" + esc(s.ship_to_name) + '<br><span class="tiny">' + esc([s.address_line1, s.address_line2, s.city, s.province, s.postal_code].filter(Boolean).join(", ")) + '</span></td><td><span class="code" style="letter-spacing:0;font-size:12.5px">' + esc(s.clinic ? s.clinic.links.nfc : "") + '</span>' + (s.clinic ? '<br><a class="tiny" target="_blank" rel="noopener" href="print/?type=label&clinic=' + s.clinic.id + '">Stand label</a>' : "") + '</td><td><span class="pill ' + esc(s.status) + '">' + esc(s.status) + '</span></td><td><div class="row">' + next + "</div></td></tr>";
       }).join("") + '</tbody></table></div><details style="margin-top:12px"><summary class="small"><b>Fulfilment checklist</b></summary><ol class="checklist small" style="margin-top:8px"><li>Write the NFC link to a genuine NXP NTAG213 or NTAG215 tag using NFC Tools.</li><li>Test the tap on an iPhone and an Android phone.</li><li>Lock the tag.</li><li>Print the stand label and apply it over the tag.</li><li>Scan the printed QR code to confirm it opens the right clinic page.</li><li>Enter the tag ID and tracking number, then mark the request shipped.</li></ol></details>' : '<p class="muted" style="margin-top:8px">No stand requests.</p>') + "</div>";
 
     html += '<div class="card"><div class="row"><h2>Where bookings come from</h2><span class="spacer"></span><button class="btn btn-ghost btn-sm" id="csv"' + (report.length ? "" : " disabled") + '>Export CSV</button></div><p class="tiny" style="margin-top:4px">Counts of link events by clinic and month. This is not attendance: events are not tied to appointments.</p>' +
@@ -290,7 +357,7 @@
     el.innerHTML = '<div class="demo"><div class="demo-in"><b>Demo mode</b><span>Data stays in this browser. No emails are sent.</span><span class="spacer"></span>' +
       '<a href="#/admin">TSB admin view</a>' + (me && me.clinic.status === "approved" ? '<button id="seed">Add sample activity</button>' : "") + '<button id="reset">Reset demo</button></div></div>';
     if (document.getElementById("seed")) document.getElementById("seed").onclick = function () { S.demo.seedActivity(); toast("Sample activity added"); route(); };
-    document.getElementById("reset").onclick = function () { if (confirm("Clear all demo data in this browser?")) { S.demo.reset(); go("/register"); route(); } };
+    document.getElementById("reset").onclick = function () { if (confirm("Clear all demo data in this browser?")) { S.demo.reset(); try { Object.keys(localStorage).forEach(function (k) { if (k.indexOf("lobcp:") === 0) localStorage.removeItem(k); }); } catch (e) {} go("/register"); route(); } };
   }
 
   /* ---------- router ---------- */
