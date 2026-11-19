@@ -3,374 +3,381 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap">
 <style>
-/* Layout: task-first hero (quick-start form + "next openings" board), then sections in the order
-   a patient needs them: how it works, find a lab, prepare, change/cancel, FAQ, footer. */
+/* Layout: one header, three big task buttons, then Find a lab / Before you go / Help.
+   Every task opens a step-by-step dialog in place, so no button is a dead end.
+   All sizes are rem so the "Text size" control scales the whole page. */
 :root {
   --bg: #ffffff;
-  --paper: #eff5f8;
+  --paper: #eef5f8;
   --surface: #ffffff;
-  --ink: #102a3a;
-  --ink-soft: #46606f;
-  --muted: #6b8593;
-  --line: #dbe7ec;
-  --accent: #0f7590;
+  --ink: #0f2838;
+  --ink-soft: #3d5868;
+  --muted: #526d7c;
+  --line: #d3e2e9;
+  --accent: #0d6f89;
   --accent-ink: #ffffff;
-  --accent-soft: #e2f2f7;
+  --accent-soft: #dff0f6;
   --navy: #0a2740;
   --navy-ink: #ffffff;
-  --navy-soft: #b8d3df;
-  --ok: #1d7a4c;
-  --ok-soft: #e4f4ec;
-  --warn: #7a4f00;
-  --warn-soft: #fff3d6;
-  --focus: #26a9cc;
+  --navy-soft: #c3d9e3;
+  --ok: #19703f;
+  --ok-soft: #e2f3e9;
+  --warn: #714800;
+  --warn-soft: #fff1d1;
+  --danger: #a8231b;
+  --danger-soft: #fde9e7;
+  --focus: #1b9cc0;
   --f: "Hanken Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
-  --r: 14px;
-  --maxw: 1160px;
+  --r: 0.9rem;
+  --maxw: 72rem;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #0a1820; --paper: #0e212b; --surface: #122834; --ink: #e5f0f4; --ink-soft: #a7bdc8; --muted: #86a1ae; --line: #234150;
-  --accent: #4cc3e0; --accent-ink: #06202c; --accent-soft: #133a48; --navy: #061520; --navy-ink: #e9f4f8; --navy-soft: #8fb2c2;
-  --ok: #6fd3a0; --ok-soft: #12352a; --warn: #f2c46b; --warn-soft: #3a2d10; --focus: #7fdcf2; color-scheme: dark; } }
+  --bg: #0a1820; --paper: #0e212b; --surface: #122834; --ink: #e8f2f6; --ink-soft: #b3c8d2; --muted: #9db4bf; --line: #2a4958;
+  --accent: #55c8e3; --accent-ink: #06202c; --accent-soft: #143c4a; --navy: #061520; --navy-ink: #e9f4f8; --navy-soft: #a3c1ce;
+  --ok: #74d6a4; --ok-soft: #12352a; --warn: #f2c46b; --warn-soft: #3a2d10; --danger: #ff9a90; --danger-soft: #3d1b19; --focus: #8ae0f4; color-scheme: dark; } }
 :root[data-theme="dark"] {
-  --bg: #0a1820; --paper: #0e212b; --surface: #122834; --ink: #e5f0f4; --ink-soft: #a7bdc8; --muted: #86a1ae; --line: #234150;
-  --accent: #4cc3e0; --accent-ink: #06202c; --accent-soft: #133a48; --navy: #061520; --navy-ink: #e9f4f8; --navy-soft: #8fb2c2;
-  --ok: #6fd3a0; --ok-soft: #12352a; --warn: #f2c46b; --warn-soft: #3a2d10; --focus: #7fdcf2; color-scheme: dark; }
+  --bg: #0a1820; --paper: #0e212b; --surface: #122834; --ink: #e8f2f6; --ink-soft: #b3c8d2; --muted: #9db4bf; --line: #2a4958;
+  --accent: #55c8e3; --accent-ink: #06202c; --accent-soft: #143c4a; --navy: #061520; --navy-ink: #e9f4f8; --navy-soft: #a3c1ce;
+  --ok: #74d6a4; --ok-soft: #12352a; --warn: #f2c46b; --warn-soft: #3a2d10; --danger: #ff9a90; --danger-soft: #3d1b19; --focus: #8ae0f4; color-scheme: dark; }
 
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+html { font-size: 100%; scroll-behavior: smooth; }
+html.ts-1 { font-size: 112.5%; }
+html.ts-2 { font-size: 125%; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-body { background: var(--bg); color: var(--ink); font-family: var(--f); font-size: 17px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
-body.large { font-size: 19.5px; }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f); font-size: 1.125rem; line-height: 1.6; -webkit-font-smoothing: antialiased; }
 body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 60; background: var(--bg); }
-h1, h2, h3 { margin: 0; line-height: 1.12; letter-spacing: -0.022em; text-wrap: balance; }
+h1, h2, h3 { margin: 0; line-height: 1.15; letter-spacing: -0.02em; text-wrap: balance; }
 p { margin: 0; text-wrap: pretty; }
 a { color: inherit; }
 button, input, select { font: inherit; color: inherit; }
-:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 6px; }
-.wrap { max-width: var(--maxw); margin: 0 auto; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
-section[id], #book { scroll-margin-top: 84px; }
-.sec { padding-block: clamp(56px, 7vw, 88px); }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 0.4rem; }
+.wrap { max-width: var(--maxw); margin: 0 auto; padding-left: max(1.1rem, env(safe-area-inset-left, 0px)); padding-right: max(1.1rem, env(safe-area-inset-right, 0px)); }
+section[id] { scroll-margin-top: 5.5rem; }
+.sec { padding-block: clamp(3rem, 6vw, 5rem); }
 .sec.alt { background: var(--paper); }
-.eyebrow { font-size: 12.5px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--accent); }
-.sec-head { display: grid; gap: 10px; max-width: 62ch; margin-bottom: 32px; }
-.sec-head h2 { font-size: clamp(26px, 3.2vw, 36px); font-weight: 800; }
+.sec-head { display: grid; gap: 0.5rem; max-width: 40rem; margin-bottom: 1.75rem; }
+.sec-head h2 { font-size: clamp(1.6rem, 3vw, 2.1rem); font-weight: 800; }
 .sec-head p { color: var(--ink-soft); }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-.skip { position: absolute; left: 12px; top: -60px; background: var(--accent); color: var(--accent-ink); padding: 10px 14px; border-radius: 8px; font-weight: 700; z-index: 99; }
-.skip:focus { top: 12px; }
+.skip { position: absolute; left: 0.75rem; top: -4rem; background: var(--accent); color: var(--accent-ink); padding: 0.6rem 0.9rem; border-radius: 0.5rem; font-weight: 700; z-index: 99; }
+.skip:focus { top: 0.75rem; }
 
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 50px; padding: 12px 22px; border-radius: 12px; font-weight: 700; text-decoration: none; border: 1.5px solid transparent; cursor: pointer; white-space: nowrap; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 3.2rem; padding: 0.75rem 1.4rem; border-radius: 0.75rem; font-weight: 700; text-decoration: none; border: 2px solid transparent; cursor: pointer; }
 .btn-primary { background: var(--accent); color: var(--accent-ink); }
 .btn-primary:hover { filter: brightness(1.08); }
+.btn-primary:disabled { opacity: .45; cursor: not-allowed; filter: none; }
 .btn-ghost { border-color: var(--line); background: var(--surface); }
 .btn-ghost:hover { border-color: var(--accent); }
-.link { color: var(--accent); font-weight: 700; text-decoration: none; }
-.link:hover { text-decoration: underline; }
+.btn-danger { background: var(--danger); color: #fff; }
+.link { color: var(--accent); font-weight: 700; text-decoration: underline; text-underline-offset: 0.18em; background: none; border: 0; padding: 0.25rem 0; cursor: pointer; }
 
-/* utility + header */
-.util { background: var(--navy); color: var(--navy-soft); font-size: 14px; }
-.util .wrap { display: flex; gap: 10px 18px; align-items: center; justify-content: space-between; flex-wrap: wrap; padding-block: 7px; }
-.util b { color: var(--navy-ink); }
-.util-tools { display: flex; gap: 8px; align-items: center; }
-.util button, .util select { background: transparent; border: 1px solid rgba(255,255,255,.25); color: var(--navy-ink); border-radius: 8px; padding: 4px 10px; font-size: 14px; font-weight: 600; cursor: pointer; }
-.util select option { color: #102a3a; }
-.util button[aria-pressed="true"] { background: var(--navy-ink); color: var(--navy); }
-header.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 50; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
-header.top .wrap { display: flex; align-items: center; gap: 24px; min-height: 70px; }
-.logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 19px; text-decoration: none; letter-spacing: -.015em; }
-.logo .mk { width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(135deg,#2bb0d2,#157a99); display: grid; place-items: center; }
-.logo small { display: block; font-size: 11.5px; font-weight: 600; color: var(--muted); letter-spacing: 0; margin-top: -3px; }
-nav.main { display: flex; gap: 22px; margin-left: auto; align-items: center; }
-nav.main a { text-decoration: none; font-weight: 600; color: var(--ink-soft); font-size: 15.5px; }
-nav.main a:hover { color: var(--accent); }
-nav.main a.btn, nav.main a.btn:hover { color: var(--accent-ink); }
-.menu-btn { display: none; margin-left: auto; background: none; border: 1.5px solid var(--line); border-radius: 10px; padding: 8px 12px; font-weight: 700; cursor: pointer; }
-@media (max-width: 900px) {
-  .menu-btn { display: inline-flex; }
-  nav.main { display: none; position: absolute; left: 0; right: 0; top: 100%; background: var(--bg); border-bottom: 1px solid var(--line); flex-direction: column; align-items: stretch; gap: 0; padding: 8px max(20px, env(safe-area-inset-right, 0px)) 16px max(20px, env(safe-area-inset-left, 0px)); }
-  nav.main.open { display: flex; }
-  nav.main a { padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 17px; }
-  nav.main .btn { margin-top: 12px; }
+/* ===== header ===== */
+header.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 50; background: var(--bg); border-bottom: 1px solid var(--line); }
+header.top .wrap { display: flex; align-items: center; gap: 1rem; min-height: 4.5rem; }
+.logo { display: flex; align-items: center; gap: 0.6rem; font-weight: 800; font-size: 1.2rem; text-decoration: none; letter-spacing: -.015em; }
+.logo .mk { width: 2.2rem; height: 2.2rem; border-radius: 0.65rem; background: linear-gradient(135deg,#2bb0d2,#157a99); display: grid; place-items: center; flex: none; }
+nav.main { display: flex; gap: 0.25rem; margin-left: auto; align-items: center; }
+nav.main a, nav.main button.navb { text-decoration: none; font-weight: 700; color: var(--ink); font-size: 1rem; padding: 0.6rem 0.8rem; border-radius: 0.6rem; background: none; border: 0; cursor: pointer; }
+nav.main a:hover, nav.main button.navb:hover { background: var(--paper); }
+.tools { display: flex; gap: 0.5rem; align-items: center; }
+.tool { display: inline-flex; align-items: center; gap: 0.35rem; min-height: 2.75rem; border: 2px solid var(--line); background: var(--surface); border-radius: 0.6rem; padding: 0.35rem 0.7rem; font-weight: 700; font-size: 0.95rem; cursor: pointer; }
+.tool:hover { border-color: var(--accent); }
+.menu-btn { display: none; }
+.nav-lang { display: none; }
+@media (max-width: 960px) {
+  nav.main { display: none; }
+  .menu-btn { display: inline-flex; margin-left: auto; }
+  nav.main.open { display: grid; position: absolute; left: 0; right: 0; top: 100%; background: var(--bg); border-bottom: 1px solid var(--line); padding: 0.5rem max(1.1rem, env(safe-area-inset-right, 0px)) 1rem max(1.1rem, env(safe-area-inset-left, 0px)); gap: 0; box-shadow: 0 20px 30px -20px rgba(0,0,0,.25); }
+  nav.main.open a, nav.main.open button.navb { padding: 0.9rem 0.25rem; border-bottom: 1px solid var(--line); border-radius: 0; text-align: left; font-size: 1.1rem; }
+  .tools .tool-l, .tools #lang { display: none; }
+  nav.main.open .nav-lang { display: grid; gap: 0.35rem; padding-top: 0.9rem; font-weight: 700; }
 }
 
-/* notice */
-.notice { background: var(--warn-soft); color: var(--warn); font-size: 15px; }
-.notice .wrap { display: flex; gap: 12px; align-items: center; padding-block: 10px; }
-.notice p { flex: 1; }
-.notice button { background: none; border: 0; color: inherit; font-weight: 700; cursor: pointer; padding: 6px; }
+/* ===== hero ===== */
+.hero { background: var(--paper); padding-block: clamp(2rem, 5vw, 4rem) clamp(2.5rem, 5vw, 4rem); }
+.hero h1 { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 800; letter-spacing: -.03em; max-width: 20ch; }
+.hero .lede { font-size: clamp(1.1rem, 1.6vw, 1.25rem); color: var(--ink-soft); margin-top: 0.75rem; max-width: 44ch; }
+.notice { margin-top: 1.25rem; display: inline-flex; gap: 0.6rem; align-items: flex-start; background: var(--warn-soft); color: var(--warn); border-radius: 0.7rem; padding: 0.6rem 0.9rem; font-size: 1rem; max-width: 100%; }
+.notice svg { flex: none; margin-top: 0.2rem; }
+.tasks { margin-top: 1.75rem; display: grid; grid-template-columns: 1.35fr 1fr 1fr; gap: 0.9rem; }
+@media (max-width: 860px) { .tasks { grid-template-columns: 1fr; } }
+.task { text-align: left; display: grid; grid-template-columns: auto minmax(0,1fr) auto; gap: 0.25rem 1rem; align-items: center; background: var(--surface); border: 2px solid var(--line); border-radius: 1.1rem; padding: 1.25rem 1.25rem; cursor: pointer; text-decoration: none; min-height: 6.5rem; }
+.task:hover { border-color: var(--accent); }
+.task .ic { grid-row: span 2; width: 3.2rem; height: 3.2rem; border-radius: 0.85rem; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); }
+.task .t { font-weight: 800; font-size: 1.3rem; letter-spacing: -.01em; }
+.task .d { color: var(--ink-soft); font-size: 1rem; grid-column: 2; }
+.task .go { grid-row: 1 / span 2; grid-column: 3; color: var(--accent); }
+.task.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.task.primary .ic { background: rgba(255,255,255,.18); color: inherit; }
+.task.primary .d { color: inherit; opacity: .9; }
+.task.primary .go { color: inherit; }
+.need { margin-top: 1.5rem; display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; color: var(--ink-soft); font-size: 1rem; }
+.need b { color: var(--ink); }
+.need span { display: inline-flex; gap: 0.4rem; align-items: center; }
+.need svg { color: var(--ok); }
 
-/* hero */
-.hero { background: var(--paper); padding-block: clamp(40px, 6vw, 72px); position: relative; overflow: hidden; }
-.hero::after { content: ""; position: absolute; right: -120px; top: -160px; width: 520px; height: 520px; border-radius: 50%; background: radial-gradient(circle, var(--accent-soft), transparent 70%); pointer-events: none; }
-.hero .wrap { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); gap: clamp(28px, 4vw, 56px); align-items: start; position: relative; z-index: 1; }
-@media (max-width: 920px) { .hero .wrap { grid-template-columns: 1fr; } }
-.hero h1 { font-size: clamp(34px, 5.2vw, 56px); font-weight: 800; letter-spacing: -.03em; }
-.hero .lede { font-size: clamp(17px, 1.6vw, 19.5px); color: var(--ink-soft); margin-top: 14px; max-width: 46ch; }
-.quick { margin-top: 28px; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 18px; box-shadow: 0 24px 50px -32px rgba(8,32,54,.35); display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr) auto; gap: 12px; align-items: end; }
-@media (max-width: 640px) { .quick { grid-template-columns: 1fr; } }
-.f { display: grid; gap: 6px; min-width: 0; }
-.f label { font-size: 13.5px; font-weight: 700; color: var(--ink-soft); }
-.inp { width: 100%; min-height: 50px; border: 1.5px solid var(--line); border-radius: 11px; padding: 11px 14px; background: var(--surface); }
+/* ===== find a lab ===== */
+.finder-bar { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.75rem; align-items: end; margin-bottom: 1rem; }
+@media (max-width: 640px) { .finder-bar { grid-template-columns: 1fr; } }
+.f { display: grid; gap: 0.35rem; min-width: 0; }
+.f > label, .f > .lbl { font-weight: 700; font-size: 1rem; }
+.f .help { font-size: 0.95rem; color: var(--muted); }
+.f .err { font-size: 0.95rem; color: var(--danger); font-weight: 700; }
+.inp { width: 100%; min-height: 3.2rem; border: 2px solid var(--line); border-radius: 0.7rem; padding: 0.6rem 0.9rem; background: var(--surface); font-size: 1.05rem; }
 .inp:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
-.hero-links { display: flex; gap: 10px 22px; flex-wrap: wrap; margin-top: 18px; font-size: 15.5px; }
-.hero-links a { display: inline-flex; gap: 6px; align-items: center; }
-.trust { margin-top: 26px; display: flex; gap: 10px 22px; flex-wrap: wrap; color: var(--muted); font-size: 14px; }
-.trust span { display: inline-flex; gap: 7px; align-items: center; }
-.trust svg { color: var(--ok); }
-
-/* openings board */
-.board { background: var(--navy); color: var(--navy-ink); border-radius: 20px; padding: 22px; display: grid; gap: 14px; box-shadow: 0 34px 70px -38px rgba(4,20,32,.7); }
-.board-h { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
-.board-h h2 { font-size: 18px; font-weight: 800; letter-spacing: -.01em; }
-.board-h span { font-size: 12.5px; color: var(--navy-soft); }
-.live { display: inline-flex; align-items: center; gap: 6px; }
-.live::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #5fd6a0; box-shadow: 0 0 0 0 rgba(95,214,160,.6); animation: pulse 2s infinite; }
-@keyframes pulse { 70% { box-shadow: 0 0 0 8px rgba(95,214,160,0); } 100% { box-shadow: 0 0 0 0 rgba(95,214,160,0); } }
-@media (prefers-reduced-motion: reduce) { .live::before { animation: none; } }
-.board ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
-.board li a { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 2px 12px; padding: 12px 12px; border-radius: 12px; text-decoration: none; }
-.board li a:hover { background: rgba(255,255,255,.07); }
-.board .n { font-weight: 700; }
-.board .a { font-size: 13.5px; color: var(--navy-soft); }
-.board .t { font-family: var(--mono); font-weight: 600; font-size: 15px; color: #7fe0ff; text-align: right; white-space: nowrap; }
-.board .d { font-size: 12.5px; color: var(--navy-soft); text-align: right; }
-.board-f { font-size: 13px; color: var(--navy-soft); border-top: 1px solid rgba(255,255,255,.12); padding-top: 12px; }
-.board-f a { color: var(--navy-ink); font-weight: 700; }
-
-/* steps */
-.steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 18px; counter-reset: s; }
-@media (max-width: 880px) { .steps { grid-template-columns: repeat(2, minmax(0,1fr)); } }
-@media (max-width: 520px) { .steps { grid-template-columns: 1fr; } }
-.steps li { counter-increment: s; display: grid; gap: 8px; align-content: start; padding-top: 16px; border-top: 2px solid var(--line); }
-.steps li::before { content: "Step " counter(s); font-family: var(--mono); font-size: 13px; color: var(--accent); font-weight: 600; }
-.steps h3 { font-size: 19px; font-weight: 800; }
-.steps p { color: var(--ink-soft); font-size: 15.5px; }
-
-/* find a lab */
-.finder { display: grid; gap: 16px; }
-.finder-bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-.finder-bar .inp { flex: 1 1 260px; width: auto; }
-.chips { display: flex; gap: 8px; flex-wrap: wrap; }
-.chip { border: 1.5px solid var(--line); background: var(--surface); border-radius: 99px; padding: 7px 13px; font-size: 14.5px; font-weight: 600; cursor: pointer; color: var(--ink-soft); }
-.chip[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--ink); }
-.labs { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
+.inp.bad { border-color: var(--danger); }
+.chips { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.chip { min-height: 2.75rem; border: 2px solid var(--line); background: var(--surface); border-radius: 99px; padding: 0.35rem 0.95rem; font-size: 1rem; font-weight: 700; cursor: pointer; }
+.chip[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.meta { color: var(--muted); font-size: 1rem; margin: 1rem 0 0.75rem; }
+.labs { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 0.9rem; }
 @media (max-width: 760px) { .labs { grid-template-columns: 1fr; } }
-.lab { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px 18px; display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 6px 14px; }
-.lab h3 { font-size: 17.5px; font-weight: 800; letter-spacing: -.01em; }
-.lab .addr { color: var(--ink-soft); font-size: 15px; }
-.lab .hrs { color: var(--muted); font-size: 14px; }
-.lab .nx { text-align: right; }
-.lab .nx small { display: block; font-size: 11.5px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 700; }
-.lab .nx b { color: var(--accent); white-space: nowrap; }
-.lab .row { grid-column: 1 / -1; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-top: 4px; }
-.lab .row .btn { margin-left: auto; min-height: 42px; padding: 8px 16px; font-size: 15px; }
-.pill { font-size: 12.5px; font-weight: 700; border-radius: 99px; padding: 3px 9px; background: var(--paper); color: var(--ink-soft); border: 1px solid var(--line); }
+.lab { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 1.1rem 1.2rem; display: grid; gap: 0.35rem; }
+.lab h3 { font-size: 1.2rem; font-weight: 800; }
+.lab .addr { color: var(--ink-soft); }
+.lab .hrs { color: var(--muted); font-size: 1rem; }
+.lab .pills { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.25rem; }
+.lab .foot { display: flex; gap: 0.75rem; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-top: 0.6rem; padding-top: 0.75rem; border-top: 1px solid var(--line); }
+.lab .nx { font-size: 1rem; color: var(--ink-soft); }
+.lab .nx b { color: var(--ink); }
+.pill { font-size: 0.875rem; font-weight: 700; border-radius: 99px; padding: 0.15rem 0.6rem; background: var(--paper); color: var(--ink-soft); border: 1px solid var(--line); }
 .pill.ok { background: var(--ok-soft); color: var(--ok); border-color: transparent; }
-.meta { color: var(--muted); font-size: 14px; }
-.empty { border: 1.5px dashed var(--line); border-radius: var(--r); padding: 24px; text-align: center; color: var(--ink-soft); grid-column: 1 / -1; }
+.empty { border: 2px dashed var(--line); border-radius: var(--r); padding: 1.5rem; text-align: center; color: var(--ink-soft); grid-column: 1 / -1; display: grid; gap: 0.75rem; justify-items: center; }
 
-/* prepare */
-.prep { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 14px; }
-@media (max-width: 960px) { .prep { grid-template-columns: repeat(2, minmax(0,1fr)); } }
-@media (max-width: 540px) { .prep { grid-template-columns: 1fr; } }
-.prep article { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 18px; display: grid; gap: 10px; align-content: start; }
-.prep h3 { font-size: 18px; font-weight: 800; }
-.prep .len { font-family: var(--mono); font-size: 13px; color: var(--muted); }
-.prep ul { margin: 0; padding-left: 18px; color: var(--ink-soft); font-size: 15.5px; display: grid; gap: 4px; }
-.prep .flag { font-size: 13.5px; font-weight: 700; color: var(--warn); background: var(--warn-soft); border-radius: 8px; padding: 6px 10px; justify-self: start; }
-.bring { margin-top: 18px; display: flex; gap: 10px 26px; flex-wrap: wrap; align-items: center; color: var(--ink-soft); }
-.bring b { color: var(--ink); }
+/* ===== before you go ===== */
+.tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.tabs button { min-height: 3rem; border: 2px solid var(--line); background: var(--surface); border-radius: 0.7rem; padding: 0.4rem 1rem; font-weight: 700; cursor: pointer; }
+.tabs button[aria-selected="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.prep-panel { background: var(--surface); border: 1px solid var(--line); border-radius: 1.1rem; padding: 1.4rem; display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 1.5rem; }
+@media (max-width: 720px) { .prep-panel { grid-template-columns: 1fr; } }
+.prep-panel h3 { font-size: 1.3rem; font-weight: 800; margin-bottom: 0.25rem; }
+.prep-panel .len { color: var(--muted); font-size: 1rem; }
+.prep-panel ul { margin: 0.75rem 0 0; padding: 0; list-style: none; display: grid; gap: 0.6rem; }
+.prep-panel li { display: grid; grid-template-columns: 1.4rem 1fr; gap: 0.6rem; }
+.prep-panel li svg { color: var(--ok); margin-top: 0.3rem; }
+.flag { display: inline-block; margin-top: 0.6rem; font-weight: 700; color: var(--warn); background: var(--warn-soft); border-radius: 0.5rem; padding: 0.3rem 0.7rem; font-size: 1rem; }
+.bring { background: var(--paper); border-radius: 0.9rem; padding: 1.1rem 1.2rem; }
+.bring h4 { margin: 0 0 0.5rem; font-size: 1.05rem; }
 
-/* manage */
-.manage { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1.1fr); gap: clamp(24px, 4vw, 56px); align-items: center; }
-@media (max-width: 860px) { .manage { grid-template-columns: 1fr; } }
-.mform { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 22px; display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 14px; }
-@media (max-width: 540px) { .mform { grid-template-columns: 1fr; } }
-.mform .full { grid-column: 1 / -1; }
-.mform .help { font-size: 13.5px; color: var(--muted); }
-.result { border-radius: 12px; padding: 12px 14px; font-weight: 600; font-size: 15.5px; }
-.result.ok { background: var(--ok-soft); color: var(--ok); }
-.result.err { background: var(--warn-soft); color: var(--warn); }
-
-/* help strip */
-.help-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 28px; }
-@media (max-width: 820px) { .help-grid { grid-template-columns: 1fr; } }
-.help-grid > div { display: grid; gap: 8px; align-content: start; }
-.help-grid .ic { width: 42px; height: 42px; border-radius: 12px; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; }
-.help-grid h3 { font-size: 18px; font-weight: 800; }
-.help-grid p { color: var(--ink-soft); font-size: 15.5px; }
-
-/* faq */
-.faq { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: clamp(24px, 4vw, 56px); }
+/* ===== help ===== */
+.faq { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: clamp(1.5rem, 4vw, 3.5rem); }
 @media (max-width: 860px) { .faq { grid-template-columns: 1fr; } }
+.contact { display: grid; gap: 0.75rem; align-content: start; }
+.contact .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 1rem 1.1rem; }
+.contact .card b { display: block; font-size: 1.05rem; }
+.contact .card span { color: var(--ink-soft); font-size: 1rem; }
+.contact .big { font-family: var(--mono); font-size: 1.35rem; font-weight: 600; color: var(--ink); }
 .faq details { border-bottom: 1px solid var(--line); }
 .faq details:first-child { border-top: 1px solid var(--line); }
-.faq summary { cursor: pointer; list-style: none; padding: 18px 36px 18px 0; font-weight: 700; font-size: 17.5px; position: relative; }
+.faq summary { cursor: pointer; list-style: none; padding: 1.1rem 2.5rem 1.1rem 0; font-weight: 700; font-size: 1.15rem; position: relative; min-height: 3rem; }
 .faq summary::-webkit-details-marker { display: none; }
-.faq summary::after { content: "+"; position: absolute; right: 4px; top: 14px; font-size: 24px; font-weight: 500; color: var(--accent); }
+.faq summary::after { content: "+"; position: absolute; right: 0.3rem; top: 0.8rem; font-size: 1.6rem; font-weight: 500; color: var(--accent); }
 .faq details[open] summary::after { content: "−"; }
-.faq details p { padding: 0 0 18px; color: var(--ink-soft); max-width: 64ch; }
+.faq details > div { padding: 0 0 1.2rem; color: var(--ink-soft); max-width: 40rem; display: grid; gap: 0.75rem; justify-items: start; }
 
-/* footer */
-footer { background: var(--navy); color: var(--navy-soft); font-size: 15px; padding-block: 48px 36px; }
-footer .cols { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 28px; }
-@media (max-width: 820px) { footer .cols { grid-template-columns: 1fr 1fr; } }
-@media (max-width: 480px) { footer .cols { grid-template-columns: 1fr; } }
-footer h3 { color: var(--navy-ink); font-size: 14px; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 10px; }
-footer ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
-footer a { text-decoration: none; }
-footer a:hover { color: var(--navy-ink); text-decoration: underline; }
-footer .legal { border-top: 1px solid rgba(255,255,255,.12); margin-top: 32px; padding-top: 20px; font-size: 13.5px; display: grid; gap: 6px; }
-.proto { position: fixed; right: max(12px, env(safe-area-inset-right, 0px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px)); background: var(--ink); color: var(--bg); font-size: 12.5px; font-weight: 700; padding: 6px 11px; border-radius: 99px; z-index: 70; opacity: .9; }
+/* ===== footer ===== */
+footer { background: var(--navy); color: var(--navy-soft); font-size: 1rem; padding-block: 2.5rem calc(2rem + 4.5rem); }
+@media (min-width: 961px) { footer { padding-bottom: 2rem; } }
+footer .cols { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 1.5rem; }
+@media (max-width: 760px) { footer .cols { grid-template-columns: 1fr; } }
+footer h3 { color: var(--navy-ink); font-size: 1rem; margin-bottom: 0.5rem; }
+footer ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.35rem; }
+footer button, footer a { color: inherit; background: none; border: 0; padding: 0.15rem 0; cursor: pointer; text-decoration: underline; text-underline-offset: .18em; font: inherit; }
+footer .legal { border-top: 1px solid rgba(255,255,255,.15); margin-top: 1.75rem; padding-top: 1.1rem; font-size: 0.95rem; }
+
+/* ===== phone action bar ===== */
+.actionbar { display: none; }
+@media (max-width: 960px) {
+  .actionbar { display: grid; grid-template-columns: 1.3fr 1fr; gap: 0.6rem; position: fixed; left: 0; right: 0; bottom: 0; z-index: 55; background: var(--bg); border-top: 1px solid var(--line); padding: 0.6rem max(0.9rem, env(safe-area-inset-right, 0px)) calc(0.6rem + env(safe-area-inset-bottom, 0px)) max(0.9rem, env(safe-area-inset-left, 0px)); box-shadow: 0 -10px 24px -18px rgba(0,0,0,.3); }
+  .actionbar .btn { min-height: 3.2rem; padding-inline: 0.75rem; }
+}
+
+/* ===== dialog (all tasks) ===== */
+dialog.flow { width: min(44rem, 100vw); max-width: 100vw; max-height: min(52rem, 100dvh); padding: 0; border: 0; border-radius: 1.2rem; background: var(--bg); color: var(--ink); box-shadow: 0 40px 80px -30px rgba(0,0,0,.5); overflow: hidden; }
+dialog.flow::backdrop { background: rgba(6, 22, 32, .55); }
+dialog.flow[open] { display: flex; flex-direction: column; }
+@media (max-width: 640px) { dialog.flow { width: 100vw; height: 100dvh; max-height: 100dvh; border-radius: 0; margin: 0; } }
+.fl-head { display: grid; gap: 0.6rem; padding: calc(1rem + env(safe-area-inset-top, 0px)) max(1.25rem, env(safe-area-inset-right, 0px)) 0.9rem max(1.25rem, env(safe-area-inset-left, 0px)); border-bottom: 1px solid var(--line); }
+.fl-top { display: flex; align-items: center; gap: 0.75rem; }
+.fl-top .ttl { font-weight: 800; font-size: 1.05rem; }
+.fl-top .stp { color: var(--muted); font-size: 1rem; font-weight: 600; }
+.fl-top .x { margin-left: auto; }
+.bar { display: flex; gap: 0.3rem; }
+.bar span { flex: 1; height: 0.35rem; border-radius: 99px; background: var(--line); }
+.bar span.on { background: var(--accent); }
+.fl-body { flex: 1; overflow-y: auto; padding: 1.25rem max(1.25rem, env(safe-area-inset-right, 0px)) 1.5rem max(1.25rem, env(safe-area-inset-left, 0px)); display: grid; gap: 1.1rem; align-content: start; }
+.fl-body h2 { font-size: 1.6rem; font-weight: 800; }
+.fl-body h2:focus { outline: none; }
+.fl-body .sub { color: var(--ink-soft); }
+.fl-foot { display: flex; gap: 0.75rem; padding: 0.9rem max(1.25rem, env(safe-area-inset-right, 0px)) calc(0.9rem + env(safe-area-inset-bottom, 0px)) max(1.25rem, env(safe-area-inset-left, 0px)); border-top: 1px solid var(--line); background: var(--bg); }
+.fl-foot .btn-primary { margin-left: auto; min-width: 9rem; }
+.fl-foot:empty { display: none; }
+
+.choices { display: grid; gap: 0.6rem; }
+.choices.two { grid-template-columns: repeat(2, minmax(0,1fr)); }
+@media (max-width: 520px) { .choices.two { grid-template-columns: 1fr; } }
+.choice { position: relative; display: grid; grid-template-columns: 1.6rem minmax(0,1fr); gap: 0.15rem 0.8rem; align-items: start; border: 2px solid var(--line); border-radius: 0.9rem; padding: 0.9rem 1rem; cursor: pointer; background: var(--surface); min-height: 3.5rem; }
+.choice:hover { border-color: var(--accent); }
+.choice input { position: absolute; opacity: 0; pointer-events: none; }
+.choice .dot { width: 1.4rem; height: 1.4rem; border-radius: 50%; border: 2px solid var(--muted); display: grid; place-items: center; margin-top: 0.15rem; grid-row: span 2; }
+.choice:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+.choice:has(input:checked) .dot { border-color: var(--accent); }
+.choice:has(input:checked) .dot::after { content: ""; width: 0.7rem; height: 0.7rem; border-radius: 50%; background: var(--accent); }
+.choice:has(input:focus-visible) { outline: 3px solid var(--focus); outline-offset: 2px; }
+.choice .t { font-weight: 800; }
+.choice .d { color: var(--ink-soft); font-size: 1rem; }
+.lab-pick { text-align: left; width: 100%; border: 2px solid var(--line); background: var(--surface); border-radius: 0.9rem; padding: 0.9rem 1rem; display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 0.15rem 1rem; cursor: pointer; }
+.lab-pick:hover, .lab-pick[aria-pressed="true"] { border-color: var(--accent); }
+.lab-pick[aria-pressed="true"] { background: var(--accent-soft); }
+.lab-pick .n { font-weight: 800; }
+.lab-pick .a { color: var(--ink-soft); font-size: 1rem; }
+.lab-pick .w { text-align: right; font-size: 0.95rem; color: var(--muted); }
+.lab-pick .w b { display: block; color: var(--accent); font-size: 1.05rem; white-space: nowrap; }
+.earliest { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap; border: 2px solid var(--accent); background: var(--accent-soft); border-radius: 0.9rem; padding: 0.9rem 1rem; }
+.earliest b { display: block; font-size: 1.1rem; }
+.days { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(4.3rem, 1fr); gap: 0.5rem; overflow-x: auto; padding-bottom: 0.4rem; }
+.day { border: 2px solid var(--line); background: var(--surface); border-radius: 0.75rem; padding: 0.5rem 0.25rem; text-align: center; cursor: pointer; display: grid; min-height: 4.4rem; }
+.day .w { font-size: 0.85rem; font-weight: 700; color: var(--muted); }
+.day .n { font-size: 1.3rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.day .c { font-size: 0.8rem; font-weight: 700; color: var(--ok); }
+.day[disabled] { opacity: .5; cursor: not-allowed; background: var(--paper); }
+.day[disabled] .c { color: var(--muted); }
+.day[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.day[aria-pressed="true"] .w, .day[aria-pressed="true"] .c { color: inherit; }
+.slot-h { font-size: 1rem; font-weight: 800; color: var(--ink-soft); }
+.slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr)); gap: 0.5rem; }
+.slot { min-height: 3.2rem; border: 2px solid var(--line); background: var(--surface); border-radius: 0.7rem; font-weight: 700; cursor: pointer; font-variant-numeric: tabular-nums; }
+.slot:hover { border-color: var(--accent); }
+.slot[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.form { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 1rem; }
+.form .full { grid-column: 1 / -1; }
+@media (max-width: 560px) { .form { grid-template-columns: 1fr; } }
+.dob { display: grid; grid-template-columns: 4.5rem minmax(0,1fr) 6rem; gap: 0.5rem; }
+.dob label { font-size: 0.9rem; color: var(--muted); font-weight: 600; display: grid; gap: 0.2rem; }
+.err-sum { border: 2px solid var(--danger); background: var(--danger-soft); color: var(--danger); border-radius: 0.8rem; padding: 0.8rem 1rem; font-weight: 700; }
+.err-sum:focus { outline: none; }
+.rev { border: 1px solid var(--line); border-radius: 0.9rem; overflow: hidden; }
+.rev-row { display: grid; grid-template-columns: 7.5rem minmax(0,1fr) auto; gap: 0.75rem; padding: 0.9rem 1rem; border-top: 1px solid var(--line); align-items: start; }
+.rev-row:first-child { border-top: 0; }
+.rev-row .k { color: var(--muted); font-weight: 700; font-size: 1rem; }
+.rev-row .v { font-weight: 700; }
+.rev-row .v small { display: block; font-weight: 500; color: var(--ink-soft); font-size: 1rem; }
+@media (max-width: 520px) { .rev-row { grid-template-columns: minmax(0,1fr) auto; } .rev-row .k { grid-column: 1 / -1; } }
+.callout { border-radius: 0.8rem; padding: 0.8rem 1rem; display: grid; grid-template-columns: 1.3rem 1fr; gap: 0.6rem; font-size: 1rem; }
+.callout svg { margin-top: 0.2rem; }
+.callout.info { background: var(--accent-soft); }
+.callout.warn { background: var(--warn-soft); color: var(--warn); }
+.callout.ok { background: var(--ok-soft); color: var(--ok); font-weight: 700; }
+.done-badge { width: 3.5rem; height: 3.5rem; border-radius: 50%; background: var(--ok-soft); color: var(--ok); display: grid; place-items: center; }
+.code { font-family: var(--mono); font-size: 1.3rem; letter-spacing: .05em; background: var(--paper); border: 2px dashed var(--line); border-radius: 0.6rem; padding: 0.3rem 0.8rem; display: inline-block; }
+.list-plain { margin: 0; padding: 0; list-style: none; display: grid; gap: 0.5rem; }
+.list-plain li { display: grid; grid-template-columns: 1.4rem 1fr; gap: 0.6rem; }
+.list-plain svg { color: var(--ok); margin-top: 0.3rem; }
+.row-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+.proto { position: fixed; left: max(0.75rem, env(safe-area-inset-left, 0px)); bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px)); background: var(--ink); color: var(--bg); font-size: 0.8rem; font-weight: 700; padding: 0.3rem 0.7rem; border-radius: 99px; z-index: 54; opacity: .85; }
+@media (max-width: 960px) { .proto { bottom: calc(5.2rem + env(safe-area-inset-bottom, 0px)); } }
 </style>
 
-<a class="skip" href="#book">Skip to booking</a>
-
-<div class="util">
-  <div class="wrap">
-    <span>Health questions? Call <b>8-1-1</b>, any time. For an emergency, call <b>9-1-1</b>.</span>
-    <div class="util-tools">
-      <button type="button" id="bigtext" aria-pressed="false">Larger text</button>
-      <label class="sr" for="lang">Language</label>
-      <select id="lang"><option>English</option><option>Français</option><option>中文</option><option>ਪੰਜਾਬੀ</option><option>한국어</option><option>Tiếng Việt</option><option>فارسی</option></select>
-    </div>
-  </div>
-</div>
+<a class="skip" href="#tasks">Skip to main tasks</a>
 
 <header class="top">
   <div class="wrap" style="position:relative">
     <a class="logo" href="#top" aria-label="LabOnlineBooking home">
       <span class="mk" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6L5 18a2 2 0 0 0 1.8 3h10.4A2 2 0 0 0 19 18l-5-9V3"/></svg></span>
-      <span>LabOnlineBooking<small>BC public &amp; hospital outpatient labs</small></span>
+      LabOnlineBooking
     </a>
-    <button class="menu-btn" type="button" id="menu" aria-expanded="false" aria-controls="nav">Menu</button>
     <nav class="main" id="nav" aria-label="Main">
+      <button class="navb" type="button" data-open="book">Book a test</button>
+      <button class="navb" type="button" data-open="manage">My booking</button>
       <a href="#labs">Find a lab</a>
-      <a href="#prepare">Prepare for your test</a>
-      <a href="#manage">Change or cancel</a>
-      <a href="#faq">Help</a>
-      <a class="btn btn-primary" href="#book">Book a test</a>
+      <a href="#prepare">Before you go</a>
+      <a href="#help">Help</a>
+      <label class="nav-lang">Language<select class="inp" id="lang-m"><option>English</option><option>Français</option><option>中文</option><option>ਪੰਜਾਬੀ</option><option>한국어</option><option>Tiếng Việt</option><option>فارسی</option></select></label>
     </nav>
+    <div class="tools">
+      <button class="tool" type="button" id="ts" aria-label="Text size: normal. Tap to make text larger."><span aria-hidden="true" style="font-size:.85em">A</span><span aria-hidden="true" style="font-size:1.15em">A</span><span class="tool-l">Text size</span></button>
+      <label class="sr" for="lang">Language</label>
+      <select class="tool" id="lang" title="Language (prototype is English only)">
+        <option>English</option><option>Français</option><option>中文</option><option>ਪੰਜਾਬੀ</option><option>한국어</option><option>Tiếng Việt</option><option>فارسی</option>
+      </select>
+      <button class="tool menu-btn" type="button" id="menu" aria-expanded="false" aria-controls="nav">Menu</button>
+    </div>
   </div>
 </header>
-
-<div class="notice" id="notice" role="region" aria-label="Service notice">
-  <div class="wrap">
-    <p><b>Holiday hours:</b> most labs are closed Dec 25, Dec 26 and Jan 1. Times shown already reflect this.</p>
-    <button type="button" id="notice-x" aria-label="Dismiss notice">Dismiss</button>
-  </div>
-</div>
 
 <main id="top">
   <section class="hero" aria-labelledby="hero-h">
     <div class="wrap">
-      <div id="book">
-        <span class="eyebrow">Book online in about 2 minutes</span>
-        <h1 id="hero-h">Book your lab test at a BC public or hospital lab</h1>
-        <p class="lede">Choose your test, pick a lab near you, and get a time that works. You'll need the requisition from your doctor or nurse practitioner.</p>
-        <form class="quick" id="quick" aria-label="Start a booking">
-          <div class="f"><label for="q-test">What test is on your requisition?</label>
-            <select class="inp" id="q-test">
-              <option value="blood">Blood test</option><option value="blood">Urine sample</option><option value="blood">Blood and urine</option>
-              <option value="ecg">ECG (heart tracing)</option><option value="gtt">Glucose tolerance test</option><option value="blood">I'm not sure</option>
-            </select></div>
-          <div class="f"><label for="q-where">Near</label>
-            <input class="inp" id="q-where" placeholder="City or postal code" autocomplete="postal-code"></div>
-          <button class="btn btn-primary" type="submit">Find times</button>
-        </form>
-        <div class="hero-links">
-          <a class="link" href="#manage">Change or cancel a booking →</a>
-          <a class="link" href="#prepare">How to prepare →</a>
-        </div>
-        <div class="trust">
-          <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>Free to book</span>
-          <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>No account needed</span>
-          <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>Text or email reminder</span>
-        </div>
+      <p style="display:inline-block;margin-bottom:.9rem;font-size:.875rem;font-weight:700;background:var(--ink);color:var(--bg);border-radius:99px;padding:.2rem .7rem">Prototype · labs, times and codes are sample data</p>
+      <h1 id="hero-h">Book a lab test at a BC public or hospital lab</h1>
+      <p class="lede">Free to book. No account needed. It takes about 2 minutes.</p>
+
+      <div class="tasks" id="tasks" role="group" aria-label="What would you like to do?">
+        <button class="task primary" type="button" data-open="book">
+          <span class="ic" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M12 14v4M10 16h4"/></svg></span>
+          <span class="t">Book a test</span><span class="d">Choose a test, a lab and a time</span>
+          <svg class="go" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+        <button class="task" type="button" data-open="manage">
+          <span class="ic" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M9 15l2 2 4-4"/></svg></span>
+          <span class="t">My booking</span><span class="d">Change the time or cancel</span>
+          <svg class="go" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+        <a class="task" href="#labs">
+          <span class="ic" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg></span>
+          <span class="t">Find a lab</span><span class="d">Addresses and hours</span>
+          <svg class="go" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+        </a>
       </div>
 
-      <aside class="board" aria-labelledby="board-h">
-        <div class="board-h"><h2 id="board-h">Next openings</h2><span class="live">Updated just now</span></div>
-        <ol id="board"></ol>
-        <p class="board-f">Showing labs near Surrey. <a href="#labs">See all labs</a></p>
-      </aside>
+      <p class="need" aria-label="What you need to book"><b>You'll need:</b>
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>Your lab requisition</span>
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>Your BC Services Card</span>
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>A mobile number or email</span>
+      </p>
+      <p class="notice" role="note"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg><span><b>Holiday hours:</b> most labs are closed Dec 25, Dec 26 and Jan 1.</span></p>
     </div>
   </section>
 
-  <section class="sec" aria-labelledby="how-h">
+  <section class="sec" id="labs" aria-labelledby="labs-h">
     <div class="wrap">
-      <div class="sec-head"><span class="eyebrow">How it works</span><h2 id="how-h">From requisition to lab visit</h2></div>
-      <ol class="steps">
-        <li><h3>Get your requisition</h3><p>Your doctor or nurse practitioner gives you a lab requisition. It lists the tests you need.</p></li>
-        <li><h3>Choose test and lab</h3><p>Tell us the test and we show only labs that can do it, with the next open time at each.</p></li>
-        <li><h3>Pick a time</h3><p>Take the earliest opening or choose a day that suits you. Booking is free.</p></li>
-        <li><h3>Get your confirmation</h3><p>We text or email your booking code and a reminder before the visit.</p></li>
-      </ol>
-    </div>
-  </section>
-
-  <section class="sec alt" id="labs" aria-labelledby="labs-h">
-    <div class="wrap finder">
-      <div class="sec-head" style="margin-bottom:8px"><span class="eyebrow">Find a lab</span><h2 id="labs-h">Participating labs</h2><p>Hours, access features and the next open time at each location.</p></div>
+      <div class="sec-head"><h2 id="labs-h">Find a lab</h2><p>Search by city or postal code. Each lab shows its hours and its next open time.</p></div>
       <div class="finder-bar">
-        <label class="sr" for="lab-q">Search labs</label>
-        <input class="inp" id="lab-q" placeholder="Search by city, postal code or lab name">
-        <div class="chips" role="group" aria-label="Health authority" id="orgs"></div>
+        <div class="f"><label for="lab-q">City, postal code or lab name</label><input class="inp" id="lab-q" placeholder="For example: Surrey or V3V" autocomplete="postal-code"></div>
+        <button class="btn btn-ghost" type="button" id="lab-clear">Show all labs</button>
       </div>
+      <div class="chips" role="group" aria-label="Filter labs" id="filters"></div>
       <p class="meta" id="lab-meta" aria-live="polite"></p>
       <div class="labs" id="labs-list"></div>
     </div>
   </section>
 
-  <section class="sec" id="prepare" aria-labelledby="prep-h">
+  <section class="sec alt" id="prepare" aria-labelledby="prep-h">
     <div class="wrap">
-      <div class="sec-head"><span class="eyebrow">Prepare for your test</span><h2 id="prep-h">What to do before you go</h2><p>Follow your clinician's instructions first. These are the usual steps.</p></div>
-      <div class="prep">
-        <article><span class="len">About 10 min</span><h3>Blood test</h3><ul><li>Drink water unless told not to.</li><li>Wear a top with sleeves that roll up.</li><li>Take your usual medicines unless told otherwise.</li></ul></article>
-        <article><span class="len">About 10 min</span><h3>Fasting blood test</h3><span class="flag">Fasting: 10 to 12 hours</span><ul><li>Nothing to eat or drink except water.</li><li>Book a morning time.</li><li>Bring a snack for after.</li></ul></article>
-        <article><span class="len">About 15 min</span><h3>ECG</h3><ul><li>Wear a top that opens at the front.</li><li>Skip body lotion on your chest that day.</li></ul></article>
-        <article><span class="len">2 to 3 hours</span><h3>Glucose tolerance test</h3><span class="flag">Fasting required</span><ul><li>Book a time before 10 AM.</li><li>Stay at the lab for the whole test.</li><li>Bring something to read.</li></ul></article>
-      </div>
-      <p class="bring"><b>Always bring:</b> <span>Your requisition</span><span>Your BC Services Card</span><span>Your booking code</span></p>
+      <div class="sec-head"><h2 id="prep-h">Before you go</h2><p>Choose your test to see how to get ready. Always follow your clinician's instructions first.</p></div>
+      <div class="tabs" role="tablist" aria-label="Test type" id="prep-tabs"></div>
+      <div id="prep-panel" role="tabpanel"></div>
     </div>
   </section>
 
-  <section class="sec alt" id="manage" aria-labelledby="manage-h">
-    <div class="wrap manage">
-      <div class="sec-head" style="margin:0"><span class="eyebrow">Change or cancel</span><h2 id="manage-h">Need a different time?</h2><p>Move or cancel your booking yourself, no account or phone call needed. If you can't make it, please cancel so someone else can have the time.</p></div>
-      <form class="mform" id="mform" novalidate aria-label="Find your booking">
-        <div class="f"><label for="m-code">Booking code</label><input class="inp" id="m-code" placeholder="LOB-7K3Q-92" autocomplete="off" aria-describedby="m-help"></div>
-        <div class="f"><label for="m-dob">Patient's date of birth</label><input class="inp" id="m-dob" type="date"></div>
-        <p class="help full" id="m-help">Your code is in your confirmation text or email.</p>
-        <div class="full" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><button class="btn btn-primary" type="submit">Find my booking</button><a class="link" href="#faq-code">Lost your code?</a></div>
-        <div class="full" id="m-result" aria-live="polite"></div>
-      </form>
-    </div>
-  </section>
-
-  <section class="sec" aria-labelledby="help-h">
-    <div class="wrap">
-      <div class="sec-head"><span class="eyebrow">Everyone's welcome</span><h2 id="help-h">Booking for someone else, or need support?</h2></div>
-      <div class="help-grid">
-        <div><span class="ic" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17.5" cy="9" r="2.5"/><path d="M16 14.5a5 5 0 0 1 6 5"/></svg></span><h3>Booking for a family member</h3><p>Use their requisition and their BC Services Card details. Choose “Someone else” when you book.</p></div>
-        <div><span class="ic" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4.5" r="2"/><path d="M12 7v6h5l2 6M12 13l-3 7M8 9.5a6 6 0 1 0 6.5 9"/></svg></span><h3>Accessibility needs</h3><p>Filter for wheelchair access and parking. Add a note when you book, like needing an interpreter or extra time.</p></div>
-        <div><span class="ic" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><h3>Can't book online?</h3><p>Call the lab you plan to visit. Phone numbers are on each lab's details. For health questions, call 8-1-1.</p></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="sec alt" id="faq" aria-labelledby="faq-h">
+  <section class="sec" id="help" aria-labelledby="help-h">
     <div class="wrap faq">
-      <div class="sec-head"><span class="eyebrow">Help</span><h2 id="faq-h">Common questions</h2><p>Still stuck? Contact the lab you're booking with.</p></div>
+      <div class="contact">
+        <div class="sec-head" style="margin:0"><h2 id="help-h">Help</h2><p>Answers to common questions, and who to call.</p></div>
+        <div class="card"><b>Health questions</b><span>Nurses and pharmacists, any time</span><div class="big">8-1-1</div></div>
+        <div class="card"><b>Emergency</b><div class="big">9-1-1</div></div>
+        <div class="card"><b>Can't book online?</b><span>Call the lab you plan to visit. Each lab's phone number is in “Find a lab”.</span></div>
+      </div>
       <div>
-        <details><summary>Can I book a LifeLabs location here?</summary><p>No. This site books participating public and hospital outpatient labs. LifeLabs Patient Service Centres are booked on LifeLabs' own site, <a class="link" href="https://appointments.lifelabs.com/" target="_blank" rel="noopener">appointments.lifelabs.com</a>. LifeLabs is not affiliated with LabOnlineBooking.ca.</p></details>
-        <details><summary>Do I need a requisition?</summary><p>Yes. The lab needs the requisition from the clinician who ordered your test. Bring it to your appointment, on paper or as your clinician sent it.</p></details>
-        <details><summary>Can I walk in without booking?</summary><p>Plan on booking. Some labs keep a few walk-in spaces, but waits can be long and booked patients go first.</p></details>
-        <details id="faq-code"><summary>I lost my booking code. What do I do?</summary><p>Check your text messages and email (including spam) for the confirmation. If you can't find it, choose “Lost your code?” and we'll send it to the mobile number or email on the booking.</p></details>
-        <details><summary>How do I get my results?</summary><p>This site handles bookings only. Your results go to the clinician who ordered the test, and many appear in Health Gateway. Ask your clinician about your results.</p></details>
-        <details><summary>Is my information private?</summary><p>We collect only what the lab needs to identify you and match your requisition. Your information is stored in Canada and used for your booking.</p></details>
+        <details><summary>I lost my booking code</summary><div><p>We can send it again to the mobile number or email on the booking.</p><button class="btn btn-ghost" type="button" data-open="lost">Send my code again</button></div></details>
+        <details><summary>Can I book a LifeLabs location here?</summary><div><p>No. This site books participating public and hospital outpatient labs. LifeLabs Patient Service Centres are booked on LifeLabs' own site, <a class="link" href="https://appointments.lifelabs.com/" target="_blank" rel="noopener">appointments.lifelabs.com</a>. LifeLabs is not affiliated with LabOnlineBooking.ca.</p></div></details>
+        <details><summary>I'm booking for a family member</summary><div><p>Choose “Someone else” when you book. Use their requisition and the details on their BC Services Card, and book with their knowledge.</p><button class="btn btn-ghost" type="button" data-open="book" data-who="other">Book for someone else</button></div></details>
+        <details><summary>I need a wheelchair, an interpreter or extra time</summary><div><p>Use the “Wheelchair access” filter in Find a lab. When you book, add a note for the lab, such as needing an interpreter or more time.</p></div></details>
+        <details><summary>Do I need a requisition?</summary><div><p>Yes. The lab needs the requisition from the clinician who ordered your test. Bring it to your visit.</p></div></details>
+        <details><summary>Can I walk in without booking?</summary><div><p>Please book. Some labs take walk-ins when they have space, but booked patients are seen first.</p></div></details>
+        <details><summary>How do I get my results?</summary><div><p>This site handles bookings only. Results go to the clinician who ordered the test, and many also appear in Health Gateway.</p></div></details>
       </div>
     </div>
   </section>
@@ -379,75 +386,340 @@ footer .legal { border-top: 1px solid rgba(255,255,255,.12); margin-top: 32px; p
 <footer>
   <div class="wrap">
     <div class="cols">
-      <div><h3>LabOnlineBooking.ca</h3><p>Online booking for participating public and hospital outpatient labs in British Columbia. This site books visits; the lab you choose does the testing.</p></div>
-      <div><h3>Book</h3><ul><li><a href="#book">Book a test</a></li><li><a href="#labs">Find a lab</a></li><li><a href="#manage">Change or cancel</a></li></ul></div>
-      <div><h3>Help</h3><ul><li><a href="#prepare">Prepare for your test</a></li><li><a href="#faq">Common questions</a></li><li><a href="#faq">Accessibility</a></li><li><a href="#faq">Privacy</a></li></ul></div>
-      <div><h3>Participating organizations</h3><ul><li>Fraser Health</li><li>Vancouver Coastal Health</li><li>Interior Health</li><li>Providence Health Care</li></ul></div>
+      <div><h3>LabOnlineBooking.ca</h3><p>Online booking for participating public and hospital outpatient labs in British Columbia, with Fraser Health, Vancouver Coastal Health, Interior Health and Providence Health Care. This site books visits; the lab does the testing.</p></div>
+      <div><h3>Book</h3><ul><li><button type="button" data-open="book">Book a test</button></li><li><button type="button" data-open="manage">My booking</button></li><li><a href="#labs">Find a lab</a></li></ul></div>
+      <div><h3>Help</h3><ul><li><a href="#prepare">Before you go</a></li><li><a href="#help">Common questions</a></li><li><a href="#help">Accessibility</a></li><li><a href="#help">Privacy</a></li></ul></div>
     </div>
-    <div class="legal">
-      <p>Operated by TSB Healthcare. LifeLabs is a trademark of its owner and is not affiliated with LabOnlineBooking.ca.</p>
-      <p>© 2026 TSB Healthcare</p>
-    </div>
+    <p class="legal">Operated by TSB Healthcare. LifeLabs is a trademark of its owner and is not affiliated with LabOnlineBooking.ca. © 2026 TSB Healthcare</p>
   </div>
 </footer>
 
-<span class="proto">Prototype · sample labs and times</span>
+<div class="actionbar" role="group" aria-label="Quick actions">
+  <button class="btn btn-primary" type="button" data-open="book">Book a test</button>
+  <button class="btn btn-ghost" type="button" data-open="manage">My booking</button>
+</div>
+
+
+<dialog class="flow" id="flow" aria-labelledby="fl-title">
+  <div class="fl-head">
+    <div class="fl-top"><span class="ttl" id="fl-title">Book a test</span><span class="stp" id="fl-step"></span>
+      <button class="tool x" type="button" id="fl-close">Close</button></div>
+    <div class="bar" id="fl-bar" aria-hidden="true"></div>
+  </div>
+  <div class="fl-body" id="fl-body" aria-live="polite"></div>
+  <div class="fl-foot" id="fl-foot"></div>
+</dialog>
 
 <script>
 (function () {
-  const $ = s => document.querySelector(s);
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const ck = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>';
+  const info = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg>';
+
+  /* ---------- sample data ---------- */
   const ORGS = ['Fraser Health', 'Vancouver Coastal Health', 'Interior Health', 'Providence Health Care'];
   const LABS = [
-    { name: 'Surrey Outpatient Lab', addr: '13750 96 Ave, Surrey', k: 'surrey v3v', org: 0, km: 2.1, svc: ['blood','ecg','gtt'], feat: ['Wheelchair access','Free parking','Open Saturday'], hrs: 'Mon–Fri 7:00–4:30 · Sat 8:00–12:00', next: [0, 14 * 60 + 40] },
-    { name: 'Langley Outpatient Lab', addr: '22051 Fraser Hwy, Langley', k: 'langley v3a', org: 0, km: 11.8, svc: ['blood','ecg'], feat: ['Wheelchair access','Free parking'], hrs: 'Mon–Fri 7:00–3:30', next: [0, 15 * 60 + 10] },
-    { name: 'Burnaby Outpatient Lab', addr: '3935 Kincaid St, Burnaby', k: 'burnaby v5g', org: 0, km: 14.6, svc: ['blood','ecg','gtt'], feat: ['Wheelchair access','Transit nearby'], hrs: 'Mon–Fri 7:00–4:00 · Sat 8:00–12:00', next: [1, 7 * 60 + 20] },
-    { name: 'Vancouver Outpatient Lab, Broadway', addr: '899 W 12th Ave, Vancouver', k: 'vancouver v5z', org: 1, km: 24.0, svc: ['blood','ecg','gtt'], feat: ['Wheelchair access','Transit nearby'], hrs: 'Mon–Fri 7:00–5:00', next: [1, 9 * 60 + 50] },
-    { name: 'Downtown Outpatient Lab, Burrard', addr: '1081 Burrard St, Vancouver', k: 'vancouver v6z downtown', org: 3, km: 26.3, svc: ['blood','ecg'], feat: ['Wheelchair access','Transit nearby'], hrs: 'Mon–Fri 7:30–4:00', next: [2, 8 * 60] },
-    { name: 'North Shore Outpatient Lab', addr: '231 E 15th St, North Vancouver', k: 'north vancouver v7l', org: 1, km: 29.5, svc: ['blood'], feat: ['Free parking','Open Saturday'], hrs: 'Mon–Fri 7:00–3:00 · Sat 8:00–11:30', next: [0, 13 * 60 + 30] },
-    { name: 'Kelowna Outpatient Lab', addr: '2268 Pandosy St, Kelowna', k: 'kelowna v1y', org: 2, km: 388, svc: ['blood','ecg','gtt'], feat: ['Wheelchair access','Free parking'], hrs: 'Mon–Fri 7:00–4:00', next: [1, 8 * 60 + 10] },
-    { name: 'Kamloops Outpatient Lab', addr: '311 Columbia St, Kamloops', k: 'kamloops v2c', org: 2, km: 342, svc: ['blood','gtt'], feat: ['Wheelchair access'], hrs: 'Mon–Fri 7:00–3:30', next: [3, 7 * 60 + 40] }
+    { id: 'sur', name: 'Surrey Outpatient Lab', addr: '13750 96 Ave, Surrey', k: 'surrey v3v', org: 0, km: 2.1, svc: ['blood','ecg','gtt'], feat: ['Wheelchair access','Free parking','Open Saturday'], hrs: 'Mon–Fri 7 AM–4:30 PM · Sat 8 AM–noon', sat: true, busy: .55, tel: '604-555-0101' },
+    { id: 'lan', name: 'Langley Outpatient Lab', addr: '22051 Fraser Hwy, Langley', k: 'langley v3a', org: 0, km: 11.8, svc: ['blood','ecg'], feat: ['Wheelchair access','Free parking'], hrs: 'Mon–Fri 7 AM–3:30 PM', sat: false, busy: .3, tel: '604-555-0102' },
+    { id: 'bby', name: 'Burnaby Outpatient Lab', addr: '3935 Kincaid St, Burnaby', k: 'burnaby v5g', org: 0, km: 14.6, svc: ['blood','ecg','gtt'], feat: ['Wheelchair access','Near transit','Open Saturday'], hrs: 'Mon–Fri 7 AM–4 PM · Sat 8 AM–noon', sat: true, busy: .7, tel: '604-555-0103' },
+    { id: 'van', name: 'Vancouver Outpatient Lab, Broadway', addr: '899 W 12th Ave, Vancouver', k: 'vancouver v5z', org: 1, km: 24.0, svc: ['blood','ecg','gtt'], feat: ['Wheelchair access','Near transit'], hrs: 'Mon–Fri 7 AM–5 PM', sat: false, busy: .8, tel: '604-555-0104' },
+    { id: 'phc', name: 'Downtown Outpatient Lab, Burrard', addr: '1081 Burrard St, Vancouver', k: 'vancouver v6z downtown', org: 3, km: 26.3, svc: ['blood','ecg'], feat: ['Wheelchair access','Near transit'], hrs: 'Mon–Fri 7:30 AM–4 PM', sat: false, busy: .6, tel: '604-555-0105' },
+    { id: 'nsh', name: 'North Shore Outpatient Lab', addr: '231 E 15th St, North Vancouver', k: 'north vancouver v7l', org: 1, km: 29.5, svc: ['blood'], feat: ['Free parking','Open Saturday'], hrs: 'Mon–Fri 7 AM–3 PM · Sat 8–11:30 AM', sat: true, busy: .4, tel: '604-555-0106' },
+    { id: 'kel', name: 'Kelowna Outpatient Lab', addr: '2268 Pandosy St, Kelowna', k: 'kelowna v1y', org: 2, km: 388, svc: ['blood','ecg','gtt'], feat: ['Wheelchair access','Free parking'], hrs: 'Mon–Fri 7 AM–4 PM', sat: false, busy: .5, tel: '250-555-0107' },
+    { id: 'kam', name: 'Kamloops Outpatient Lab', addr: '311 Columbia St, Kamloops', k: 'kamloops v2c', org: 2, km: 342, svc: ['blood','gtt'], feat: ['Wheelchair access'], hrs: 'Mon–Fri 7 AM–3:30 PM', sat: false, busy: .35, tel: '250-555-0108' }
   ];
-  const t = m => { let h = Math.floor(m / 60), mm = m % 60, ap = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12; return h + ':' + String(mm).padStart(2, '0') + ' ' + ap; };
-  const day = off => { if (off === 0) return 'Today'; if (off === 1) return 'Tomorrow'; const d = new Date(); d.setDate(d.getDate() + off); return d.toLocaleDateString('en-CA', { weekday: 'short', month: 'short', day: 'numeric' }); };
-  const nextTxt = l => day(l.next[0]) + ', ' + t(l.next[1]);
+  const TESTS = [
+    { id: 'blood', svc: 'blood', name: 'Blood test', d: 'Routine blood work', len: 'About 10 minutes' },
+    { id: 'fast', svc: 'blood', name: 'Fasting blood test', d: 'Your requisition says “fasting”', len: 'About 10 minutes', fast: true },
+    { id: 'urine', svc: 'blood', name: 'Urine sample', d: 'Bring the container if you have one', len: 'About 5 minutes' },
+    { id: 'ecg', svc: 'ecg', name: 'ECG (heart tracing)', d: 'Stickers on your chest, painless', len: 'About 15 minutes' },
+    { id: 'gtt', svc: 'gtt', name: 'Glucose tolerance test', d: 'You stay 2 to 3 hours', len: '2 to 3 hours', fast: true },
+    { id: 'unsure', svc: 'blood', name: "I'm not sure", d: 'Lab staff will check your requisition', len: 'Varies' }
+  ];
+  const PREP = {
+    blood: { t: 'Blood test', len: 'About 10 minutes', do: ['Drink water unless told not to.', 'Wear a top with sleeves that roll up.', 'Take your usual medicines unless told otherwise.'] },
+    fast: { t: 'Fasting blood test', len: 'About 10 minutes', flag: 'No food for 10 to 12 hours', do: ['Nothing to eat or drink except water.', 'Book an early morning time.', 'Bring a snack for after.'] },
+    urine: { t: 'Urine sample', len: 'About 5 minutes', do: ['Bring the container your clinic gave you, if any.', 'First-morning urine only if your requisition asks for it.'] },
+    ecg: { t: 'ECG', len: 'About 15 minutes', do: ['Wear a top that opens at the front.', 'Skip body lotion on your chest that day.'] },
+    gtt: { t: 'Glucose tolerance test', len: '2 to 3 hours', flag: 'Fasting required', do: ['Book a time before 10 AM.', 'Stay at the lab for the whole test.', 'Bring something to read.'] }
+  };
+  const FEATS = ['Wheelchair access', 'Free parking', 'Near transit', 'Open Saturday'];
 
-  // board: nearest 4 by soonest time
-  $('#board').innerHTML = LABS.filter(l => l.km < 30).sort((a, b) => a.next[0] * 1440 + a.next[1] - (b.next[0] * 1440 + b.next[1])).slice(0, 4).map(l => `
-    <li><a href="#labs"><span><span class="n">${esc(l.name)}</span><br><span class="a">${l.km} km · ${ORGS[l.org]}</span></span>
-    <span><span class="t">${t(l.next[1])}</span><br><span class="d">${day(l.next[0])}</span></span></a></li>`).join('');
-
-  // finder
-  const S = { q: '', orgs: [], svc: null };
-  $('#orgs').innerHTML = ORGS.map((o, i) => `<button type="button" class="chip" data-o="${i}" aria-pressed="false">${o}</button>`).join('');
-  function renderLabs() {
-    const q = S.q.trim().toLowerCase();
-    const list = LABS.filter(l => (!q || (l.name + ' ' + l.addr + ' ' + l.k).toLowerCase().includes(q)) && (!S.orgs.length || S.orgs.includes(l.org)) && (!S.svc || l.svc.includes(S.svc))).sort((a, b) => a.km - b.km);
-    const svcName = { ecg: 'ECG', gtt: 'glucose tolerance tests', blood: 'blood and urine tests' }[S.svc];
-    $('#lab-meta').innerHTML = `${list.length} lab${list.length === 1 ? '' : 's'}${svcName ? ' that do ' + svcName + ` · <button type="button" class="link" id="clr-svc" style="background:none;border:0;padding:0;cursor:pointer">Show all tests</button>` : ''} · sample data, distances from Surrey`;
-    $('#labs-list').innerHTML = list.length ? list.map(l => `
-      <article class="lab"><div><h3>${esc(l.name)}</h3><p class="addr">${esc(l.addr)} · ${l.km} km</p><p class="hrs">${esc(l.hrs)}</p></div>
-        <div class="nx"><small>Next open</small><b>${nextTxt(l)}</b></div>
-        <div class="row"><span class="pill">${ORGS[l.org]}</span>${l.feat.map(f => `<span class="pill ok">${f}</span>`).join('')}<a class="btn btn-primary" href="#book" aria-label="Book at ${esc(l.name)}">Book here</a></div></article>`).join('')
-      : `<div class="empty"><b>No labs match.</b> Try a nearby city or clear the filters. Looking for LifeLabs? Book at appointments.lifelabs.com.</div>`;
-    const c = $('#clr-svc'); if (c) c.onclick = () => { S.svc = null; renderLabs(); };
+  /* ---------- time helpers ---------- */
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const DAYS = Array.from({ length: 14 }, (_, i) => { const d = new Date(today); d.setDate(d.getDate() + i); return d; });
+  const fmtT = m => { let h = Math.floor(m / 60), mm = m % 60, ap = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12; return h + ':' + String(mm).padStart(2, '0') + ' ' + ap; };
+  const fmtD = (d, long) => d.toLocaleDateString('en-CA', long ? { weekday: 'long', month: 'long', day: 'numeric' } : { weekday: 'short', month: 'short', day: 'numeric' });
+  const rel = d => { const n = Math.round((d - today) / 864e5); return n === 0 ? 'Today' : n === 1 ? 'Tomorrow' : fmtD(d); };
+  const rnd = s => { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return ((h >>> 0) % 1000) / 1000; };
+  function slots(lab, d, test) {
+    const dow = d.getDay(); if (dow === 0 || (dow === 6 && !lab.sat)) return null;
+    const t = TESTS.find(x => x.id === test) || TESTS[0];
+    const start = 7 * 60, end = dow === 6 ? 11 * 60 + 30 : 15 * 60 + 30;
+    const last = t.fast ? 10 * 60 : end, step = t.id === 'gtt' ? 60 : 10;
+    const now = new Date(), nowM = now.getHours() * 60 + now.getMinutes(), isT = +d === +today;
+    const out = [];
+    for (let m = start; m <= last; m += step) { if (isT && m < nowM + 30) continue; if (rnd(lab.id + d.toDateString() + m) < lab.busy) continue; out.push(m); }
+    return out;
   }
-  $('#lab-q').oninput = e => { S.q = e.target.value; renderLabs(); };
-  $('#orgs').onclick = e => { const b = e.target.closest('[data-o]'); if (!b) return; const i = +b.dataset.o; S.orgs = S.orgs.includes(i) ? S.orgs.filter(x => x !== i) : [...S.orgs, i]; b.setAttribute('aria-pressed', S.orgs.includes(i)); renderLabs(); };
+  function nextOpen(lab, test) { for (const d of DAYS) { const s = slots(lab, d, test); if (s && s.length) return { d, m: s[0] }; } return null; }
+
+  /* ---------- text size ---------- */
+  const TS = ['normal', 'large', 'larger'];
+  let ts = 0; try { ts = +localStorage.getItem('lob-ts') || 0; } catch (e) {}
+  function applyTs() { document.documentElement.classList.remove('ts-1', 'ts-2'); if (ts) document.documentElement.classList.add('ts-' + ts); $('#ts').setAttribute('aria-label', 'Text size: ' + TS[ts] + '. Tap to change.'); }
+  $('#ts').onclick = () => { ts = (ts + 1) % 3; try { localStorage.setItem('lob-ts', ts); } catch (e) {} applyTs(); };
+  applyTs();
+
+  /* ---------- menu ---------- */
+  const nav = $('#nav'), menu = $('#menu');
+  menu.onclick = () => { const o = nav.classList.toggle('open'); menu.setAttribute('aria-expanded', o); menu.textContent = o ? 'Close' : 'Menu'; };
+  nav.addEventListener('click', e => { if (e.target.closest('a,button')) { nav.classList.remove('open'); menu.setAttribute('aria-expanded', 'false'); menu.textContent = 'Menu'; } });
+
+  /* ---------- find a lab ---------- */
+  const F = { q: '', feats: [] };
+  $('#filters').innerHTML = FEATS.map(f => `<button type="button" class="chip" data-f="${f}" aria-pressed="false">${f}</button>`).join('');
+  function renderLabs() {
+    const q = F.q.trim().toLowerCase();
+    const list = LABS.filter(l => (!q || (l.name + ' ' + l.addr + ' ' + l.k).toLowerCase().includes(q)) && F.feats.every(f => l.feat.includes(f))).sort((a, b) => a.km - b.km);
+    $('#lab-meta').textContent = `${list.length} of ${LABS.length} labs · sample data, distances from Surrey`;
+    $('#labs-list').innerHTML = list.length ? list.map(l => { const n = nextOpen(l, 'blood'); return `
+      <article class="lab"><h3>${esc(l.name)}</h3>
+        <p class="addr">${esc(l.addr)} · ${l.km} km</p><p class="hrs">${esc(l.hrs)} · ${l.tel}</p>
+        <div class="pills"><span class="pill">${ORGS[l.org]}</span>${l.feat.map(f => `<span class="pill ok">${f}</span>`).join('')}</div>
+        <div class="foot"><span class="nx">Next open: <b>${n ? rel(n.d) + ', ' + fmtT(n.m) : 'none in 2 weeks'}</b></span>
+          <button class="btn btn-primary" type="button" data-open="book" data-lab="${l.id}" aria-label="Book at ${esc(l.name)}">Book here</button></div></article>`; }).join('')
+      : `<div class="empty"><b>No labs match.</b><span>Try a nearby city, or remove a filter. Looking for LifeLabs? Book at appointments.lifelabs.com.</span><button class="btn btn-ghost" type="button" id="lab-reset">Show all labs</button></div>`;
+    const r = $('#lab-reset'); if (r) r.onclick = clearLabs;
+  }
+  function clearLabs() { F.q = ''; F.feats = []; $('#lab-q').value = ''; $$('#filters .chip').forEach(c => c.setAttribute('aria-pressed', 'false')); renderLabs(); }
+  $('#lab-q').oninput = e => { F.q = e.target.value; renderLabs(); };
+  $('#lab-clear').onclick = clearLabs;
+  $('#filters').onclick = e => { const b = e.target.closest('[data-f]'); if (!b) return; const f = b.dataset.f; F.feats = F.feats.includes(f) ? F.feats.filter(x => x !== f) : [...F.feats, f]; b.setAttribute('aria-pressed', F.feats.includes(f)); renderLabs(); };
   renderLabs();
 
-  // hero quick start -> filter finder and jump to it
-  $('#quick').onsubmit = e => { e.preventDefault(); S.svc = $('#q-test').value; S.q = $('#q-where').value; $('#lab-q').value = S.q; renderLabs(); document.getElementById('labs').scrollIntoView(); $('#lab-q').focus({ preventScroll: true }); };
+  /* ---------- before you go ---------- */
+  let prepSel = 'blood';
+  function renderPrep() {
+    $('#prep-tabs').innerHTML = Object.entries(PREP).map(([k, p]) => `<button type="button" role="tab" id="tab-${k}" aria-selected="${k === prepSel}" aria-controls="prep-panel" tabindex="${k === prepSel ? 0 : -1}" data-p="${k}">${p.t}</button>`).join('');
+    const p = PREP[prepSel];
+    $('#prep-panel').setAttribute('aria-labelledby', 'tab-' + prepSel);
+    $('#prep-panel').innerHTML = `<div class="prep-panel"><div><h3>${p.t}</h3><p class="len">${p.len}</p>${p.flag ? `<span class="flag">${p.flag}</span>` : ''}
+      <ul>${p.do.map(x => `<li>${ck}<span>${x}</span></li>`).join('')}</ul></div>
+      <div class="bring"><h4>Always bring</h4><ul class="list-plain"><li>${ck}<span>Your lab requisition</span></li><li>${ck}<span>Your BC Services Card</span></li><li>${ck}<span>Your booking code</span></li></ul></div></div>`;
+  }
+  $('#prep-tabs').addEventListener('click', e => { const b = e.target.closest('[data-p]'); if (b) { prepSel = b.dataset.p; renderPrep(); $('#tab-' + prepSel).focus(); } });
+  $('#prep-tabs').addEventListener('keydown', e => { const keys = Object.keys(PREP), i = keys.indexOf(prepSel);
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); prepSel = keys[(i + (e.key === 'ArrowRight' ? 1 : keys.length - 1)) % keys.length]; renderPrep(); $('#tab-' + prepSel).focus(); } });
+  renderPrep();
 
-  // manage
-  $('#mform').onsubmit = e => { e.preventDefault(); const c = $('#m-code').value.trim(), d = $('#m-dob').value, r = $('#m-result');
-    r.innerHTML = !c || !d ? '<p class="result err">Enter both the booking code and the date of birth.</p>'
-      : '<p class="result ok">Found it: Blood test, Surrey Outpatient Lab. In the full site you would now choose “Change time” or “Cancel”.</p>'; };
+  /* ---------- dialog flows ---------- */
+  const dlg = $('#flow'), body = $('#fl-body'), foot = $('#fl-foot');
+  const blankP = () => ({ first: '', last: '', dd: '', mm: '', yyyy: '', phn: '', phone: '', email: '', notes: '' });
+  let S;
+  const BOOK = ['test', 'lab', 'time', 'details', 'review'];
+  const LBL = { test: 'Test', lab: 'Lab', time: 'Time', details: 'Your details', review: 'Confirm' };
 
-  // chrome
-  $('#notice-x').onclick = () => { $('#notice').hidden = true; };
-  $('#menu').onclick = e => { const n = $('#nav'), o = n.classList.toggle('open'); e.currentTarget.setAttribute('aria-expanded', o); };
-  $('#nav').onclick = e => { if (e.target.closest('a')) { $('#nav').classList.remove('open'); $('#menu').setAttribute('aria-expanded', 'false'); } };
-  $('#bigtext').onclick = e => { const on = document.body.classList.toggle('large'); e.currentTarget.setAttribute('aria-pressed', on); };
+  function open(kind, opts = {}) {
+    S = { kind, view: kind === 'book' ? 'test' : kind === 'lost' ? 'lost' : 'find', test: null, lab: opts.lab || null, who: opts.who || 'me', day: null, time: null, p: blankP(), errs: {}, mcode: '', mdob: blankP(), resched: false, labFixed: !!opts.lab };
+    $('#fl-title').textContent = kind === 'book' ? 'Book a test' : kind === 'lost' ? 'Get my booking code' : 'My booking';
+    render(); if (!dlg.open) dlg.showModal();
+  }
+  function close() { dlg.close(); }
+  $('#fl-close').onclick = close;
+  dlg.addEventListener('click', e => { if (e.target === dlg) close(); });
+  document.addEventListener('click', e => { const b = e.target.closest('[data-open]'); if (!b || dlg.contains(b)) return; open(b.dataset.open, { lab: b.dataset.lab, who: b.dataset.who }); });
+
+  const test = () => TESTS.find(t => t.id === S.test);
+  const lab = () => LABS.find(l => l.id === S.lab);
+  function steps() { return S.kind === 'book' ? BOOK.filter(s => !(s === 'lab' && S.labFixed)) : null; }
+
+  function go(v) { S.view = v; render(); const h = body.querySelector('h2'); if (h) { h.setAttribute('tabindex', '-1'); h.focus(); } body.scrollTop = 0; }
+
+  function chrome() {
+    const st = steps(), i = st ? st.indexOf(S.view) : -1;
+    $('#fl-step').textContent = i >= 0 ? `Step ${i + 1} of ${st.length}: ${LBL[S.view]}` : '';
+    $('#fl-bar').innerHTML = i >= 0 ? st.map((_, k) => `<span class="${k <= i ? 'on' : ''}"></span>`).join('') : '';
+    $('#fl-bar').hidden = i < 0;
+  }
+  function footer(back, nextLabel, nextOk, onNext) {
+    foot.innerHTML = (back ? `<button class="btn btn-ghost" type="button" id="fb">Back</button>` : '') + (nextLabel ? `<button class="btn btn-primary" type="button" id="fn" ${nextOk ? '' : 'disabled'}>${nextLabel}</button>` : '');
+    if (back) $('#fb').onclick = () => typeof back === 'function' ? back() : go(back);
+    if (nextLabel) $('#fn').onclick = onNext;
+  }
+  function prevStep() { const st = steps(), i = st.indexOf(S.view); return i > 0 ? st[i - 1] : null; }
+  function nextStep() { const st = steps(), i = st.indexOf(S.view); return st[i + 1]; }
+
+  const V = {
+    test() {
+      body.innerHTML = `<h2>What is the test for?</h2><p class="sub">Look at your requisition. If you're not sure, choose “I'm not sure”.</p>
+        <fieldset style="border:0;margin:0;padding:0;display:grid;gap:.5rem"><legend class="f" style="font-weight:700;margin-bottom:.4rem">Who is the test for?</legend>
+          <div class="choices two">
+            <label class="choice"><input type="radio" name="who" value="me" ${S.who === 'me' ? 'checked' : ''}><span class="dot"></span><span class="t">Me</span></label>
+            <label class="choice"><input type="radio" name="who" value="other" ${S.who === 'other' ? 'checked' : ''}><span class="dot"></span><span class="t">Someone else</span><span class="d">A child, parent or person I care for</span></label>
+          </div></fieldset>
+        <fieldset style="border:0;margin:0;padding:0;display:grid;gap:.5rem"><legend style="font-weight:700;margin-bottom:.4rem">Which test?</legend>
+          <div class="choices two">${TESTS.filter(t => !S.lab || lab().svc.includes(t.svc)).map(t => `
+            <label class="choice"><input type="radio" name="test" value="${t.id}" ${S.test === t.id ? 'checked' : ''}><span class="dot"></span><span class="t">${t.name}</span><span class="d">${t.d}</span></label>`).join('')}</div></fieldset>
+        ${S.lab ? `<div class="callout info">${info}<span>Booking at <b>${esc(lab().name)}</b>. <button class="link" type="button" id="unlab">Choose a different lab</button></span></div>` : ''}`;
+      $$('input[name=who]', body).forEach(r => r.onchange = () => { S.who = r.value; });
+      $$('input[name=test]', body).forEach(r => r.onchange = () => { S.test = r.value; $('#fn').disabled = false; });
+      const u = $('#unlab'); if (u) u.onclick = () => { S.lab = null; S.labFixed = false; render(); };
+      footer(null, 'Continue', !!S.test, () => go(nextStep()));
+    },
+    lab() {
+      const t = test();
+      const q = (S.lq || '').trim().toLowerCase();
+      const list = LABS.filter(l => l.svc.includes(t.svc) && (!q || (l.name + ' ' + l.addr + ' ' + l.k).toLowerCase().includes(q))).map(l => ({ l, n: nextOpen(l, t.id) }));
+      if (S.lsort === 'soon') list.sort((a, b) => (a.n ? +a.n.d + a.n.m * 6e4 : Infinity) - (b.n ? +b.n.d + b.n.m * 6e4 : Infinity)); else list.sort((a, b) => a.l.km - b.l.km);
+      body.innerHTML = `<h2>Choose a lab</h2><p class="sub">These labs can do a <b>${esc(t.name.toLowerCase())}</b>.</p>
+        <div class="f"><label for="lq">City, postal code or lab name</label><input class="inp" id="lq" value="${esc(S.lq || '')}" placeholder="For example: Surrey or V3V"></div>
+        <div class="chips" role="group" aria-label="Sort labs"><button type="button" class="chip" data-s="near" aria-pressed="${S.lsort !== 'soon'}">Closest first</button><button type="button" class="chip" data-s="soon" aria-pressed="${S.lsort === 'soon'}">Earliest time first</button></div>
+        <div class="choices" id="lab-list">${list.length ? list.map(({ l, n }) => `
+          <button type="button" class="lab-pick" data-l="${l.id}" aria-pressed="${S.lab === l.id}"><span><span class="n">${esc(l.name)}</span><br><span class="a">${esc(l.addr)} · ${l.km} km</span></span>
+            <span class="w">Next open<b>${n ? rel(n.d) + ', ' + fmtT(n.m) : 'None soon'}</b></span></button>`).join('') : `<div class="empty">No labs match. Try another city.</div>`}</div>`;
+      const lq = $('#lq'); lq.oninput = () => { S.lq = lq.value; const pos = lq.selectionStart; render(); const n = $('#lq'); n.focus(); n.setSelectionRange(pos, pos); };
+      $$('[data-s]', body).forEach(b => b.onclick = () => { S.lsort = b.dataset.s; render(); });
+      $$('[data-l]', body).forEach(b => b.onclick = () => { if (S.lab !== b.dataset.l) { S.day = null; S.time = null; } S.lab = b.dataset.l; go('time'); });
+      footer(prevStep(), 'Continue', !!S.lab, () => go('time'));
+    },
+    time() {
+      const l = lab(), t = test(), n = nextOpen(l, t.id);
+      if (!S.day) S.day = n ? n.d : DAYS[0];
+      const sl = slots(l, S.day, t.id) || [];
+      const am = sl.filter(m => m < 720), pm = sl.filter(m => m >= 720);
+      body.innerHTML = `${S.resched ? `<div class="callout warn">${info}<span>Your current booking stays until you confirm a new time.</span></div>` : ''}
+        <h2>Pick a time</h2><p class="sub">At <b>${esc(l.name)}</b>${t.fast ? '. Fasting test, so morning times only.' : '.'}</p>
+        ${n ? `<div class="earliest"><span>Earliest time<b>${rel(n.d)}, ${fmtT(n.m)}</b></span><button class="btn btn-ghost" type="button" id="early">Choose this time</button></div>` : ''}
+        <p class="slot-h" id="dl">Or choose a day</p>
+        <div class="days" role="group" aria-labelledby="dl">${DAYS.map(d => { const s = slots(l, d, t.id), c = s ? s.length : 0; return `
+          <button type="button" class="day" data-d="${+d}" aria-pressed="${+d === +S.day}" ${c ? '' : 'disabled'} aria-label="${fmtD(d, true)}: ${s ? c + ' times' : 'closed'}"><span class="w">${d.toLocaleDateString('en-CA', { weekday: 'short' })}</span><span class="n">${d.getDate()}</span><span class="c">${s ? (c ? c + ' open' : 'Full') : 'Closed'}</span></button>`; }).join('')}</div>
+        <p class="slot-h">${fmtD(S.day, true)}</p>
+        ${[['Morning', am], ['Afternoon', pm]].filter(g => g[1].length).map(([g, ms]) => `<div style="display:grid;gap:.4rem"><span style="color:var(--muted);font-size:1rem;font-weight:700">${g}</span><div class="slots">${ms.map(m => `<button type="button" class="slot" data-m="${m}" aria-pressed="${S.time === m && +S.tday === +S.day}">${fmtT(m)}</button>`).join('')}</div></div>`).join('') || '<div class="empty">No times this day. Choose another day above.</div>'}`;
+      const e = $('#early'); if (e) e.onclick = () => { S.day = n.d; S.tday = n.d; S.time = n.m; go(S.resched ? 'review' : nextStep()); };
+      $$('[data-d]', body).forEach(b => b.onclick = () => { S.day = new Date(+b.dataset.d); render(); $(`[data-d="${b.dataset.d}"]`).focus(); });
+      $$('[data-m]', body).forEach(b => b.onclick = () => { S.time = +b.dataset.m; S.tday = S.day; render(); $('#fn').focus(); });
+      const ok = S.time != null && +S.tday === +S.day;
+      footer(S.resched ? () => { S.view = 'found'; render(); } : prevStep(), S.resched ? 'Review new time' : 'Continue', ok, () => go(S.resched ? 'review' : nextStep()));
+    },
+    details() {
+      const p = S.p, e = S.errs, other = S.who === 'other', ek = Object.keys(e);
+      const fld = (id, label, attrs, help, cls = '') => `<div class="f ${cls}"><label for="p-${id}">${label}</label>${help ? `<span class="help" id="h-${id}">${help}</span>` : ''}
+        <input class="inp ${e[id] ? 'bad' : ''}" id="p-${id}" data-p="${id}" value="${esc(p[id])}" ${attrs} aria-describedby="${help ? 'h-' + id : ''}${e[id] ? ' e-' + id : ''}" ${e[id] ? 'aria-invalid="true"' : ''}>${e[id] ? `<span class="err" id="e-${id}">${e[id]}</span>` : ''}</div>`;
+      const mo = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      body.innerHTML = `<h2>${other ? "The patient's details" : 'Your details'}</h2><p class="sub">${other ? 'Use the details on their BC Services Card.' : 'As shown on your BC Services Card.'}</p>
+        ${ek.length ? `<div class="err-sum" id="errsum" tabindex="-1" role="alert">Please check ${ek.length === 1 ? 'one thing' : ek.length + ' things'} below.</div>` : ''}
+        <div class="form">
+          ${fld('first', 'First name', 'autocomplete="given-name"')}
+          ${fld('last', 'Last name', 'autocomplete="family-name"')}
+          <div class="f full"><span class="lbl" id="dob-l">Date of birth</span>
+            <div class="dob" role="group" aria-labelledby="dob-l">
+              <label>Day<input class="inp ${e.dob ? 'bad' : ''}" id="p-dd" data-p="dd" inputmode="numeric" maxlength="2" value="${esc(p.dd)}" autocomplete="bday-day"></label>
+              <label>Month<select class="inp ${e.dob ? 'bad' : ''}" id="p-mm" data-p="mm" autocomplete="bday-month"><option value="">Choose</option>${mo.map((m, i) => `<option value="${i + 1}" ${+p.mm === i + 1 ? 'selected' : ''}>${m}</option>`).join('')}</select></label>
+              <label>Year<input class="inp ${e.dob ? 'bad' : ''}" id="p-yyyy" data-p="yyyy" inputmode="numeric" maxlength="4" value="${esc(p.yyyy)}" autocomplete="bday-year" placeholder="1958"></label>
+            </div>${e.dob ? `<span class="err">${e.dob}</span>` : ''}</div>
+          ${fld('phn', 'Personal Health Number', 'inputmode="numeric" maxlength="12" placeholder="9123 456 789"', '10 digits, on the back of the BC Services Card', 'full')}
+          ${fld('phone', 'Mobile number', 'type="tel" inputmode="tel" autocomplete="tel" placeholder="604 555 0123"', 'We text your confirmation and a reminder')}
+          ${fld('email', 'Email (optional)', 'type="email" autocomplete="email"', 'For a copy by email')}
+          <div class="f full"><label for="p-notes">Note for the lab (optional)</label><span class="help" id="h-notes">For example: uses a wheelchair, needs an interpreter</span><input class="inp" id="p-notes" data-p="notes" value="${esc(p.notes)}" aria-describedby="h-notes"></div>
+        </div>`;
+      $$('[data-p]', body).forEach(i => i.addEventListener(i.tagName === 'SELECT' ? 'change' : 'input', () => {
+        if (i.dataset.p === 'phn') { const d = i.value.replace(/\D/g, '').slice(0, 10); i.value = [d.slice(0, 4), d.slice(4, 7), d.slice(7)].filter(Boolean).join(' '); }
+        S.p[i.dataset.p] = i.value;
+      }));
+      if (ek.length) $('#errsum').focus();
+      footer(prevStep(), 'Continue', true, () => {
+        const q = S.p, er = {};
+        if (!q.first.trim()) er.first = 'Enter a first name.';
+        if (!q.last.trim()) er.last = 'Enter a last name.';
+        const dd = +q.dd, yy = +q.yyyy;
+        if (!dd || dd > 31 || !q.mm || !yy || yy < 1900 || yy > today.getFullYear()) er.dob = 'Enter the day, choose the month, and enter a 4-digit year.';
+        const pd = q.phn.replace(/\D/g, '').length; if (pd !== 10) er.phn = `A Personal Health Number has 10 digits. This one has ${pd}.`;
+        if (q.phone.replace(/\D/g, '').length < 10) er.phone = 'Enter 10 digits, including the area code.';
+        if (q.email && !/^\S+@\S+\.\S+$/.test(q.email)) er.email = 'Check the email. It should look like name@example.com.';
+        S.errs = er; Object.keys(er).length ? render() : go('review');
+      });
+    },
+    review() {
+      const t = test(), l = lab(), p = S.p;
+      const row = (k, v, to) => `<div class="rev-row"><span class="k">${k}</span><span class="v">${v}</span>${to ? `<button class="link" type="button" data-to="${to}">Change</button>` : '<span></span>'}</div>`;
+      body.innerHTML = `<h2>${S.resched ? 'Confirm your new time' : 'Check and confirm'}</h2><p class="sub">Nothing is booked until you press Confirm.</p>
+        <div class="rev">
+          ${row('Test', `${esc(t.name)}<small>${t.len}</small>`, S.resched ? null : 'test')}
+          ${row('Lab', `${esc(l.name)}<small>${esc(l.addr)}</small>`, S.resched || S.labFixed ? null : 'lab')}
+          ${row('When', `${fmtD(S.day, true)}<small>${fmtT(S.time)}. Please arrive 5 minutes early.</small>`, 'time')}
+          ${S.resched ? '' : row(S.who === 'other' ? 'Patient' : 'You', `${esc(p.first)} ${esc(p.last)}<small>Text reminder to ${esc(p.phone)}</small>`, 'details')}
+        </div>
+        ${t.fast ? `<div class="callout warn">${info}<span>Fasting test: nothing but water for 10 to 12 hours before.</span></div>` : ''}`;
+      $$('[data-to]', body).forEach(b => b.onclick = () => go(b.dataset.to));
+      footer(S.resched ? 'time' : prevStep(), S.resched ? 'Confirm new time' : 'Confirm booking', true, () => go('done'));
+    },
+    done() {
+      const t = test(), l = lab();
+      const maps = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(l.addr + ', BC');
+      $('#fl-step').textContent = ''; $('#fl-bar').hidden = true;
+      body.innerHTML = `<span class="done-badge"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg></span>
+        <h2>${S.resched ? 'Your new time is booked' : "You're booked"}</h2>
+        <p style="font-size:1.15rem"><b>${fmtD(S.day, true)}, ${fmtT(S.time)}</b><br>${esc(l.name)}, ${esc(l.addr)}</p>
+        <p>Booking code <span class="code">LOB-7K3Q-92</span></p>
+        <p class="sub">${S.resched ? 'We have texted you the new time.' : 'We have texted this to ' + esc(S.p.phone || 'your phone') + '. Keep the code to change or cancel.'}</p>
+        <div class="bring"><h4>Bring with you</h4><ul class="list-plain"><li>${ck}<span>Your lab requisition</span></li><li>${ck}<span>Your BC Services Card</span></li>${t.fast ? `<li>${ck}<span>Nothing to eat for 10 to 12 hours before</span></li>` : ''}</ul></div>
+        <div class="row-actions"><a class="btn btn-ghost" href="${maps}" target="_blank" rel="noopener">Get directions</a></div>`;
+      footer(null, 'Done', true, close);
+    },
+    find() {
+      const e = S.errs;
+      const mo = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      body.innerHTML = `<h2>Find your booking</h2><p class="sub">No account needed. Your booking code is in your confirmation text or email.</p>
+        ${e.find ? `<div class="err-sum" id="errsum" tabindex="-1" role="alert">${e.find}</div>` : ''}
+        <div class="f"><label for="m-code">Booking code</label><span class="help" id="h-mc">It looks like LOB-7K3Q-92</span><input class="inp" id="m-code" value="${esc(S.mcode)}" autocomplete="off" aria-describedby="h-mc" style="font-family:var(--mono);text-transform:uppercase"></div>
+        <div class="f"><span class="lbl" id="mdob-l">Patient's date of birth</span>
+          <div class="dob" role="group" aria-labelledby="mdob-l">
+            <label>Day<input class="inp" id="m-dd" inputmode="numeric" maxlength="2" value="${esc(S.mdob.dd)}"></label>
+            <label>Month<select class="inp" id="m-mm"><option value="">Choose</option>${mo.map((m, i) => `<option value="${i + 1}" ${+S.mdob.mm === i + 1 ? 'selected' : ''}>${m}</option>`).join('')}</select></label>
+            <label>Year<input class="inp" id="m-yyyy" inputmode="numeric" maxlength="4" value="${esc(S.mdob.yyyy)}" placeholder="1958"></label></div></div>
+        <p><button class="link" type="button" id="m-lost">I don't have my code</button> · <button class="link" type="button" id="m-sample">Fill in a sample booking</button></p>`;
+      if (e.find) $('#errsum').focus();
+      const keep = () => { S.mcode = $('#m-code').value; S.mdob = { dd: $('#m-dd').value, mm: $('#m-mm').value, yyyy: $('#m-yyyy').value }; };
+      $('#m-lost').onclick = () => { $('#fl-title').textContent = 'Get my booking code'; S.errs = {}; go('lost'); };
+      $('#m-sample').onclick = () => { $('#m-code').value = 'LOB-7K3Q-92'; $('#m-dd').value = '14'; $('#m-mm').value = '5'; $('#m-yyyy').value = '1958'; };
+      footer(null, 'Find my booking', true, () => { keep(); if (!S.mcode.trim() || !S.mdob.dd || !S.mdob.mm || S.mdob.yyyy.length !== 4) { S.errs = { find: 'Enter the booking code and the full date of birth.' }; render(); return; } S.errs = {}; go('found'); });
+    },
+    found() {
+      Object.assign(S, { test: S.test || 'blood', lab: S.lab || 'sur' });
+      if (S.time == null) { S.day = DAYS[3]; S.time = 8 * 60 + 20; S.tday = S.day; }
+      const l = lab();
+      body.innerHTML = `<h2>Your booking</h2><p class="sub">Code <span class="code" style="font-size:1rem">LOB-7K3Q-92</span></p>
+        <div class="rev">
+          <div class="rev-row"><span class="k">Test</span><span class="v">${esc(test().name)}</span><span></span></div>
+          <div class="rev-row"><span class="k">Lab</span><span class="v">${esc(l.name)}<small>${esc(l.addr)}</small></span><span></span></div>
+          <div class="rev-row"><span class="k">When</span><span class="v">${fmtD(S.day, true)}<small>${fmtT(S.time)}</small></span><span></span></div>
+        </div>
+        <div class="row-actions"><button class="btn btn-primary" type="button" id="m-move">Change the time</button><button class="btn btn-ghost" type="button" id="m-cancel">Cancel this booking</button></div>`;
+      $('#m-move').onclick = () => { S.resched = true; S.time = null; S.day = null; go('time'); };
+      $('#m-cancel').onclick = () => go('cancel');
+      footer('find', null);
+    },
+    cancel() {
+      body.innerHTML = `<h2>Cancel this booking?</h2><p class="sub">${fmtD(S.day, true)} at ${fmtT(S.time)}, ${esc(lab().name)}. The time will go to another patient.</p>`;
+      foot.innerHTML = `<button class="btn btn-ghost" type="button" id="keep">No, keep it</button><button class="btn btn-danger" type="button" id="yes" style="margin-left:auto">Yes, cancel booking</button>`;
+      $('#keep').onclick = () => go('found');
+      $('#yes').onclick = () => { body.innerHTML = `<h2 tabindex="-1">Booking cancelled</h2><div class="callout ok">${ck}<span>We've texted you to confirm. You can book again any time.</span></div>`; body.querySelector('h2').focus();
+        footer(null, 'Book a new time', true, () => open('book')); };
+    },
+    lost() {
+      body.innerHTML = `<h2>Get your booking code</h2><p class="sub">Enter the mobile number or email used for the booking. We'll send the code there.</p>
+        <div class="f"><label for="l-c">Mobile number or email</label><input class="inp" id="l-c" autocomplete="tel"></div>
+        <div id="l-r" aria-live="polite"></div>`;
+      footer(S.kind === 'manage' ? () => { $('#fl-title').textContent = 'My booking'; go('find'); } : null, 'Send my code', true, () => {
+        const v = $('#l-c').value.trim();
+        $('#l-r').innerHTML = v ? `<div class="callout ok">${ck}<span>If a booking uses ${esc(v)}, the code is on its way.</span></div>` : `<div class="err-sum">Enter a mobile number or email.</div>`;
+        if (v) footer(null, 'Find my booking', true, () => { $('#fl-title').textContent = 'My booking'; S.kind = 'manage'; go('find'); });
+      });
+    }
+  };
+  function render() { chrome(); V[S.view](); }
 })();
 </script>
