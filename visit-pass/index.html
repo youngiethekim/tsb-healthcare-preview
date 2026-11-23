@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Digital Visit Pass | Slot IQ</title>
+<meta name="description" content="Slot IQ Digital Visit Pass: one pass and one number for a hospital visit with several appointments. Working demo with fake patients.">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="../assets/img/favicon.svg">
+<link rel="stylesheet" href="visit-pass.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand"><span class="wm">Slot<i>IQ</i></span><span>by TSB Healthcare · Digital Visit Pass demo</span></div>
+    <div class="sim" id="sim"></div>
+  </div>
+  <div id="tabs"></div>
+  <p class="intro"><span class="tip"><i></i></span><span><b>Tap the glowing button under the phone.</b> It plays the next step.</span></p>
+  <main class="work" id="work">
+    <div class="col-phone" id="phonecol"></div>
+    <div class="col-side" id="sidecol"></div>
+  </main>
+</div>
+<section class="vid" aria-labelledby="vidh"><div class="vin"><a class="vposter" data-video href="#" target="_blank" rel="noopener" aria-label="Watch the Slot IQ video, 1 minute 44 seconds. Opens in a new tab."><img src="img/video.jpg" alt="Animated scene: a patient walks up to a check-in kiosk at the hospital doors" width="1100" height="619"><span class="vplay"><i></i></span><span class="vlen">1:44</span></a><div class="vtxt"><span class="label">Watch</span><h2 id="vidh">One visit, start to finish, in under two minutes</h2><p>Follow one patient from the doctor’s requisition to the exit: booking, several appointments combined into one plan, a tap or scan at each door, and a tap out at the end. Then see what the same visit looks like for staff and managers.</p><ul><li><b>0:10</b> Book from the requisition</li><li><b>0:21</b> Several appointments, one plan</li><li><b>0:40</b> Tap or scan at the doors</li><li><b>0:50</b> Join the queue at the department kiosk</li><li><b>1:00</b> For staff: late arrivals and no-shows flagged early</li><li><b>1:11</b> For managers: where and when, never results</li><li><b>1:21</b> Tap out and give feedback</li></ul><a class="btn primary" data-video href="#" target="_blank" rel="noopener">Watch the video</a><small>Opens in a new tab.</small></div></div></section>
+<div class="band"><div class="in"><h2>One pass for <em>the whole visit.</em></h2><p>Prototype. Fake patients and a fictional hospital. Nothing is sent or saved.</p></div></div>
+<div id="modal"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<!-- Core: always loaded. -->
+<script src="config.js"></script>
+<script src="engine.js"></script>
+<script src="demo-sim.js"></script>
+<script src="store.js"></script>
+<script src="vendor/qrcode.js"></script>
+<script src="app.js"></script>
+<!-- Components: drop a line to leave a component out of a build. -->
+<script src="views/pass.js"></script>
+<script src="views/assist.js"></script>
+<script src="views/flow.js"></script>
+<script src="views/journeys.js"></script>
+<script src="views/booking.js"></script>
+<script src="views/kiosk.js"></script>
+<script src="views/display.js"></script>
+<script src="views/stations.js"></script>
+<script src="views/rules.js"></script>
+<script src="views/insight.js"></script>
+<script src="views/setup.js"></script>
+</body>
+</html>
