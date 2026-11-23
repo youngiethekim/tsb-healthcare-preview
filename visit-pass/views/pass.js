@@ -22,7 +22,7 @@ var accOpen=null,LOC={English:'en-CA','Français':'fr-CA','中文':'zh-CN','ਪ�
   'Español':{t:'Este es su Pase Digital de Visita',n:'Su número de hoy',k:'Es suyo todo el día. Escanéelo en cada puerta.',s:'Escanear o tocar para entrar',d:'Escanear o tocar en la puerta'}};
 var NEEDS=VP.NEEDS;
 function passDate(){
-  var d=new Date();
+  var d=new Date();d.setDate(d.getDate()+(S.day||0));
   if(U.setg.lang==='ਪੰਜਾਬੀ')return ['ਐਤਵਾਰ','ਸੋਮਵਾਰ','ਮੰਗਲਵਾਰ','ਬੁੱਧਵਾਰ','ਵੀਰਵਾਰ','ਸ਼ੁੱਕਰਵਾਰ','ਸ਼ਨੀਵਾਰ'][d.getDay()]+', '+d.getDate()+' '+['ਜਨਵਰੀ','ਫ਼ਰਵਰੀ','ਮਾਰਚ','ਅਪ੍ਰੈਲ','ਮਈ','ਜੂਨ','ਜੁਲਾਈ','ਅਗਸਤ','ਸਤੰਬਰ','ਅਕਤੂਬਰ','ਨਵੰਬਰ','ਦਸੰਬਰ'][d.getMonth()]+' '+d.getFullYear();
   return d.toLocaleDateString(LOC[U.setg.lang]||'en-CA',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
 }
@@ -139,7 +139,7 @@ function phone(){
   var m=S.me,h='<div class="ph-bar"><span>'+fmt(S.now)+'</span><i></i><span>5G</span></div><div class="ph-h"><span class="wm">Slot<i>IQ</i></span><span>'+SITE+' '+esc(CFG.site.note)+'</span><button class="gear'+(accOpen?' on':'')+'" data-a="acc" data-v="menu" aria-label="Language and accessibility settings" aria-expanded="'+!!accOpen+'">'+ic('gear')+'</button></div><div class="pscroll" tabindex="0" aria-label="Phone screen, scrolls">'+accBar();
   var T9=LT[U.setg.lang]||LT.English;
   function pic(cls,icn,t,d){return '<div class="now npic '+cls+'"><span class="ni">'+ic(icn)+'</span><div><b>'+t+'</b><span>'+d+'</span></div></div>';}
-  if(!m)h+=pic('','clock','No visit yet','Your clinic books your appointments. Your pass will show up here.');
+  if(!m)h+=(VP.selfbook&&VP.selfbook.phone())||pic('','clock','No visit yet','Your clinic books your appointments. Your pass will show up here.');
   else if(U.dirFor&&stepOf(m,U.dirFor)){
     var dd=dirsTo(m,U.dirFor),TT=TYPES[U.dirFor];
     h+='<button class="back" data-a="dirfor" data-v="">← Back to my visit</button><h2>'+TT.name+'</h2>'+
@@ -232,7 +232,7 @@ function phone(){
   var demo='';
   if(store.mode!=='demo')demo='';
   else if(store.isAuto())demo='<span class="btn big on">Playing…</span>';
-  else if(!m)demo=btn('book','Book the visit','primary big wide next','clerk');
+  else if(!m)demo=(VP.selfbook&&VP.selfbook.demo())||(U.invite?'':btn('book','Book the visit','primary big wide next','clerk'));
   else if(m.state==='expected')demo=btn('checkin','Patient scans in at the entrance','primary big wide next');
   else if(m.state==='called')demo=btn('menext','Patient scans in at the door','way big wide next');
   else if(m.state==='waiting')demo=btn('skip','Skip the wait','primary big wide next');

@@ -111,7 +111,7 @@ function finish(S, roomId) { E.roomNext(S, roomId); E.roomNext(S, roomId); } // 
 {
   const sim = Sim.create(E, cfg); const S = sim.reset(); sim.bookMe(E.ORDER.slice()); sim.advance(60);
   const keys = new Set(); JSON.stringify(S, (k, v) => { keys.add(k); return v; });
-  const allowed = ["", "now", "rules", "patients", "rooms", "log", "id", "name", "call", "ref", "token", "isMe", "steps", "state", "dueAt", "arrivedAt", "cur", "finishedAt", "bump", "f", "type", "status", "room", "calledAt", "start", "end", "d", "level", "pid", "since", "t", "me"].concat(cfg.rules.map(r => r.id)).concat(Object.keys(Array(200).fill(0)));
+  const allowed = ["", "now", "rules", "patients", "rooms", "log", "id", "name", "call", "ref", "token", "isMe", "steps", "state", "dueAt", "arrivedAt", "cur", "finishedAt", "bump", "f", "type", "status", "room", "calledAt", "start", "end", "d", "level", "pid", "since", "t", "me", "day", "arriveBy", "plan", "arrive"].concat(cfg.rules.map(r => r.id)).concat(Object.keys(Array(200).fill(0)));
   const extra = [...keys].filter(k => !allowed.includes(k));
   ok(extra.length === 0, "state holds only name, number, place and time fields" + (extra.length ? ": " + extra : ""));
 }

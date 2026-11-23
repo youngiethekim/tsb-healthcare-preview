@@ -170,7 +170,8 @@ function meNext() { // the demo patient's next physical step
 function demoStrip() {
   var m = S.me, t, b;
   if (store.mode !== "demo") return "";
-  if (!m) { t = "No demo patient yet."; b = btn("book", "Book the demo visit", "primary", "clerk"); }
+  if (!m && U.invite) { t = "Pick-your-time link sent to the demo patient."; b = (VP.selfbook && VP.selfbook.demo()) || ""; }
+  else if (!m) { t = "No demo patient yet."; b = btn("book", "Book the demo visit", "primary", "clerk"); }
   else if (m.state === "expected") { t = "Demo patient <b>" + m.call + "</b> has not arrived yet."; b = btn("checkin", "Scan " + m.call + " in at the kiosk", "primary"); }
   else if (m.state === "waiting") { t = "Demo patient <b>" + m.call + "</b> is in the waiting area."; b = btn("skip", "Skip the wait", ""); }
   else if (m.state === "called") { t = "Demo patient <b>" + m.call + "</b> is called to " + room(m.cur).name + "."; b = btn("menext", "Patient scans in at the door", "way"); }
@@ -212,6 +213,7 @@ function setView(v, push) {
 }
 
 function render(force) {
+  VP.arriveBy = (S.me && S.me.arriveBy) || CFG.demo.arriveBy;
   VP.list.forEach(function (c) { if (VP.enabled(c.id) && c.before) c.before(); });
   var showPhone = only ? only === "pass" : (aud === "patient" && VP.enabled("pass"));
   var sc = side && VP.comps[side];
@@ -281,7 +283,7 @@ var SHARED = {
     U.wrong = null; U.callOn = false; U.asks = []; U.openCard = null; U.pscr = "visit"; U.dirFor = null; spoken = "";
     VP.list.forEach(function (c) { if (c.reset) c.reset(); });
   },
-  book: function () { if (S.me) return; prebook(); toast("<span>Visit booked. Pass sent to " + esc(CFG.demo.patientName.split(" ")[0]) + "’s phone.</span>"); },
+  book: function () { if (S.me) return; U.invite = null; prebook(); toast("<span>Visit booked. Pass sent to " + esc(CFG.demo.patientName.split(" ")[0]) + "’s phone.</span>"); },
   checkin: function () { if (S.me) store.checkIn(S.me.id); },
   skip: function () { store.clock.running = true; store.advance(40, true); },
   menext: meNext,
