@@ -15,7 +15,7 @@ window.VISIT_PASS_CONFIG = {
   //   booking   Book a visit                         kiosk     Check-in kiosk + door scanners
   //   display   Waiting room display                 stations  Station hub (staff)
   //   rules     Visit rules                          insight   Analytics
-  //   setup     Pick components
+  //   selfbook  Pick-your-time invitations           setup     Pick components
   components: null,
   apiBase: "/visit-api",
   pollSeconds: 3,
@@ -33,12 +33,18 @@ window.VISIT_PASS_CONFIG = {
 
   // Appointment types. dur is the typical length in minutes; where is shown
   // to the patient. The array order is the order a visit is listed in.
+  // selfBook: true means the clinic can send a private "pick your time" link
+  // for it (Invitations). prep is shown when the patient books.
   types: [
     { id: "blood",   name: "Blood test",     short: "Blood",  dur: 5,  where: "Level 1, Lab",          color: "#e0605e", dark: "#c94a48", colorName: "red" },
-    { id: "ecg",     name: "Cardiogram",     short: "ECG",    dur: 10, where: "Level 2, Heart tests",  color: "#12a89d", dark: "#0e877e", colorName: "teal" },
-    { id: "xray",    name: "X-ray",          short: "X-ray",  dur: 10, where: "Level 1, Imaging",      color: "#4f86e8", dark: "#3a6fd0", colorName: "blue" },
-    { id: "echo",    name: "Echocardiogram", short: "Echo",   dur: 25, where: "Level 2, Heart tests",  color: "#9a63d8", dark: "#8350c4", colorName: "purple" },
-    { id: "consult", name: "Cardiologist",   short: "Doctor", dur: 15, where: "Level 3, Heart clinic", color: "#d98a14", dark: "#b56f08", colorName: "orange" }
+    { id: "ecg",     name: "Cardiogram",     short: "ECG",    dur: 10, where: "Level 2, Heart tests",  color: "#12a89d", dark: "#0e877e", colorName: "teal",
+      selfBook: true, prep: "Wear a top that is easy to open." },
+    { id: "xray",    name: "X-ray",          short: "X-ray",  dur: 10, where: "Level 1, Imaging",      color: "#4f86e8", dark: "#3a6fd0", colorName: "blue",
+      selfBook: true, prep: "Wear clothes without metal: no zips, buttons or underwire. Tell staff if you might be pregnant." },
+    { id: "echo",    name: "Echocardiogram", short: "Echo",   dur: 25, where: "Level 2, Heart tests",  color: "#9a63d8", dark: "#8350c4", colorName: "purple",
+      selfBook: true, prep: "No special preparation. Wear a top that is easy to open." },
+    { id: "consult", name: "Cardiologist",   short: "Doctor", dur: 15, where: "Level 3, Heart clinic", color: "#d98a14", dark: "#b56f08", colorName: "orange",
+      selfBook: true, prep: "Bring a list of the medicines you take." }
   ],
 
   // Rooms. Each serves one appointment type. level is the floor (for directions).
@@ -69,6 +75,30 @@ window.VISIT_PASS_CONFIG = {
       desc: "The echo room is only offered once the cardiogram is done." }
   ],
 
+  // Pick-your-time booking, by invitation only (not public like LOB). A clinic
+  // sends one patient a private link for specific exams; the patient proves
+  // who they are, then picks a time that fits every exam back to back.
+  selfBooking: {
+    inviteBaseUrl: "https://slotiq.example/i/",  // patient link: {inviteBaseUrl}{token}
+    verify: "dob",              // the patient enters their date of birth before seeing anything
+    maxAttempts: 5,             // wrong answers before the link locks (staff can resend)
+    priorities: [               // how soon the exam must happen: the bookable window
+      { id: "urgent",  label: "Urgent",  days: 2 },
+      { id: "soon",    label: "Soon",    days: 7 },
+      { id: "routine", label: "Routine", days: 30 }
+    ],
+    open: 510, close: 990,      // bookable hours, minutes after midnight (8:30 to 16:30)
+    closedWeekdays: [0, 6],     // Sunday, Saturday
+    startEvery: 15,             // offered start times: every 15 minutes
+    step: 5,                    // room calendars are in 5-minute steps
+    transfer: 5,                // minutes to walk between exams
+    maxSpan: 150,               // longest a whole visit may take, first start to last end
+    leadMinutes: 120,           // earliest bookable time today: now + 2 h
+    arriveEarly: 10,            // "arrive by" is 10 minutes before the first exam
+    changeUntilHours: 24,       // patients can change or cancel until 24 h before
+    demoBusy: 0.55              // demo only: share of room time already booked by others
+  },
+
   // Example floor plan for the patient map: [id, x, y, w, h, label, level].
   // Room ids match `rooms`; kiosk, w1-w3 and cafe are landmarks.
   map: {
@@ -98,6 +128,7 @@ window.VISIT_PASS_CONFIG = {
   demo: {
     seed: 20261110, open: 510, lastArrival: 750, warmUp: 25, arriveBy: "9:00",
     patientName: "Alex Taylor", patientCall: "B-052", clinicName: "Heart clinic",
+    patientDob: "1984-03-12",   // what the demo patient enters to open a pick-your-time link
     // Share of fake patients who need each type.
     mix: { blood: 0.9, ecg: 0.5, xray: 0.35, echo: 0.2, consult: 0.35 }
   },

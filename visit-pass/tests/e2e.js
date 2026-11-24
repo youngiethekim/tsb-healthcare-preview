@@ -87,6 +87,39 @@ const url = (q, h) => B + (q ? "?" + q : "") + (h ? "#" + h : "");
     await page.keyboard.press("Escape");
   }
 
+  /* ---- pick-your-time booking, by invitation ---- */
+  await page.goto(url("", "selfbook")); await page.reload();
+  await page.click('[data-a="sbtype"][data-v="xray"]');
+  await page.click('[data-a="sbtype"][data-v="consult"]');
+  await page.click('[data-a="sbsend"]');
+  ok(/slotiq\.example\/i\/[A-Z2-9]{10}/.test(await page.locator(".sblink").textContent()), "staff send a private pick-your-time link");
+  await page.click('[data-a="see"][data-v="pass"]');
+  ok(await page.locator("#sbdob").count() === 1 && !/X-ray/.test(await page.locator(".phone").textContent()), "link asks for date of birth and shows no exams before that");
+  await page.fill("#sbdob", "1990-01-01"); await page.click('[data-a="sbverify"]');
+  ok(/4 tries left/.test(await page.locator(".sberr").textContent()), "wrong date of birth is refused");
+  await page.fill("#sbdob", "1984-03-12"); await page.click('[data-a="sbverify"]');
+  await page.waitForSelector(".sbday");
+  const future = page.locator('.sbday:not(.none):not(.on)').first();
+  await future.click();
+  await page.locator(".sbtime").first().click();
+  ok(/X-ray/.test(await page.locator(".sbplan").textContent()) && /Cardiologist/.test(await page.locator(".sbplan").textContent()), "review shows both exams with times and prep");
+  ok(/without metal/.test(await page.locator(".sbplan").textContent()), "prep instructions shown before booking");
+  await page.screenshot({ path: OUT + "5-pick-review.png" });
+  await page.click('[data-a="sbconfirm"]');
+  await page.waitForSelector("text=You’re booked");
+  ok(true, "patient books the time");
+  await page.goto(url("", "selfbook"));
+  ok(/Booked/.test(await page.locator("tr.me").textContent()), "staff see the booking on Invitations");
+  await page.goto(url("", "pass"));
+  await page.click('.demo [data-a="sbjump"]');
+  await page.waitForSelector(".pass.top");
+  const v = await page.evaluate(() => { const d = new Date(); d.setDate(d.getDate() + VP.S.day); return { day: VP.S.day, arrive: VP.S.me.arriveBy, types: VP.S.me.steps.map(s => s.type).join(","), date: d.toLocaleDateString("en-CA", { weekday: "long", month: "long", day: "numeric" }) }; });
+  ok(v.day > 0 && v.types === "xray,consult" && (await page.locator(".pass.top").textContent()).includes(v.date), "on the day (" + v.date + ") the booking becomes the Digital Visit Pass");
+  await page.click('[data-a="pscr"][data-v="journey"]');
+  ok((await page.locator(".phone").textContent()).includes(v.arrive), "the pass uses the booked arrival time, " + v.arrive);
+  await page.click('[data-a="pscr"][data-v="visit"]');
+  await page.click('.demo [data-a="restart"], [data-a="restart"] >> nth=0');
+
   /* ---- pick and choose ---- */
   await page.goto(url("components=kiosk,display", "kiosk"));
   const nav = await page.locator(".snav button").allTextContents();
@@ -107,7 +140,7 @@ const url = (q, h) => B + (q ? "?" + q : "") + (h ? "#" + h : "");
   /* ---- phone width ---- */
   const m = await browser.newPage({ viewport: { width: 390, height: 844 } });
   m.on("pageerror", e => errs.push(e.message));
-  for (const h of ["pass", "flow", "journeys", "display", "stations"]) {
+  for (const h of ["pass", "flow", "journeys", "display", "stations", "selfbook"]) {
     await m.goto(url("", h)); await m.waitForTimeout(400);
     const sw = await m.evaluate(() => document.documentElement.scrollWidth);
     ok(sw <= 390, "no sideways scroll at 390px on " + h + " (" + sw + ")");

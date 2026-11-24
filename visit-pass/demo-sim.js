@@ -19,8 +19,8 @@
 
     /* A fresh day: fake patients booked from opening time, then a short
        warm-up so the floor is already busy when the demo opens. */
-    sim.reset = function () {
-      var r = rng(D.seed), S = E.newState(D.open), n = 31, t = D.open, i = 0;
+    sim.reset = function (day) {
+      var r = rng(D.seed + (day || 0)), S = E.newState(D.open), n = 31, t = D.open, i = 0;
       while (t < D.lastArrival) {
         var types = [];
         E.ORDER.forEach(function (k) { if (r() < (D.mix[k] || 0)) types.push(k); });
@@ -30,17 +30,19 @@
         E.addVisit(S, { id: "p" + i, name: NAMES[i % NAMES.length], call: (booked ? "B-0" : "W-0") + n, types: types, dueAt: t, f: 0.85 + r() * 0.35 });
         n++; i++; t += 4 + r() * 5;
       }
+      S.day = day || 0; // days from today; the demo can jump to a booked visit's day
       sim.S = S; sim.me = null; sim.auto = false;
       sim.advance(D.warmUp, false);
       return S;
     };
 
     /* The demo patient's visit, booked by the clerk. */
-    sim.bookMe = function (types) {
+    sim.bookMe = function (types, opts) {
+      opts = opts || {};
       if (sim.me || !types.length) return null;
       var tok = "";
       for (var i = 0; i < 8; i++) tok += TOKEN_ALPHABET[Math.floor(Math.random() * TOKEN_ALPHABET.length)];
-      sim.me = E.addVisit(sim.S, { id: "me", name: D.patientName, call: me, types: types, isMe: true, token: tok });
+      sim.me = E.addVisit(sim.S, { id: "me", name: D.patientName, call: me, types: types, isMe: true, token: tok, dueAt: opts.dueAt, arriveBy: opts.arriveBy, plan: opts.plan });
       return sim.me;
     };
     sim.unbookMe = function () { if (sim.me && E.removeVisit(sim.S, sim.me.id)) sim.me = null; };

@@ -24,6 +24,7 @@ Switch to **I am staff** for the staff app.
 | `index.html#journeys` | Staff app open on one component (any component id) |
 | `index.html?components=pass,kiosk,display` | Only those components. Use it to show a site its own setup |
 | `index.html?only=display` | One component full screen, no app chrome. For a TV or a kiosk tablet |
+| `index.html?invite=TOKEN#pass` | The patient's pick-your-time link (api mode) |
 
 **Your setup** in the staff app picks components and builds the `?components=` link.
 
@@ -44,6 +45,7 @@ out of a site in any of three ways:
 | `flow` | `views/flow.js` | Slot IQ Flow | Live floor: animated engine view, drag-and-drop board, every clinic worst first | — |
 | `journeys` | `views/journeys.js` | Slot IQ Flow | **Patients**: each visit as a line of stops, search by name, reference or number | — |
 | `booking` | `views/booking.js` | Slot IQ Book | Clerk books every appointment on a request form as one visit | — |
+| `selfbook` | `views/selfbook.js` | Slot IQ Book | **Pick-your-time invitations** for imaging and other exams not open to the public: staff send one patient a private link, the patient picks a time that fits every exam | `pass` for the patient side |
 | `kiosk` | `views/kiosk.js` | Slot IQ Arrive | Entrance kiosk and door scanners, including the wrong-door case | — |
 | `display` | `views/display.js` | Slot IQ Arrive | Waiting room display: numbers, never names. Staff announcements, voice | — |
 | `stations` | `views/stations.js` | Slot IQ Flow | Station hub: "Patient arrived" and "Check out" per room | — |
@@ -60,6 +62,7 @@ phone; without `kiosk` the demo still checks the patient in from the demo strip.
 |---|---|
 | `index.html` | Page skeleton and script order. Core first, then one line per component |
 | `config.js` | Everything site-specific: appointment types, rooms, visit rules, floor plan, patient-facing text, which components are on, `mode` |
+| `scheduler.js` | **Slot finding** for pick-your-time booking: times where every exam on an invitation fits back to back, in an order the visit rules allow. No DOM; runs in Node |
 | `engine.js` | **The queue engine.** Pooled queue, dispatch rule, visit rules, wait and arrival estimates. No DOM; runs in Node. This is what the server must reproduce |
 | `demo-sim.js` | Demo only. A fictional clinic day: fake patients, a clock, and the staff taps real people make |
 | `store.js` | **Data layer.** One interface, two adapters: `demo` (engine + simulator in the browser) and `api` (fetch to the routes below) |
@@ -69,6 +72,7 @@ phone; without `kiosk` the demo still checks the patient in from the demo strip.
 | `vendor/qrcode.js` | qrcode-generator 2.0.4 (MIT), same copy as the clinic portal |
 | `img/video.jpg` | Poster for the explainer video |
 | `tests/engine.js` | Engine unit tests (Node, no dependencies) |
+| `tests/scheduler.js` | Scheduler and invitation rules (Node, no dependencies) |
 | `tests/e2e.js` | Browser test of the whole demo (Playwright) |
 
 ## How it fits together
@@ -140,6 +144,61 @@ The api adapter sends the CSRF token from `<meta name="csrf-token">` and polls
 every `pollSeconds`. It has **not** been run against a real backend yet: treat
 it as the contract, not as tested code.
 
+### Pick-your-time booking (by invitation)
+
+For imaging and other custom appointments. **Not public**: unlike Lab Online
+Booking there is no open booking page. Only a patient with a link can book,
+and only the exams on it.
+
+1. Staff (Invitations screen) tick the exams and how soon: Urgent 2 days,
+   Soon 7, Routine 30 (`selfBooking.priorities`). Slot IQ texts the patient a
+   link with a random token. Exams that can be booked this way have
+   `selfBook: true` in `config.js`; blood tests stay walk-in.
+2. The patient opens the link and enters their **date of birth**. Nothing about
+   the visit shows before that. 5 wrong tries lock the link; staff resend to unlock.
+3. The patient sees days in the window (closed days greyed) and start times.
+   Every time shown fits **all** the exams back to back: each in a free room of
+   its type, in an order the visit rules allow (cardiologist last, and so on),
+   with 5 minutes to walk between rooms, the whole visit within 2.5 hours.
+   Same-day times start at least 2 hours from now.
+4. They check the times and prep notes and book. The server re-checks the rooms
+   (someone may have just taken them). They can add it to their calendar
+   (a real `.ics` file), change it or cancel up to 24 hours before.
+5. On the day the booking is a normal visit: it gets a call number and the
+   Digital Visit Pass, with the booked arrival time.
+
+| Store method | Route | Who |
+|---|---|---|
+| `invite({types, priority})` | `POST /visit-api/invites` → `{id, token, …}`; send the SMS here | staff |
+| `resendInvite(id)` | `POST /visit-api/invites/{id}/resend` (new SMS, unlocks) | staff |
+| `revokeInvite(id)` | `DELETE /visit-api/invites/{id}` (frees booked rooms) | staff |
+| `state().invites` | in `GET /visit-api/floor` | staff |
+| `openInvite(token)` | `GET /visit-api/i/{token}` → `{ok, locked, verified}`, nothing personal | patient |
+| `verifyInvite(token, dob)` | `POST /visit-api/i/{token}/verify` `{answer}` → `{ok, invite}` or `{ok:false, reason, left}`; starts a session | patient |
+| `slots(token, day)` | `GET /visit-api/i/{token}/slots?day=N` → plans | patient |
+| `bookInvite(token, plan)` | `POST /visit-api/i/{token}/book` `{day, start}` → `{ok}` or `{ok:false, reason:"taken"}` | patient |
+| `cancelInvite(token)` | `POST /visit-api/i/{token}/cancel` (refused inside 24 h) | patient |
+
+A plan is `{day, start, end, arrive, steps: [{type, room, start, end}]}`; `day`
+is days from today (send ISO dates on the wire if you prefer and convert in the
+adapter). `tests/scheduler.js` is the spec for the server.
+
+Server side, beyond the demo:
+
+- **Room calendars.** The demo invents other patients' bookings. In production
+  the scheduler needs each room's real booked time. **Open question for John:**
+  do imaging rooms already have a calendar in another system (RIS/PACS
+  scheduling), or does Slot IQ own it? That decides whether `busy(room, day)`
+  reads our table or calls theirs.
+- **No double booking.** Re-check and insert in one transaction with a lock per
+  room and day (or a unique index on room + start).
+- **Identity.** Check the date of birth against the patient record, count
+  attempts per token, expire the token at the end of the window, and keep the
+  patient's session short. Never return exams or names before verification.
+- **Holidays** and per-room hours (`open`, `close`, `closedWeekdays` are site-wide in the demo).
+- **On the day** the pooled queue still runs: a booked patient joins it when
+  they scan in. Booked times reserve capacity; they don't skip the queue.
+
 ### Porting the engine
 
 `engine.js` is about 220 lines and is the spec. Two options:
@@ -175,18 +234,20 @@ These parts look real on screen but need real work before launch:
    expiry at the end of the visit, and rate limiting on `/visit/{token}`.
 2. **Live updates.** The api adapter polls. For the display and the station
    hub, a push channel (Laravel Echo / Reverb) is better.
-3. **Scanning.** The QR code encodes `SLOTIQ-VISIT-{token}`; kiosks and door
+3. **Pick-your-time SMS and identity check.** Links are shown, not texted; the
+   date of birth is checked against a demo value (see "Pick-your-time booking").
+4. **Scanning.** The QR code encodes `SLOTIQ-VISIT-{token}`; kiosks and door
    scanners need hardware and a check-in endpoint per device. NFC tap is shown, not built.
-4. **Notifications.** "Your turn" texts and phone notifications are simulated
+5. **Notifications.** "Your turn" texts and phone notifications are simulated
    (an SMS provider and web push are needed). Voice uses the browser's speech.
-5. **Apple Wallet, ride booking, Google Maps directions** are simulated or link-only.
-6. **AI assistant** replies are scripted from the live visit. A real assistant
+6. **Apple Wallet, ride booking, Google Maps directions** are simulated or link-only.
+7. **AI assistant** replies are scripted from the live visit. A real assistant
    should get the same facts (where, when, what is on hold) as its only context.
-7. **Translations** are a sample on the pass only.
-8. **Map** is an example floor plan in `config.js`.
-9. **Other clinics** on the Flow "Clinics" view are simulated; only this
+8. **Translations** are a sample on the pass only.
+9. **Map** is an example floor plan in `config.js`.
+10. **Other clinics** on the Flow "Clinics" view are simulated; only this
    site's six rooms are live.
-10. **Analytics** are computed in the browser from today's state. Production
+11. **Analytics** are computed in the browser from today's state. Production
     needs stored events (check-in, called, in, done per step) to report over time.
 
 ## Changes from the prototype artifact
@@ -206,6 +267,10 @@ node visit-pass/tests/engine.js
 ```
 
 ```bash
+node visit-pass/tests/scheduler.js
+```
+
+```bash
 npm i playwright && node visit-pass/tests/e2e.js
 ```
 
@@ -213,5 +278,7 @@ The browser test opens the page from disk (set `VISIT_PASS_URL` to test a
 server). It plays the demo patient through all five appointments, sends the
 survey and checks it in Analytics, switches a rule, scans at the wrong door,
 sends a staff message to the phone, posts an announcement, drags on the
-board, checks `?components=` and `?only=`, and checks phone width (390px)
+board, sends a pick-your-time link and books it as the patient (wrong date of
+birth first, then a future day, then jumps to that day and checks the pass),
+checks `?components=` and `?only=`, and checks phone width (390px)
 for sideways scrolling. Screenshots go to `SHOTS_DIR` (default: the system temp folder).

@@ -10,7 +10,7 @@
  *   { now, rules: {id: bool}, rooms: [Room], patients: [Patient], log: [Call] }
  *   Room    { id, name, type, level, state: 'free'|'called'|'in', pid, since }
  *   Patient { id, name, call, ref, token, isMe, state, dueAt, arrivedAt, cur,
- *             finishedAt, bump, steps: [Step] }
+ *             finishedAt, bump, steps: [Step], arriveBy?, plan? }
  *     state: 'expected' -> 'waiting' <-> 'called' -> 'in' -> ... -> 'finished'
  *   Step    { type, status: 'todo'|'called'|'in'|'done', room, calledAt, start, end, d }
  *   Call    { t, call, room, me }   newest first, the last 8
@@ -51,6 +51,8 @@
         steps: makeSteps(v.types), state: "expected", dueAt: v.dueAt || 0, arrivedAt: null, cur: null, finishedAt: null,
         bump: null, f: v.f || 1
       };
+      if (v.arriveBy) p.arriveBy = v.arriveBy; // a booked time ("10:05"); otherwise the clinic default
+      if (v.plan) p.plan = v.plan;             // planned exam times from pick-your-time booking
       S.patients.push(p);
       return p;
     }

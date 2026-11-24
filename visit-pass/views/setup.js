@@ -10,6 +10,7 @@ var SITE = esc(CFG.site.name), FIRST = esc(CFG.demo.patientName.split(" ")[0]);
 var COMPS=[
   ['flow','Slot IQ Flow','The engine','board','The live floor and the queue. Every patient is a card that moves by itself as they scan in.','flow',1],
   ['booking','Online booking','Slot IQ Book','people','Patients or booking clerks book appointments online, at any time of day.','booking',1],
+  ['selfbook','Pick-your-time invitations','Slot IQ Book','cal','For imaging and other exams not open to the public: a private link lets one patient pick a time that fits every exam.','selfbook',1],
   ['assist','AI scheduling assistant','Slot IQ Assist','sound','Answers patient questions and guides them to the right place, by chat or by phone call.','help',1],
   ['kiosk','Kiosk check-in','Slot IQ Arrive','kiosk','Patients scan in at the door. No line at the front desk.','kiosk',1],
   ['display','Waiting room display','Slot IQ Arrive','screen','Calls patients by code, never by name.','display',1],

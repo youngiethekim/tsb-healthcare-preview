@@ -19,7 +19,7 @@ function clerk(){
   return '<div class="card"><h3>Book a visit for a patient</h3><div class="mini" style="margin-bottom:12px"><span class="num">'+initials(CFG.demo.patientName)+'</span><span><b>'+esc(CFG.demo.patientName)+'</b><br>Request form received from the clinic</span></div>'+
     '<p class="sub" style="margin-bottom:8px">Tick what is on the request form. Slot IQ puts them in a workable order.</p><div class="list">'+
     ORDER.map(function(k){return '<button class="opt" role="checkbox" aria-checked="'+(!!U.sel[k])+'" data-a="sel" data-v="'+k+'"><span class="box">'+(U.sel[k]?'✓':'')+'</span><span><b>'+TYPES[k].name+'</b><small>'+notes[k]+' · '+TYPES[k].where+'</small></span></button>';}).join('')+
-    '</div><p class="sub" style="margin:10px 0">'+plural(n,'appointment')+' · one arrival today at '+VP.arriveBy+' · one Digital Visit Pass</p>'+(n?btn('book','Book the visit and text the pass','primary big next','clerk'):'<p class="sub">Tick at least one appointment.</p>')+'</div>';
+    '</div><p class="sub" style="margin:10px 0">'+plural(n,'appointment')+' · one arrival today at '+VP.arriveBy+' · one Digital Visit Pass</p>'+(n?btn('book','Book the visit and text the pass','primary big next','clerk'):'<p class="sub">Tick at least one appointment.</p>')+(VP.enabled('selfbook')?'<p class="sub" style="margin-top:12px">Imaging and other exams the patient books themselves: '+btn('go','Send a pick-your-time link ›','','selfbook')+'</p>':'')+'</div>';
 }
 
 VP.component({
